@@ -1,0 +1,207 @@
+
+#app h3[data-v-238c4d20] {
+  font-size: 1.75rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-weight: 500;
+  line-height: 1.2;
+}
+#chord[data-v-238c4d20] {
+  size: 48px;
+}
+
+
+#chord[data-v-8467b08a] {
+  size: 48px;
+}
+
+
+#chord[data-v-5e1272c1] {
+  size: 48px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* bootstrap */
+#app .card[data-v-8019db9c] {
+  position: relative;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+}
+#app .card-header[data-v-8019db9c] {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+#app .card-body[data-v-8019db9c] {
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  padding: 1.25rem;
+}
+#app .card-footer[data-v-8019db9c] {
+  padding: 0.75rem 1.25rem;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+#app p[data-v-8019db9c] {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* user */
+div#chordPlayer-config[data-v-8019db9c] {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 20%;
+  background: white;
+}
+#pop-up[data-v-8019db9c] {
+  z-index: 1000;
+  position: absolute !important;
+}
+
+
+#cd-wrapper[data-v-7669a0a2] {
+  position: rerative;
+}
+
