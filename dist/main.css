@@ -136,9 +136,8 @@
 
 
 
-
 /* bootstrap */
-.card[data-v-1f90d4d4] {
+.card[data-v-5de4c86a] {
   position: relative;
   display: -ms-flexbox;
   display: flex;
@@ -151,29 +150,29 @@
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
 }
-.card-header[data-v-1f90d4d4] {
+.card-header[data-v-5de4c86a] {
   padding: 0.75rem 1.25rem;
   margin-bottom: 0;
   background-color: rgba(0, 0, 0, 0.03);
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
-.card-body[data-v-1f90d4d4] {
+.card-body[data-v-5de4c86a] {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   padding: 1.25rem;
 }
-.card-footer[data-v-1f90d4d4] {
+.card-footer[data-v-5de4c86a] {
   padding: 0.75rem 1.25rem;
   background-color: rgba(0, 0, 0, 0.03);
   border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
-p[data-v-1f90d4d4] {
+p[data-v-5de4c86a] {
   margin-top: 0;
   margin-bottom: 1rem;
 }
 
 /* user */
-div#chordPlayer-config[data-v-1f90d4d4] {
+div#chordPlayer-config[data-v-5de4c86a] {
   position: fixed;
   top: 0;
   right: 0;
@@ -181,7 +180,7 @@ div#chordPlayer-config[data-v-1f90d4d4] {
   width: 20%;
   background: white;
 }
-#pop-up[data-v-1f90d4d4] {
+#pop-up[data-v-5de4c86a] {
   z-index: 1000;
   position: absolute !important;
 }

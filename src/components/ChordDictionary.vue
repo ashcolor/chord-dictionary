@@ -111,9 +111,8 @@ export default {
     window.addEventListener(
       "mousemove",
       function(e) {
-        const event = e || window.event; // IE対応
-        this.position.top = event.pageY;
-        this.position.left = event.pageX;
+        this.position.top = e.pageY + 20;
+        this.position.left = e.pageX + 20;
         const word = this.getPointedWord(event);
 
         if (this.chordName === word) return false;

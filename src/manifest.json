@@ -1,12 +1,28 @@
 {
   "name": "chord-dictionary",
   "description": "chord-dictionary",
-  "version": null,
+  "version": "1.0.0",
   "manifest_version": 2,
   "icons": {
     "48": "icons/icon_48.png",
     "128": "icons/icon_128.png"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "main.js"
+      ],
+      "css": [
+        "main.css"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    "sounds/*.mp3"
+  ],
   "browser_action": {
     "default_title": "chord-dictionary",
     "default_popup": "popup/popup.html"
