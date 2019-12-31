@@ -1,10 +1,5 @@
 <template>
-  <div
-    id="pop-up"
-    class="card"
-    v-show="is_chord"
-    :style="{ top: position.top + 'px' , left: position.left + 'px' }"
-  >
+  <div id="pop-up" class="card" :style="{ top: position.top + 'px' , left: position.left + 'px' }">
     <div class="card-header">
       <chord-name :chordName="chordName"></chord-name>
     </div>
@@ -35,7 +30,7 @@ export default {
   },
   data() {
     return {
-      chordName: "",
+      chordName: null,
       position: {
         top: 0,
         left: 0
@@ -45,9 +40,6 @@ export default {
   computed: {
     chordList() {
       return this.textToChord(this.chordName);
-    },
-    is_chord() {
-      return this.chordName !== "";
     }
   },
 
@@ -108,6 +100,7 @@ export default {
     }
   },
   mounted() {
+    this.chordName = "";
     window.addEventListener(
       "mousemove",
       function(e) {

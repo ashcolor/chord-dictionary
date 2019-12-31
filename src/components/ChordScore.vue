@@ -17,12 +17,13 @@ export default {
     }
   },
   methods: {
+    initScore: function() {},
     dispScore: function(chordList) {
-      if (typeof chordList !== "object") return false;
-      if (!chordList.length > 0) return false;
+      console.log("disp");
       const VF = Vex.Flow;
 
       const div = document.getElementById("score");
+      if (div === null) return false;
       div.textContent = null;
 
       const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
@@ -32,6 +33,9 @@ export default {
       const stave = new VF.Stave(0, -25, 100);
       stave.addClef("treble");
       stave.setContext(context).draw();
+
+      if (typeof chordList !== "object") return false;
+      if (!chordList.length > 0) return false;
 
       //♭と♯の判定
       // const acc;
@@ -80,6 +84,9 @@ export default {
       voice.addTickables(notes);
       new VF.Formatter().joinVoices([voice]).format([voice], 800);
       voice.draw(context, stave);
+    },
+    mounted() {
+      this.dispScore();
     }
   }
 };

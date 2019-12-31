@@ -1,5 +1,5 @@
 <template>
-  <p id="list" class="card-text">{{chordList | chordListToString}}</p>
+  <div id="list" class="card-text">{{chordList | chordListToString}}</p>
 </template>
 
 <script>
@@ -9,10 +9,9 @@ export default {
     chordList: Array
   },
   filters: {
-    chordListToString: function(value) {
-      if (typeof value !== "object") {
-        return false;
-      }
+    chordListToString: value => {
+      if (typeof value !== "object") return " ";
+      if (value.length === 0) return " ";
       return value.join(",");
     }
   }
@@ -20,4 +19,7 @@ export default {
 </script>
 
 <style scoped>
+#list {
+  height: 20.8px;
+}
 </style>

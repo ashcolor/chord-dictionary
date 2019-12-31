@@ -24,6 +24,7 @@
     "sounds/*.mp3"
   ],
   "browser_action": {
+    "default_icon": "icons/icon_48.png",
     "default_title": "chord-dictionary",
     "default_popup": "popup/popup.html"
   },
