@@ -16,6 +16,7 @@
     "bootstrap": "^4.4.1",
     "chord-translator": "^0.1.6",
     "core-js": "^3.4.3",
+    "hard-source-webpack-plugin": "^0.13.1",
     "jquery": "^3.4.1",
     "popper.js": "^1.16.0",
     "tonal": "^2.2.2",

@@ -7,13 +7,13 @@
       <chord-list :chordList="chordList"></chord-list>
       <chord-score :chordList="chordList"></chord-score>
     </div>
-    <chord-player :chordList="chordList"></chord-player>
+    <div class="card-footer">
+      <chord-player :chordList="chordList"></chord-player>
+    </div>
   </div>
 </template>
 
 <script>
-import $ from "jquery";
-import "bootstrap";
 import chordTranslator from "chord-translator";
 import ChordName from "./ChordName.vue";
 import ChordList from "./ChordList.vue";
@@ -121,7 +121,6 @@ export default {
 </script>
 
 <style scoped>
-/* bootstrap */
 .card {
   position: relative;
   display: -ms-flexbox;
@@ -153,11 +152,6 @@ export default {
   padding: 0.75rem 1.25rem;
   background-color: rgba(0, 0, 0, 0.03);
   border-top: 1px solid rgba(0, 0, 0, 0.125);
-}
-
-p {
-  margin-top: 0;
-  margin-bottom: 1rem;
 }
 
 /* user */

@@ -5,6 +5,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtensionReloader = require('webpack-extension-reloader');
 const { VueLoaderPlugin } = require('vue-loader');
 const { version } = require('./package.json');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 const config = {
   mode: process.env.NODE_ENV,
@@ -101,6 +102,7 @@ const config = {
         },
       },
     ]),
+    new HardSourceWebpackPlugin()
   ],
 };
 

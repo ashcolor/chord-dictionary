@@ -1,5 +1,5 @@
 <template>
-  <div id="list" class="card-text">{{chordList | chordListToString}}</p>
+  <div id="list" class="card-text">{{chordList | chordListToString}}</div>
 </template>
 
 <script>
@@ -10,8 +10,8 @@ export default {
   },
   filters: {
     chordListToString: value => {
-      if (typeof value !== "object") return " ";
-      if (value.length === 0) return " ";
+      if (typeof value !== "object") return "";
+      if (value.length === 0) return "";
       return value.join(",");
     }
   }

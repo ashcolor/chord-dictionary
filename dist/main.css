@@ -1,5 +1,6 @@
 
-#chord[data-v-f41ab304] {
+#chord[data-v-f48d5c9a] {
+  font-size: 18px;
   height: 20px;
   margin-top: 0;
   margin-bottom: 0;
@@ -8,135 +9,18 @@
 }
 
 
-#list[data-v-47220794] {
+#list[data-v-40510415] {
   height: 20.8px;
 }
 
 
+#score[data-v-3619bd64] {
+  margin-top: 10px;
+  height: 80px;
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* bootstrap */
-.card[data-v-d754a5aa] {
+.card[data-v-5cc86fac] {
   position: relative;
   display: -ms-flexbox;
   display: flex;
@@ -149,29 +33,25 @@
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
 }
-.card-header[data-v-d754a5aa] {
+.card-header[data-v-5cc86fac] {
   padding: 0.75rem 1.25rem;
   margin-bottom: 0;
   background-color: rgba(0, 0, 0, 0.03);
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
-.card-body[data-v-d754a5aa] {
+.card-body[data-v-5cc86fac] {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   padding: 1.25rem;
 }
-.card-footer[data-v-d754a5aa] {
+.card-footer[data-v-5cc86fac] {
   padding: 0.75rem 1.25rem;
   background-color: rgba(0, 0, 0, 0.03);
   border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
-p[data-v-d754a5aa] {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
 
 /* user */
-div#chordPlayer-config[data-v-d754a5aa] {
+div#chordPlayer-config[data-v-5cc86fac] {
   position: fixed;
   top: 0;
   right: 0;
@@ -179,7 +59,7 @@ div#chordPlayer-config[data-v-d754a5aa] {
   width: 20%;
   background: white;
 }
-#pop-up[data-v-d754a5aa] {
+#pop-up[data-v-5cc86fac] {
   z-index: 1000;
   position: absolute !important;
 }

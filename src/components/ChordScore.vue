@@ -17,9 +17,7 @@ export default {
     }
   },
   methods: {
-    initScore: function() {},
-    dispScore: function(chordList) {
-      console.log("disp");
+    dispScore: chordList => {
       const VF = Vex.Flow;
 
       const div = document.getElementById("score");
@@ -84,13 +82,14 @@ export default {
       voice.addTickables(notes);
       new VF.Formatter().joinVoices([voice]).format([voice], 800);
       voice.draw(context, stave);
-    },
-    mounted() {
-      this.dispScore();
     }
   }
 };
 </script>
 
 <style scoped>
+#score {
+  margin-top: 10px;
+  height: 80px;
+}
 </style>

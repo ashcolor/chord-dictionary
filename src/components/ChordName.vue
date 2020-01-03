@@ -13,6 +13,7 @@ export default {
 
 <style scoped>
 #chord {
+  font-size: 18px;
   height: 20px;
   margin-top: 0;
   margin-bottom: 0;

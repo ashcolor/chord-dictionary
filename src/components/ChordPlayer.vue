@@ -1,5 +1,5 @@
 <template>
-  <div class="card-footer">[Ctrl] + [Space] で再生</div>
+  <p>[Ctrl] + [Space] で再生</p>
 </template>
 
 <script>
@@ -18,6 +18,7 @@ export default {
   },
   methods: {
     playChord: function() {
+      console.log(this.chordList);
       const chordMelody = [["0:0:0", this.chordList]];
       new Tone.Part(
         function setPlay(time, note) {
