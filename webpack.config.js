@@ -5,12 +5,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtensionReloader = require('webpack-extension-reloader');
 const { VueLoaderPlugin } = require('vue-loader');
 const { version } = require('./package.json');
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + '/src',
   entry: {
+    'entry': './entry.js',
     'main': './main.js',
     'background': './background.js',
     'popup/popup': './popup/popup.js',
@@ -102,7 +102,6 @@ const config = {
         },
       },
     ]),
-    new HardSourceWebpackPlugin()
   ],
 };
 

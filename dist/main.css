@@ -14,18 +14,18 @@
 }
 
 
-#score[data-v-3619bd64] {
+#score[data-v-682ca22c] {
   margin-top: 10px;
-  height: 80px;
+  height: 100px;
 }
 
 
-p[data-v-fce38262] {
+p[data-v-1f6b9ecb] {
   margin: 0;
 }
 
 
-.card[data-v-5cc86fac] {
+.card[data-v-423372d8] {
   position: relative;
   display: -ms-flexbox;
   display: flex;
@@ -38,25 +38,25 @@ p[data-v-fce38262] {
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
 }
-.card-header[data-v-5cc86fac] {
+.card-header[data-v-423372d8] {
   padding: 0.75rem 1.25rem;
   margin-bottom: 0;
   background-color: rgba(0, 0, 0, 0.03);
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
-.card-body[data-v-5cc86fac] {
+.card-body[data-v-423372d8] {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   padding: 1.25rem;
 }
-.card-footer[data-v-5cc86fac] {
+.card-footer[data-v-423372d8] {
   padding: 0.75rem 1.25rem;
   background-color: rgba(0, 0, 0, 0.03);
   border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 /* user */
-div#chordPlayer-config[data-v-5cc86fac] {
+div#chordPlayer-config[data-v-423372d8] {
   position: fixed;
   top: 0;
   right: 0;
@@ -64,7 +64,7 @@ div#chordPlayer-config[data-v-5cc86fac] {
   width: 20%;
   background: white;
 }
-#pop-up[data-v-5cc86fac] {
+#pop-up[data-v-423372d8] {
   z-index: 1000;
   position: absolute !important;
 }

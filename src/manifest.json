@@ -13,14 +13,13 @@
         "<all_urls>"
       ],
       "js": [
-        "main.js"
-      ],
-      "css": [
-        "main.css"
+        "entry.js"
       ]
     }
   ],
   "web_accessible_resources": [
+    "main.js",
+    "main.css",
     "sounds/*.mp3"
   ],
   "browser_action": {

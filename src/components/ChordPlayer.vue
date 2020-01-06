@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { Note } from "tonal";
 import Tone from "tone";
 
 export default {
@@ -14,19 +15,28 @@ export default {
     };
   },
   props: {
-    chordList: Array
+    parsedChordList: Array
   },
   methods: {
-    playChord: function() {
-      console.log(this.chordList);
-      const chordMelody = [["0:0:0", this.chordList]];
-      new Tone.Part(
-        function setPlay(time, note) {
-          this.instPiano.triggerAttackRelease(note, Tone.Time("4n") * 2, time);
-        }.bind(this),
-        chordMelody
-      ).start();
-      Tone.Transport.start();
+    playChord: function(e) {
+      if (!e.ctrlKey) return false;
+      if (e.keyCode === 32) {
+        const parsedChordList = this.parsedChordList.map(v =>
+          Note.simplify(v.replace("/", ""))
+        );
+        const chordMelody = [["0:0:0", parsedChordList]];
+        new Tone.Part(
+          function setPlay(time, note) {
+            this.instPiano.triggerAttackRelease(
+              note,
+              Tone.Time("4n") * 2,
+              time
+            );
+          }.bind(this),
+          chordMelody
+        ).start();
+        Tone.Transport.start();
+      }
     }
   },
   mounted() {
@@ -54,17 +64,11 @@ export default {
     this.instPiano = new Tone.Sampler(PIANO_SAMPLE, {
       baseUrl: SAMPLE_BASE,
       onload: function() {
-        console.log("loaded");
+        console.log("[chord-dictionary] sounds loaded");
       }
     }).toMaster();
-
-    window.addEventListener(
-      "keydown",
-      function(e) {
-        if (!event.ctrlKey) return false;
-        if (e.keyCode === 32) this.playChord();
-      }.bind(this)
-    );
+    window.removeEventListener("keydown", this.playChord);
+    window.addEventListener("keydown", this.playChord);
   }
 };
 </script>

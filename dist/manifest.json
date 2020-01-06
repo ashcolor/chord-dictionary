@@ -1,7 +1,7 @@
 {
   "name": "chord-dictionary",
   "description": "chord-dictionary",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "manifest_version": 2,
   "icons": {
     "48": "icons/icon_48.png",
@@ -13,14 +13,13 @@
         "<all_urls>"
       ],
       "js": [
-        "main.js"
-      ],
-      "css": [
-        "main.css"
+        "entry.js"
       ]
     }
   ],
   "web_accessible_resources": [
+    "main.js",
+    "main.css",
     "sounds/*.mp3"
   ],
   "browser_action": {
