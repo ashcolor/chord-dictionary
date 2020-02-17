@@ -2,7 +2,7 @@
   <div class="text-muted">
     <p class="small">※コードを再生する</p>
     <p class="small">(Win) Ctrl + Space</p>
-    <p class="small">(Mac) Cmd + Ctrl + Space</p>
+    <p class="small">(Mac) Cmd + Shift + Space</p>
   </div>
 </template>
 
