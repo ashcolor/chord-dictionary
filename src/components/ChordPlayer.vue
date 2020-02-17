@@ -1,5 +1,9 @@
 <template>
-  <p>[Ctrl] + [Space] で再生</p>
+  <div class="text-muted">
+    <p class="small">※コードを再生する</p>
+    <p class="small">(Win) Ctrl + Space</p>
+    <p class="small">(Mac) Cmd + Ctrl + Space</p>
+  </div>
 </template>
 
 <script>
@@ -19,7 +23,7 @@ export default {
   },
   methods: {
     playChord: function(e) {
-      if (!e.ctrlKey) return false;
+      if (!e.ctrlKey && !e.metaKey) return false;
       if (e.keyCode === 32) {
         const parsedChordList = this.parsedChordList.map(v =>
           Note.simplify(v.replace("/", ""))
@@ -76,5 +80,12 @@ export default {
 <style scoped>
 p {
   margin: 0;
+}
+.small {
+  font-size: 80%;
+  font-weight: 400;
+}
+.text-muted {
+  color: #6c757d !important;
 }
 </style>

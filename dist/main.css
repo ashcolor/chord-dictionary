@@ -14,14 +14,21 @@
 }
 
 
-#score[data-v-682ca22c] {
+#score[data-v-312ba524] {
   margin-top: 10px;
   height: 100px;
 }
 
 
-p[data-v-1f6b9ecb] {
+p[data-v-739b41c0] {
   margin: 0;
+}
+.small[data-v-739b41c0] {
+  font-size: 80%;
+  font-weight: 400;
+}
+.text-muted[data-v-739b41c0] {
+  color: #6c757d !important;
 }
 
 

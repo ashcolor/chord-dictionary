@@ -24,10 +24,10 @@ export default {
       div.textContent = null;
 
       const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
-      renderer.resize(150, 100);
+      renderer.resize(150, 120);
       const context = renderer.getContext();
       context.setFont("Arial", 10, "").setBackgroundFillStyle("#fff");
-      const stave = new VF.Stave(0, -5, 100);
+      const stave = new VF.Stave(0, -5, 120);
       stave.addClef("treble");
       stave.setContext(context).draw();
 

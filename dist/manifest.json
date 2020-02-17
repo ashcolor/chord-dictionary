@@ -1,8 +1,7 @@
 {
-  "name": "Chord Dictionary",
-  "short_name": "Chord Dict.",
-  "description": "コードの構成音の確認、再生を行うツール",
-  "version": "1.1.0.0",
+  "name": "chord-dictionary",
+  "description": "chord-dictionary",
+  "version": "1.1.1",
   "manifest_version": 2,
   "icons": {
     "48": "icons/icon_48.png",
