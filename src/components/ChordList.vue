@@ -1,17 +1,21 @@
 <template>
-  <div id="list" class="card-text">{{chordList | chordListToString}}</div>
+  <div id="list" class="card-text">{{chordOriginal | chordListToString}}</div>
 </template>
 
 <script>
+import ChordNote from "../assets/ChordNote_for_chord-dictionary.js";
+
 export default {
   name: "ChordList",
   props: {
-    chordList: Array
+    chordList: Array,
+    chordOriginal: Array
   },
   filters: {
     chordListToString: value => {
-      if (typeof value !== "object") return "";
-      if (value.length === 0) return "";
+      value = value.map(v =>
+        ChordNote.Note(v.key, v.offset).toString(true, true)
+      );
       return value.join(",");
     }
   }

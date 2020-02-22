@@ -4,17 +4,17 @@
       <chord-name :chordName="chordName" />
     </div>
     <div class="card-body">
-      <chord-list :chordList="chordList" />
-      <chord-score :parsedChordList="parsedChordList" />
+      <chord-list :chordList="chordList" :chordOriginal="chordOriginal" />
+      <chord-score :chordList="chordList" />
     </div>
     <div class="card-footer">
-      <chord-player :parsedChordList="parsedChordList" />
+      <chord-player :chordList="chordList" />
     </div>
   </div>
 </template>
 
 <script>
-import ChordNote from "../assets/ChordNote.js";
+import ChordNote from "../assets/ChordNote_for_chord-dictionary.js";
 import ChordName from "./ChordName.vue";
 import ChordList from "./ChordList.vue";
 import ChordScore from "./ChordScore.vue";
@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      chordName: null,
+      text: "",
       position: {
         top: 0,
         left: 0
@@ -38,32 +38,20 @@ export default {
     };
   },
   computed: {
-    //["C#","E#","G#"]
-    chordList() {
-      return this.textToChord(this.chordName);
+    chordNote() {
+      return ChordNote.parseContent(this.text);
     },
-    //["C#/3","F/3","G#/3"]
-    parsedChordList() {
-      function compareNote(prev, current) {
-        let order = [];
-        ["C", "D", "E", "F", "G", "A", "B"].forEach((v, i) => (order[v] = i));
-        return order[prev] > order[current];
-      }
-      let pitch = 4;
-      const parsedChordList = this.chordList.map((v, i, array) => {
-        if (i !== 0) if (compareNote(array[i - 1][0], array[i][0])) pitch += 1;
-        return v + "/" + pitch;
-      });
-      return parsedChordList;
+    chordName() {
+      return this.chordNote.length > 0 ? this.chordNote[0].string : "";
+    },
+    chordOriginal() {
+      return this.chordNote.length > 0 ? this.chordNote[0].original : [];
+    },
+    chordList() {
+      return this.chordNote.length > 0 ? this.chordNote[0].display : [];
     }
   },
   methods: {
-    textToChord(text) {
-      if (typeof text !== "string") return [];
-      const chordList = ChordNote.parseContent(text);
-      if (chordList === false) return [];
-      return chordList;
-    },
     getPointedWord(e) {
       let range;
       let textNode;
@@ -113,13 +101,7 @@ export default {
       function(e) {
         this.position.top = e.pageY + 20;
         this.position.left = e.pageX + 20;
-        const word = this.getPointedWord(event);
-        if (this.chordName === word) return false;
-        if (!this.textToChord(word).length > 0) {
-          this.chordName = "";
-          return false;
-        }
-        this.chordName = word;
+        this.text = this.getPointedWord(event);
       }.bind(this)
     );
   }
