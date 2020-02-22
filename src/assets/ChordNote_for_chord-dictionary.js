@@ -91,7 +91,7 @@ function Chord(string, array) {
 	this.original = array;
 	var octave = 4;
 	this.display = array.map(function(item, index) {
-		return item + "/" + (array[index - 1] && item.toHalf() <= array[index - 1].toHalf() ? ++octave : octave);
+		return item + "/" + (array[index - 1] && item.key <= array[index - 1].key ? ++octave : octave);
 	});
 	this.voicing = array.map(item => item.toHalf());
 	var prev = 60, index;
