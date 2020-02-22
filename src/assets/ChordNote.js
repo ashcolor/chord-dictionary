@@ -1,20 +1,60 @@
-// @https://graphemecluster.github.io/ChordNote.js
+// @https://github.com/graphemecluster/graphemecluster.github.io/blob/master/ChordNote_for_chord-dictionary.js
+var accidentals = {
+	"b": -1,
+	"#": 1,
+	"ｂ": -1,
+	"＃": 1,
+	"♭": -1,
+	"♯": 1,
+	"♮": 0,
+	"x": 2,
+	"\uDD2B": -2,
+	"\uDD2A": 2
+};
+var relatives = [
+	[/major|(iod|hypolyd)ian/i],
+	[/dori(an|c)|hypomixolydian/i, /hypodori(an|c)/i],
+	[/phrygian/i, /hypophrygian/i],
+	[/lydian/i, /mixolydian/i],
+	[/mixolydian/i],
+	[/minor|(aeol|hypodor)ian/i],
+	[/(locr|hypophryg)ian/i]
+];
 function Note(key, offset) {
+	if (key instanceof Note) return key;
 	if (!(this instanceof Note)) return new Note(key, offset);
-	if (typeof offset == "undefined") {
-		this.key = "CDEFGAB".indexOf(key.charAt(0));
-		this.offset = 0;
-		for (var i = 1; i < key.length; i++) this.offset += key.charAt(i) == "b" ? -1 : 1;
+	if (!key || ~~key == key) {
+		this.key = key ? (key % 7 + 7) % 7 : 0;
+		this.offset = +offset || 0;
 	} else {
-		this.key = (key % 7 + 7) % 7;
-		this.offset = offset;
+		var match = key.match(/([A-Ga-gＡ-Ｇａ-ｇ])((?:[b#ｂ＃♭♯♮x]|\uD834[\uDD2B\uDD2A])*)(.*)/);
+		if (match) {
+			this.key = "CDEFGABcdefgabＣＤＥＦＧＡＢｃｄｅｆｇａｂ".indexOf(match[1]) % 7;
+			this.offset = match[2].replace(/\uD834/g, "").split("").reduce(function(total, item) {
+				return total + accidentals[item];
+			}, 0);
+			if (!match[3] || /[MＭ](?![A-Za-zＡ-Ｚａ-ｚ])/.test(match[3])) return this;
+			if (/[mｍ](?![A-Za-zＡ-Ｚａ-ｚ])/.test(match[3])) return transpose(5, 0, this);
+			var index = relatives.findIndex(function(item) {
+				return !(item[1] && item[1].test(match[3])) && item[0].test(match[3]);
+			});
+			if (index != -1) return transpose(index, 0, this);
+		} else return null;
 	}
 }
-Note.prototype.toString = function () {
-	return "CDEFGAB".charAt(this.key) + (this.offset < 0 ? "b".repeat(-this.offset) : "#".repeat(this.offset));
+Note.prototype.toString = function(useUnicode, useDouble) {
+	return "CDEFGAB".charAt(this.key) + (
+		this.offset < 0
+			? useUnicode && useDouble && this.offset == -2
+				? "𝄫"
+				: (useUnicode ? "♭" : "b").repeat(-this.offset)
+			: useDouble && this.offset == 2
+				? (useUnicode ? "𝄪" : "x")
+				: (useUnicode ? "♯" : "#").repeat(this.offset)
+	);
 };
 var half = [0, 2, 4, 5, 7, 9, 11];
-Note.prototype.toHalf = function () {
+Note.prototype.toHalf = function() {
 	return ((half[this.key] + this.offset) % 12 + 12) % 12;
 };
 var keyOffsets = [
@@ -26,12 +66,14 @@ var keyOffsets = [
 	[1, 0, 0, 1, 1, 0, 0],
 	[1, 1, 0, 1, 1, 1, 0]
 ];
-function transpose(target, note) {
+function transpose(original, target, note) {
+	original = Note(original);
+	target = Note(target);
 	note = Note(note);
-	var out = ((target.key + note.key) % 7 + 7) % 7;
-	return Note(out, keyOffsets[target.key][out] + target.offset + note.offset);
+	var out = ((target.key + note.key - original.key) % 7 + 7) % 7;
+	return Note(out, keyOffsets[target.key][out] - keyOffsets[original.key][note.key] + target.offset + note.offset - original.offset);
 }
-if (!String.prototype.repeat) String.prototype.repeat = function (times) {
+if (!String.prototype.repeat) String.prototype.repeat = function(times) {
 	var str = "" + this;
 	times = ~~times;
 	var result = "";
@@ -43,17 +85,36 @@ if (!String.prototype.repeat) String.prototype.repeat = function (times) {
 	}
 }
 
-var regex = /([+＋⁺₊﹢])|([‑‑⁻₋﹣−˗ー－-])|([／/＼\\])|([AaＡａ][DdＤｄ]{2})|([OoＯｏ0０][MmＭｍ][IiＩｉ][TtＴｔ]|[NnＮｎ][OoＯｏ0０])|([DdＤｄ][OoＯｏ0０][MmＭｍ](?![IiＩｉ][TtＴｔ])(?:[IiＩｉ](?:[NnＮｎ](?:[AaＡａ](?:[NnＮｎ][TtＴｔ]?)?)?)?)?)|([AaＡａ][UuＵｕ][GgＧｇ](?:[MmＭｍ][EeＥｅ](?:[NnＮｎ](?:[TtＴｔ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)|([OoＯｏ0０][NnＮｎ])|([DdＤｄ][IiＩｉ][MmＭｍ](?:[IiＩｉ](?:[NnＮｎ](?:[IiＩｉ](?:[SsＳｓ](?:[HhＨｈ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)?|[°ºᵒ˚⁰∘゜ﾟ○◦◯⚪⭕￮⭘OoＯｏ0０])|([HhＨｈ](?:[AaＡａ](?:[LlＬｌ][FfＦｆ]?)?)?[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*[DdＤｄ][IiＩｉ][MmＭｍ](?:[IiＩｉ](?:[NnＮｎ](?:[IiＩｉ](?:[SsＳｓ](?:[HhＨｈ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)?|[øØ∅⌀])|([SsＳｓ][UuＵｕ][SsＳｓ](?:[PpＰｐ](?:[EeＥｅ](?:[NnＮｎ](?:[DdＤｄ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)|([MmＭｍ][AaＡａ](?![UuＵｕ][GgＧｇ]|[DdＤｄ]{2})(?:[JjＪｊ](?:[OoＯｏ0０][RrＲｒ]?)?)?|[MＭΔ△∆▵])|([MmＭｍ][IiＩｉ](?:[NnＮｎ](?:[OoＯｏ0０][RrＲｒ]?)?)?|[mｍ])|([（【\(])|([）】\)])|([。．，、・,.])|([RrＲｒ][OoＯｏ0０]{2}[TtＴｔ])|((?:[EeＥｅ][LlＬｌ][EeＥｅ][VvＶｖ][EeＥｅ][NnＮｎ]|[1１]{2})(?:[TtＴｔ][HhＨｈ])?)|((?:[TtＴｔ][HhＨｈ][IiＩｉ][RrＲｒ][TtＴｔ][EeＥｅ]{2}[NnＮｎ]|[1１][3３])(?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][IiＩｉ][RrＲｒ][SsＳｓ][TtＴｔ]|[OoＯｏ0０][NnＮｎ][EeＥｅ]|[1１](?:[SsＳｓ][TtＴｔ])?)|([SsＳｓ][EeＥｅ][CcＣｃ][OoＯｏ0０][NnＮｎ][DdＤｄ]|[TtＴｔ][WwＷｗ][OoＯｏ0０]|[2２](?:[NnＮｎ][DdＤｄ])?)|([TtＴｔ][HhＨｈ](?:[IiＩｉ][RrＲｒ][DdＤｄ]|[RrＲｒ][EeＥｅ]{2})|[3３](?:[RrＲｒ][DdＤｄ])?)|((?:[FfＦｆ][OoＯｏ0０][UuＵｕ][RrＲｒ]|4|４)(?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][IiＩｉ](?:[FfＦｆ][TtＴｔ][HhＨｈ]|[VvＶｖ][EeＥｅ])|[5５](?:[TtＴｔ][HhＨｈ])?)|((?:[SsＳｓ][IiＩｉ][XxＸｘ×]|6|６)(?:[TtＴｔ][HhＨｈ])?)|((?:[SsＳｓ][EeＥｅ][VvＶｖ][EeＥｅ][NnＮｎ]|7|７)(?:[TtＴｔ][HhＨｈ])?)|([NnＮｎ][IiＩｉ][NnＮｎ](?:[TtＴｔ][HhＨｈ]|[EeＥｅ])|[9９](?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][LlＬｌ](?:[AaＡａ][TtＴｔ]?)?|♭)|([bｂ])|([SsＳｓ](?:[HhＨｈ](?:[AaＡａ](?:[RrＲｒ][PpＰｐ]?)?)?)?|[#＃♯])|([DdＤｄ](?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[FfＦｆ][LlＬｌ](?:[AaＡａ][TtＴｔ]?)?|♭)|𝄫)|([DdＤｄ](?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[SsＳｓ](?:[HhＨｈ](?:[AaＡａ](?:[RrＲｒ][PpＰｐ]?)?)?)?|[#＃♯])|𝄪|[XxＸｘ×])|([DdＤｄ]?(?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[NnＮｎ][AaＡａ](?:[TtＴｔ](?:[UuＵｕ](?:[RrＲｒ](?:[AaＡａ][LlＬｌ]?)?)?)?)?|♮))|([AaＡａ]|[VvＶｖ][IiＩｉ](?![IiＩｉ])|[Ⅵⅵ])|([BＢ]|[VvＶｖ][IiＩｉ]{2}|[Ⅶⅶ])|([CcＣｃ]|[IiＩｉ](?![IiＩｉ])|[Ⅰⅰ])|([DdＤｄ]|[IiＩｉ]{2}(?![IiＩｉ])|[Ⅱⅱ])|([EeＥｅ]|[IiＩｉ]{3}|[Ⅲⅲ])|([FfＦｆ]|[IiＩｉ][VvＶｖ]|[Ⅳⅳ])|([GgＧｇ]|[VvＶｖ](?![IiＩｉ])|[Ⅴⅴ])|([ 	 ﻿ -   　]+)|([NnＮｎ](?:[OoＯｏ0０][NnＮｎ]?)?[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　。．，、・,.]*[CcＣｃ](?:[HhＨｈ](?:[OoＯｏ0０](?:[RrＲｒ][DdＤｄ]?)?)?)?[。．，、・,.]*|[^])/g;
+function Chord(string, array) {
+	if (!(this instanceof Chord)) return new Chord(string, array);
+	this.string = string;
+	this.original = array;
+	var octave = 4;
+	this.display = array.map(function(item, index) {
+		return item + "/" + (array[index - 1] && item.toHalf() <= array[index - 1].toHalf() ? ++octave : octave);
+	});
+	this.voicing = array.map(item => item.toHalf());
+	var prev = 60, index;
+	for (var a = 0; a < 12; a++) {
+		index = this.voicing.indexOf(a % 12);
+		if (index != -1) break;
+	}
+	this.voicing = this.voicing.concat(this.voicing).slice(index, this.voicing.length + index);
+	this.voicing = this.voicing.map(item => Tone.Frequency(prev += ((item - prev) % 12 + 12) % 12, "midi"));
+	this.voicing.unshift(Tone.Frequency(array[0].toHalf() + 36, "midi"));
+}
+
+var regex = /([+＋⁺₊﹢])|([‑‑⁻₋﹣−˗ー－-])|([／/＼\\])|([AaＡａ][DdＤｄ]{2})|([OoＯｏ0０][MmＭｍ][IiＩｉ][TtＴｔ]|[NnＮｎ][OoＯｏ0０])|([DdＤｄ][OoＯｏ0０][MmＭｍ](?![IiＩｉ][TtＴｔ])(?:[IiＩｉ](?:[NnＮｎ](?:[AaＡａ](?:[NnＮｎ][TtＴｔ]?)?)?)?)?)|([AaＡａ][UuＵｕ][GgＧｇ](?:[MmＭｍ][EeＥｅ](?:[NnＮｎ](?:[TtＴｔ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)|([OoＯｏ0０][NnＮｎ])|([DdＤｄ][IiＩｉ][MmＭｍ](?:[IiＩｉ](?:[NnＮｎ](?:[IiＩｉ](?:[SsＳｓ](?:[HhＨｈ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)?|[°ºᵒ˚⁰∘゜ﾟ○◦◯⚪⭕￮⭘OoＯｏ0０])|([HhＨｈ](?:[AaＡａ](?:[LlＬｌ][FfＦｆ]?)?)?[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*[DdＤｄ][IiＩｉ][MmＭｍ](?:[IiＩｉ](?:[NnＮｎ](?:[IiＩｉ](?:[SsＳｓ](?:[HhＨｈ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)?|[øØ∅⌀])|([SsＳｓ][UuＵｕ][SsＳｓ](?:[PpＰｐ](?:[EeＥｅ](?:[NnＮｎ](?:[DdＤｄ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)|([MmＭｍ][aａ](?![UuＵｕ][GgＧｇ]|[DdＤｄ]{2})(?:[JjＪｊ](?:[OoＯｏ0０][RrＲｒ]?)?)?|[MＭΔ△∆▵])|([MmＭｍ][IiＩｉ](?:[NnＮｎ](?:[OoＯｏ0０][RrＲｒ]?)?)?|[mｍ])|([（【\(])|([）】\)])|([。．，、・,.])|([RrＲｒ][OoＯｏ0０]{2}[TtＴｔ])|((?:[EeＥｅ][LlＬｌ][EeＥｅ][VvＶｖ][EeＥｅ][NnＮｎ]|[1１]{2})(?:[TtＴｔ][HhＨｈ])?)|((?:[TtＴｔ][HhＨｈ][IiＩｉ][RrＲｒ][TtＴｔ][EeＥｅ]{2}[NnＮｎ]|[1１][3３])(?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][IiＩｉ][RrＲｒ][SsＳｓ][TtＴｔ]|[OoＯｏ0０][NnＮｎ][EeＥｅ]|[1１](?:[SsＳｓ][TtＴｔ])?)|([SsＳｓ][EeＥｅ][CcＣｃ][OoＯｏ0０][NnＮｎ][DdＤｄ]|[TtＴｔ][WwＷｗ][OoＯｏ0０]|[2２](?:[NnＮｎ][DdＤｄ])?)|([TtＴｔ][HhＨｈ](?:[IiＩｉ][RrＲｒ][DdＤｄ]|[RrＲｒ][EeＥｅ]{2})|[3３](?:[RrＲｒ][DdＤｄ])?)|((?:[FfＦｆ][OoＯｏ0０][UuＵｕ][RrＲｒ]|4|４)(?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][IiＩｉ](?:[FfＦｆ][TtＴｔ][HhＨｈ]|[VvＶｖ][EeＥｅ])|[5５](?:[TtＴｔ][HhＨｈ])?)|((?:[SsＳｓ][IiＩｉ][XxＸｘ×]|6|６)(?:[TtＴｔ][HhＨｈ])?)|((?:[SsＳｓ][EeＥｅ][VvＶｖ][EeＥｅ][NnＮｎ]|7|７)(?:[TtＴｔ][HhＨｈ])?)|([NnＮｎ][IiＩｉ][NnＮｎ](?:[TtＴｔ][HhＨｈ]|[EeＥｅ])|[9９](?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][LlＬｌ](?:[AaＡａ][TtＴｔ]?)?|♭)|([bｂ])|([SsＳｓ](?:[HhＨｈ](?:[AaＡａ](?:[RrＲｒ][PpＰｐ]?)?)?)?|[#＃♯])|([DdＤｄ](?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[FfＦｆ][LlＬｌ](?:[AaＡａ][TtＴｔ]?)?|♭)|𝄫)|([DdＤｄ](?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[SsＳｓ](?:[HhＨｈ](?:[AaＡａ](?:[RrＲｒ][PpＰｐ]?)?)?)?|[#＃♯])|𝄪|[XxＸｘ×])|([DdＤｄ]?(?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[NnＮｎ][AaＡａ](?:[TtＴｔ](?:[UuＵｕ](?:[RrＲｒ](?:[AaＡａ][LlＬｌ]?)?)?)?)?|♮))|([AaＡａ])|([BＢ])|([CcＣｃ])|([DdＤｄ])|([EeＥｅ])|([FfＦｆ])|([GgＧｇ])|([VvＶｖ][IiＩｉ](?![IiＩｉ])|[Ⅵⅵ])|([VvＶｖ][IiＩｉ]{2}|[Ⅶⅶ])|([IiＩｉ](?![IiＩｉVvＶｖ])|[Ⅰⅰ])|([IiＩｉ]{2}(?![IiＩｉ])|[Ⅱⅱ])|([IiＩｉ]{3}|[Ⅲⅲ])|([IiＩｉ][VvＶｖ]|[Ⅳⅳ])|([VvＶｖ](?![IiＩｉ])|[Ⅴⅴ])|([ 	 ﻿ -   　]+)|([NnＮｎ](?:[OoＯｏ0０][NnＮｎ]?)?[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　。．，、・,.]*[CcＣｃ](?:[HhＨｈ](?:[OoＯｏ0０](?:[RrＲｒ][DdＤｄ]?)?)?)?[。．，、・,.]*|[^])/g;
 // var types = ["plus", "minus", "slash", "add", "omit", "dom", "aug", "on", "dim", "halfdim", "sus", "major", "minor", "opb", "clb", "comma", "root", "11", "13", "1", "2", "3", "4", "5", "6", "7", "9", "flat", "b", "sharp", "dblflat", "dblsharp", "neutral", "A", "B", "C", "D", "E", "F", "G", "whitespace", "others"];
-var ids = " p_%axd'&ohsMm<>,ret12345679fb#vX!ABCDEFGw=";
-var acciList = { "f": -1, "b": -1, "#": 1, "v": -2, "X": 2, "!": 0, "w": 0 };
-var accis = { "f": "b", "b": "b", "#": "#", "p": "#", "_": "b", "!": "", "": "" };
-var omits = { "r": "C", "e": "F", "t": "A", "1": "C", "3": "E", "5": "G", "7": "B", "9": "D" };
+var ids = " p_%axd'&ohsMm<>,ret12345679fb#vX!ABCDEFGJKLNPQSw=";
+var acciList = {"f": -1, "b": -1, "#": 1, "v": -2, "X": 2, "!": 0, "w": 0};
+var accis = {"f": "b", "b": "b", "#": "#", "p": "#", "_": "b", "!": "", "": ""};
+var omits = {"r": "C", "e": "F", "t": "A", "1": "C", "3": "E", "5": "G", "7": "B", "9": "D"};
 function parseContent(input) {
 	var inputList = [];
 	var idList = "";
 	var i;
-	input.replace(regex, function (match) {
+	input.replace(regex, function(match) {
 		inputList.push(match);
 		for (i = 1; i < arguments.length; i++) {
 			if (arguments[i]) {
@@ -62,57 +123,58 @@ function parseContent(input) {
 			}
 		}
 	});
-
+	
+	var chordList = [];
+	
 	for (i = 0; i < idList.length; i++) {
-
-		var currPos = i, detect = false, note, acci;
-
+		
+		var currPos = i, detect = false, isInterval = false, note, acci;
+		
 		if ("fb#vX!".includes(curr())) {
-
+			
 			acci = acciList[curr()];
-			while (peek() in acciList) { plus(); acci += acciList[curr()]; }
-			if (peek() && "ABCDEFG".includes(peek())) {
+			while (peek() in acciList) {plus(); acci += acciList[curr()];}
+			if (peek() && "JKLNPQS".includes(peek())) {
 				plus();
-				note = idList.charCodeAt(i) - 67;
+				note = "JKLNPQS".indexOf(curr()) - 2;
 				detect = true;
+				isInterval = true;
 			} else if (curr() == "b" || curr() == "w" && prev() == "b") {
 				note = 6;
 				acci += 1;
 				detect = true;
 			} else i = currPos;
-
+			
 		} else if ("ABCDEFG".includes(curr())) {
-
+			
 			note = idList.charCodeAt(i) - 67;
 			acci = 0;
-			while (peek() in acciList) { plus(); acci += acciList[curr()]; }
+			while (peek() in acciList) {plus(); acci += acciList[curr()];}
 			detect = true;
-
+			
 		}
-
+		
 		if (detect) {
-
+			
 			var noteObj = Note(note, acci);
-
+			
 			var bracketLayer = 0;
 			var has5 = false, has6 = false, has7 = false, third = null, seventh = null, type = null;
 			var sus2 = false, sus4 = false, thirdAfterType = null, highestInterval = null, extended = false;
 			var chordNote = ["C"], addNote = [], omitNote = [], omitNotePos = [], addNoteMandatory = [];
 			var seventhPos = null, currStatus = null, mandatory = false;
 			var addDSharpPos = null, addFFlatPos = null, addASharpPos = null;
-
+			
 			addNoteMandatory[-1] = true;
-
-			var firstContinue = false;
+			
 			while (cont(
-				"p", c => { type = "'"; return true; },
-				"_", c => { if (bracketLayer) return false; third = "m"; seventhPos = i; return true; },
-				"2", c => { sus2 = true; cont("4", c => sus4 = true); return true; },
-				"4", c => { sus4 = true; cont("2", c => sus2 = true); return true; },
-				"79et", c => { has7 = true; highestInterval = c; return true; },
-				"<", c => { bracketLayer++; firstContinue = true; return peek() != ">" && !(peek() == "w" && idList.charAt(i + 2) == ">"); }
-			) && firstContinue) firstContinue = false;
-
+				"p", c => {type = "'"; return true;},
+				"_", c => {if (bracketLayer) return false; third = "m"; seventhPos = i; return true;},
+				"2", c => {sus2 = true; cont("4", c => sus4 = true); return true;},
+				"4", c => {sus4 = true; cont("2", c => sus2 = true); return true;},
+				"79et", c => {has7 = true; highestInterval = c; return true;}
+			));
+			
 			function requireNum(acci) {
 				var acciPos = i;
 				return cont(
@@ -121,17 +183,17 @@ function parseContent(input) {
 						var innerBracketLayer = 1;
 						var anyNote = false;
 						while (cont(
-							"<", c => { innerBracketLayer++; return true; },
-							">", c => { innerBracketLayer--; return true; },
-							",", c => { return true; },
-							"24569et", c => { if (addNotes(acci, c, acciPos)) return anyNote = true; }
+							"<", c => {innerBracketLayer++; return true;},
+							">", c => {innerBracketLayer--; return true;},
+							",", c => {return true;},
+							"24569et", c => {if (addNotes(acci, c, acciPos)) return anyNote = true;}
 						) && innerBracketLayer > 0);
 						if (innerBracketLayer > 0 && anyNote) currStatus = "f";
 						return anyNote;
 					}
 				);
 			}
-
+			
 			function requireAdd() {
 				return cont(
 					"2469et", c => addNotes("", c),
@@ -145,10 +207,10 @@ function parseContent(input) {
 						var innerBracketLayer = 1;
 						var anyNote = false;
 						while (cont(
-							"<", c => { innerBracketLayer++; return true; },
-							">", c => { innerBracketLayer--; return true; },
-							",", c => { return true; },
-							"2469et", c => { if (addNotes("", c)) return anyNote = true; },
+							"<", c => {innerBracketLayer++; return true;},
+							">", c => {innerBracketLayer--; return true;},
+							",", c => {return true;},
+							"2469et", c => {if (addNotes("", c)) return anyNote = true;},
 							"fb#!p_", acci => {
 								var acciPos = i;
 								return cont(
@@ -161,7 +223,7 @@ function parseContent(input) {
 					}
 				);
 			}
-
+			
 			while (cont(
 				"#fb!", requireNum,
 				"p", c => {
@@ -227,7 +289,7 @@ function parseContent(input) {
 						if (omitNotes(c)) {
 							while (cont(
 								"ret13579", c => omitNotes(c),
-								",", c => { return true; },
+								",", c => {return true;},
 							));
 							while (curr() == ",") back();
 							return true;
@@ -237,10 +299,10 @@ function parseContent(input) {
 						var innerBracketLayer = 1;
 						var anyNote = false;
 						while (cont(
-							"<", c => { innerBracketLayer++; return true; },
-							">", c => { innerBracketLayer--; return true; },
-							",", c => { return true; },
-							"ret13579", c => { if (omitNotes(c)) return anyNote = true; },
+							"<", c => {innerBracketLayer++; return true;},
+							">", c => {innerBracketLayer--; return true;},
+							",", c => {return true;},
+							"ret13579", c => {if (omitNotes(c)) return anyNote = true;},
 						) && innerBracketLayer > 0);
 						if (innerBracketLayer > 0) currStatus = "f";
 						return anyNote;
@@ -284,7 +346,7 @@ function parseContent(input) {
 					return has5 = true;
 				},
 				"6", c => {
-					if (has6 || highestInterval == "t" || addNote.includes("A")) return false;
+					if (has6 || addNote.includes("A")) return false;
 					return has6 = true;
 				},
 				"7", c => {
@@ -300,8 +362,8 @@ function parseContent(input) {
 					return bracketLayer >= 0;
 				}
 			) && !currStatus);
-
-
+			
+			
 			if (type == "h" || type == "d") has7 = true;
 			var noThird = has5 || sus2 || sus4;
 			var maxNum = has7 - noThird + 1;
@@ -326,7 +388,6 @@ function parseContent(input) {
 				}
 				if (type == "o") {
 					if (has6 && has7 && !seventh) {
-						// find previous 6 or 7 or o
 						var j = i;
 						while (!"67o".includes(idList.charAt(j))) j--;
 						clearAndReset(j);
@@ -365,19 +426,40 @@ function parseContent(input) {
 				clearAndReset(addASharpPos);
 				continue;
 			}
-
+			
 			if (addNote.includes("Db")) chordNote.push("Db");
-			if (addNote.includes("D") || "9et".includes(highestInterval) && addNoteMandatory[addNote.indexOf("Db")] && addNoteMandatory[addNote.indexOf("D#")]) chordNote.push("D");
+			if (addNote.includes("D") || "9et".includes(highestInterval) && addNoteMandatory[addNote.indexOf("Db")] && addNoteMandatory[addNote.indexOf("D#")]) {
+				if (chordNote.includes("D")) {
+					var j = i;
+					while (!"9ets".includes(idList.charAt(j))) j--;
+					clearAndReset(j);
+					continue;
+				} else chordNote.push("D");
+			}
 			if (addNote.includes("D#")) chordNote.push("D#");
-
+			
 			if (addNote.includes("Fb")) chordNote.push("Fb");
-			if (addNote.includes("F") || "et".includes(highestInterval) && addNoteMandatory[addNote.indexOf("Fb")] && addNoteMandatory[addNote.indexOf("F#")]) chordNote.push("F");
+			if (addNote.includes("F") || "et".includes(highestInterval) && addNoteMandatory[addNote.indexOf("Fb")] && addNoteMandatory[addNote.indexOf("F#")]) {
+				if (chordNote.includes("F")) {
+					var j = i;
+					while (!"ets".includes(idList.charAt(j))) j--;
+					clearAndReset(j);
+					continue;
+				} else chordNote.push("F");
+			}
 			if (addNote.includes("F#")) chordNote.push("F#");
-
+			
 			if (addNote.includes("Ab")) chordNote.push("Ab");
-			if (addNote.includes("A") || highestInterval == "t" && addNoteMandatory[addNote.indexOf("Ab")] && addNoteMandatory[addNote.indexOf("A#")]) chordNote.push("A");
+			if (addNote.includes("A") || highestInterval == "t" && addNoteMandatory[addNote.indexOf("Ab")] && addNoteMandatory[addNote.indexOf("A#")]) {
+				if (chordNote.includes("A")) {
+					var j = i;
+					while (!"t6".includes(idList.charAt(j))) j--;
+					clearAndReset(j);
+					continue;
+				} else chordNote.push("A");
+			}
 			if (addNote.includes("A#")) chordNote.push("A#");
-
+			
 			var failed = false;
 			for (var m = 0; m < omitNote.length; m++) {
 				if (omitNote[m] == "E") {
@@ -409,42 +491,44 @@ function parseContent(input) {
 				}
 			}
 			if (failed) continue;
-
-			chordNote = chordNote.map(function (item) {
-				return transpose(noteObj, item);
+			
+			chordNote = chordNote.map(function(item) {
+				return transpose(0, parseContent.transposeTo, transpose(0, isInterval && parseContent.intervalNote, transpose(0, noteObj, item)));
 			});
-
+			
 			if (currStatus == "/") {
 				if (peek() == "w") plus();
 				plus();
-
+				
 				if (curr()) {
-
+					
 					var onCurrPos = i, onDetect = false, onNote, onAcci;
-
-					if ("fb#vX!".includes(curr())) {
-
+					
+					if (isInterval && "fb#vX!".includes(curr())) {
+						
 						onAcci = acciList[curr()];
-						while (peek() in acciList) { plus(); onAcci += acciList[curr()]; }
-						if (peek() && "ABCDEFG".includes(peek())) {
+						while (peek() in acciList) {plus(); onAcci += acciList[curr()];}
+						if (peek() && "JKLNPQS".includes(peek())) {
 							plus();
-							onNote = idList.charCodeAt(i) - 67;
-							onDetect = true;
-						} else if (curr() == "b" || curr() == "w" && prev() == "b") {
-							onNote = 6;
-							onAcci += 1;
+							onNote = "JKLNPQS".indexOf(curr()) - 2;
 							onDetect = true;
 						} else i = onCurrPos;
-
-					} else if ("ABCDEFG".includes(curr())) {
-
-						onNote = idList.charCodeAt(i) - 67;
+						
+					} else if (!isInterval && "ABCDEFGb".includes(curr())) {
+						
+						onNote = curr() == "b" ? 6 : idList.charCodeAt(i) - 67;
 						onAcci = 0;
-						while (peek() in acciList) { plus(); onAcci += acciList[curr()]; }
+						while (peek() in acciList) {plus(); onAcci += acciList[curr()];}
 						onDetect = true;
-
+						
+					} else if (isInterval && "JKLNPQS".includes(curr())) {
+			
+						onNote = "JKLNPQS".indexOf(curr()) - 2;
+						onAcci = 0;
+						onDetect = true;
+						
 					}
-
+					
 					if (onDetect) {
 						var onNoteObj = Note(onNote, onAcci);
 						var half = onNoteObj.toHalf();
@@ -458,7 +542,7 @@ function parseContent(input) {
 							}
 						}
 						if (!inversion) {
-							chordNote.unshift(onNoteObj);
+							chordNote.unshift(transpose(0, parseContent.transposeTo, transpose(0, isInterval && parseContent.intervalNote, onNoteObj)));
 							chordNote.first = -1;
 						}
 					} else {
@@ -472,15 +556,15 @@ function parseContent(input) {
 					back();
 				}
 			}
-
+			
 			if (!chordNote.first) chordNote.first = 0;
-
+			
 			while ("w<,".includes(curr())) back();
-
-			inputList[currPos] = chordNote.map(function (v) { return v.toString() });
-			// inputList[currPos] = "<" + chordNote.join() + ">";
-			for (var x = currPos + 1; x <= i; x++) inputList[x] = "";
-
+			
+			var original = "";
+			for (var x = currPos; x <= i; x++) original += inputList[x];
+			chordList.push(Chord(original, chordNote, isInterval));
+			
 			function clear(pos) {
 				idList = idList.slice(0, pos) + "=" + idList.slice(pos + 1);
 			}
@@ -510,9 +594,9 @@ function parseContent(input) {
 						note == "Gb" && (addNote.includes("G#") || addNote.includes("F#") || "oh".includes(type)) ||
 						note == "G" ||
 						note == "G#" && (addNote.includes("Gb") || addNote.includes("Ab") || type == "'")) {
-						if (acci == "b") clear(acciPos || i - 1);
-						return false;
-					}
+							if (acci == "b") clear(acciPos || i - 1);
+							return false;
+						}
 					if (note == "D#") addDSharpPos = i;
 					else if (note == "Fb") {
 						if (acci == "b") clear(acciPos || i - 1);
@@ -523,7 +607,7 @@ function parseContent(input) {
 					return true;
 				}
 			}
-
+			
 			function omitNotes(note) {
 				note = omits[note];
 				if (omitNote.includes(note)) return false;
@@ -577,17 +661,14 @@ function parseContent(input) {
 			return curr();
 		}
 	}
-	inputList = inputList.filter(v => v !== "");
-	if (inputList.length === 1)
-		if (typeof inputList[0] === "object")
-			return inputList[0];
-	return false;
-	// return inputList.join("");
+	return chordList;
 }
-if (!String.prototype.includes) String.prototype.includes = function (search, start) {
+parseContent.intervalNote = null;
+parseContent.transposeTo = null;
+if (!String.prototype.includes) String.prototype.includes = function(search, start) {
 	return this.indexOf(search, start) != -1;
 };
-if (!Array.prototype.includes) Array.prototype.includes = function (search, start) {
+if (!Array.prototype.includes) Array.prototype.includes = function(search, start) {
 	return this.indexOf(search, start) != -1;
 };
-export default { parseContent }
+export default { Note, Chord, transpose, parseContent }
