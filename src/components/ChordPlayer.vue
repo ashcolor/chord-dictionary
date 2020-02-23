@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import { Note } from "tonal";
 import Tone from "tone";
+import { Note } from "tonal";
 
 export default {
   name: "ChordPlayer",
@@ -19,16 +19,16 @@ export default {
     };
   },
   props: {
-    parsedChordList: Array
+    chordList: Array
   },
   methods: {
     playChord: function(e) {
       if (!e.ctrlKey && !e.metaKey) return false;
       if (e.keyCode === 32) {
-        const parsedChordList = this.parsedChordList.map(v =>
+        const chordList = this.chordList.map(v =>
           Note.simplify(v.replace("/", ""))
         );
-        const chordMelody = [["0:0:0", parsedChordList]];
+        const chordMelody = [["0:0:0", chordList]];
         new Tone.Part(
           function setPlay(time, note) {
             this.instPiano.triggerAttackRelease(

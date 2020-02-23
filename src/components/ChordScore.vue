@@ -8,10 +8,10 @@ import Vex from "vexflow";
 export default {
   name: "ChordScore",
   props: {
-    parsedChordList: Array
+    chordList: Array
   },
   watch: {
-    parsedChordList: function(val) {
+    chordList: function(val) {
       this.dispScore(val);
     }
   },
