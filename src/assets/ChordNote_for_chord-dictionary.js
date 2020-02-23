@@ -1,4 +1,5 @@
 // @https://github.com/graphemecluster/graphemecluster.github.io/blob/master/ChordNote_for_chord-dictionary.js
+import Tone from "tone";
 var accidentals = {
 	"b": -1,
 	"#": 1,
