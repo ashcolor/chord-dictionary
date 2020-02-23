@@ -98,11 +98,8 @@ function Chord(string, array, isInterval) {
 		return item + "/" + (array[index - 1] && item.key <= array[index - 1].key ? ++octave : octave);
 	});
 	this.voicing = array.map(item => item.toHalf());
-	var prev = 60, index;
-	for (var a = 0; a < 12; a++) {
-		index = this.voicing.indexOf(a % 12);
-		if (index != -1) break;
-	}
+	var prev = 60, index = 0;
+	for (var a = 1; a < this.voicing.length; a++) if (this.voicing[a] < this.voicing[index]) index = a;
 	this.voicing = this.voicing.concat(this.voicing).slice(index, this.voicing.length + index);
 	this.voicing = this.voicing.map(item => Tone.Frequency(prev += ((item - prev) % 12 + 12) % 12, "midi"));
 	this.voicing.unshift(Tone.Frequency(array[0].toHalf() + 36, "midi"));
