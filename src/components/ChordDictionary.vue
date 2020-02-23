@@ -4,11 +4,11 @@
       <chord-name :chordName="chordName" />
     </div>
     <div class="card-body">
-      <chord-list :chordList="chordList" :chordOriginal="chordOriginal" />
-      <chord-score :chordList="chordList" />
+      <chord-list :chordOriginal="chordOriginal" />
+      <chord-score :chordDisplay="chordDisplay" />
     </div>
     <div class="card-footer">
-      <chord-player :chordList="chordList" />
+      <chord-player :chordVoicing="chordVoicing" :chordDisplay="chordDisplay" />
     </div>
   </div>
 </template>
@@ -39,6 +39,7 @@ export default {
   },
   computed: {
     chordNote() {
+      console.log(ChordNote.parseContent(this.text));
       return ChordNote.parseContent(this.text);
     },
     chordName() {
@@ -47,8 +48,11 @@ export default {
     chordOriginal() {
       return this.chordNote.length > 0 ? this.chordNote[0].original : [];
     },
-    chordList() {
+    chordDisplay() {
       return this.chordNote.length > 0 ? this.chordNote[0].display : [];
+    },
+    chordVoicing() {
+      return this.chordNote.length > 0 ? this.chordNote[0].voicing : [];
     }
   },
   methods: {
@@ -91,11 +95,11 @@ export default {
           break;
         }
       }
+      console.log(range.toString().trim());
       return range.toString().trim();
     }
   },
   mounted() {
-    this.chordName = "";
     window.addEventListener(
       "mousemove",
       function(e) {

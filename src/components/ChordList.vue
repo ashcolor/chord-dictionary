@@ -1,5 +1,5 @@
 <template>
-  <div id="list" class="card-text">{{chordOriginal | chordListToString}}</div>
+  <div id="list" class="card-text">{{chordOriginal | chordOriginalToString}}</div>
 </template>
 
 <script>
@@ -8,11 +8,10 @@ import ChordNote from "../assets/ChordNote_for_chord-dictionary.js";
 export default {
   name: "ChordList",
   props: {
-    chordList: Array,
     chordOriginal: Array
   },
   filters: {
-    chordListToString: value => {
+    chordOriginalToString: value => {
       value = value.map(v =>
         ChordNote.Note(v.key, v.offset).toString(true, true)
       );

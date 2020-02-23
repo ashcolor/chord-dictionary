@@ -19,28 +19,31 @@ export default {
     };
   },
   props: {
-    chordList: Array
+    chordDisplay: Array,
+    chordVoicing: Array
   },
   methods: {
-    playChord: function(e) {
+    playChord: function() {
+      const chordDisplay = this.chordDisplay.map(v =>
+        Note.simplify(v.replace("/", ""))
+      );
+      const chordMelody = [["0:0:0", this.chordVoicing]];
+      new Tone.Part(
+        function setPlay(time, note) {
+          this.instPiano.triggerAttackRelease(note, Tone.Time("4n") * 2, time);
+        }.bind(this),
+        chordMelody
+      ).start();
+      Tone.Transport.start();
+    },
+    keyDown: function(e) {
       if (!e.ctrlKey && !e.metaKey) return false;
       if (e.keyCode === 32) {
-        const chordList = this.chordList.map(v =>
-          Note.simplify(v.replace("/", ""))
-        );
-        const chordMelody = [["0:0:0", chordList]];
-        new Tone.Part(
-          function setPlay(time, note) {
-            this.instPiano.triggerAttackRelease(
-              note,
-              Tone.Time("4n") * 2,
-              time
-            );
-          }.bind(this),
-          chordMelody
-        ).start();
-        Tone.Transport.start();
+        this.playChord();
       }
+    },
+    click: function(e) {
+      this.playChord();
     }
   },
   mounted() {
@@ -71,8 +74,10 @@ export default {
         console.log("[chord-dictionary] sounds loaded");
       }
     }).toMaster();
-    window.removeEventListener("keydown", this.playChord);
-    window.addEventListener("keydown", this.playChord);
+    // window.removeEventListener("keydown", this.keyDown);
+    window.addEventListener("keydown", this.keyDown);
+    // window.removeEventListener("click", this.click);
+    window.addEventListener("click", this.click);
   }
 };
 </script>

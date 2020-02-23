@@ -8,15 +8,15 @@ import Vex from "vexflow";
 export default {
   name: "ChordScore",
   props: {
-    chordList: Array
+    chordDisplay: Array
   },
   watch: {
-    chordList: function(val) {
+    chordDisplay: function(val) {
       this.dispScore(val);
     }
   },
   methods: {
-    dispScore: chordList => {
+    dispScore: chordDisplay => {
       const VF = Vex.Flow;
 
       const div = document.getElementById("score");
@@ -31,12 +31,12 @@ export default {
       stave.addClef("treble");
       stave.setContext(context).draw();
 
-      if (typeof chordList !== "object") return false;
-      if (!chordList.length > 0) return false;
+      if (typeof chordDisplay !== "object") return false;
+      if (!chordDisplay.length > 0) return false;
 
-      const notes = [new VF.StaveNote({ keys: chordList, duration: "w" })];
+      const notes = [new VF.StaveNote({ keys: chordDisplay, duration: "w" })];
 
-      chordList.forEach((note, index) => {
+      chordDisplay.forEach((note, index) => {
         if (note.indexOf("##") != -1) {
           notes[0].addAccidental(index, new VF.Accidental("##"));
         } else if (note.indexOf("bb") != -1) {
