@@ -1,6 +1,6 @@
 {
-  "name": "chord-dictionary",
-  "description": "chord-dictionary",
+  "name": "Chord Dictionary",
+  "description": "chord dictionary",
   "version": "1.1.2",
   "manifest_version": 2,
   "icons": {
@@ -34,5 +34,8 @@
   "options_ui": {
     "page": "options/options.html",
     "chrome_style": true
-  }
+  },
+  "permissions": [
+    "storage"
+  ]
 }

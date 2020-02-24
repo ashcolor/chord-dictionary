@@ -1,32 +1,47 @@
 <template>
-  <div id="pop-up" class="card" :style="{ top: position.top + 'px' , left: position.left + 'px' }">
-    <div class="card-header">
-      <chord-name :chordName="chordName" />
-    </div>
-    <div class="card-body">
-      <chord-list :chordOriginal="chordOriginal" />
-      <chord-score :chordDisplay="chordDisplay" />
-    </div>
-    <div class="card-footer">
-      <chord-player :chordVoicing="chordVoicing" :chordDisplay="chordDisplay" />
-    </div>
+  <div>
+    <b-card-group
+      deck
+      id="pop-up"
+      :style="{ top: position.top + 'px' , left: position.left + 'px' }"
+    >
+      <b-card :header="chordName" title-tag="h3" no-body>
+        <b-card-body>
+          <b-card-text>{{chordOriginal | chordOriginalToString}}</b-card-text>
+          <score :chordDisplay="chordDisplay" />
+        </b-card-body>
+      </b-card>
+    </b-card-group>
+    <player :chordVoicing="chordVoicing" :settings="settings" />
+    <config
+      :settings="settings"
+      v-on:toggleClick="onToggleClick"
+      v-on:toggleKey="onToggleKey"
+      v-on:toggleHover="onToggleHover"
+    />
   </div>
 </template>
 
 <script>
 import ChordNote from "../assets/ChordNote_for_chord-dictionary.js";
-import ChordName from "./ChordName.vue";
-import ChordList from "./ChordList.vue";
-import ChordScore from "./ChordScore.vue";
-import ChordPlayer from "./ChordPlayer.vue";
+import Score from "./Score.vue";
+import Player from "./Player.vue";
+import Config from "./Config.vue";
 
 export default {
   name: "ChordDictionary",
   components: {
-    ChordName,
-    ChordList,
-    ChordScore,
-    ChordPlayer
+    Score,
+    Player,
+    Config
+  },
+  filters: {
+    chordOriginalToString: value => {
+      value = value.map(v =>
+        ChordNote.Note(v.key, v.offset).toString(true, true)
+      );
+      return value.join(" ");
+    }
   },
   data() {
     return {
@@ -34,16 +49,26 @@ export default {
       position: {
         top: 0,
         left: 0
+      },
+      settings: {
+        key: "C",
+        transpose: 0,
+        inst: "piano",
+        isActiveClick: true,
+        isActiveKey: true,
+        isActiveHover: false
       }
     };
   },
   computed: {
     chordNote() {
+      ChordNote.parseContent.intervalNote = this.settings.key;
+      ChordNote.parseContent.transposeTo = this.settings.transpose;
       console.log(ChordNote.parseContent(this.text));
       return ChordNote.parseContent(this.text);
     },
     chordName() {
-      return this.chordNote.length > 0 ? this.chordNote[0].string : "";
+      return this.chordNote.length > 0 ? this.chordNote[0].string : " ";
     },
     chordOriginal() {
       return this.chordNote.length > 0 ? this.chordNote[0].original : [];
@@ -53,6 +78,16 @@ export default {
     },
     chordVoicing() {
       return this.chordNote.length > 0 ? this.chordNote[0].voicing : [];
+    }
+  },
+  watch: {
+    settings: {
+      handler: function(newValue, oldValue) {
+        chrome.storage.local.set({ settings: newValue }, function() {
+          console.log("[chord-dictionary] settings saved");
+        });
+      },
+      deep: true
     }
   },
   methods: {
@@ -95,11 +130,26 @@ export default {
           break;
         }
       }
-      console.log(range.toString().trim());
       return range.toString().trim();
+    },
+    onToggleClick: function() {
+      this.settings.isActiveClick = !this.settings.isActiveClick;
+    },
+    onToggleKey: function() {
+      this.settings.isActiveKey = !this.settings.isActiveKey;
+    },
+    onToggleHover: function() {
+      this.settings.isActiveHover = !this.settings.isActiveHover;
     }
   },
   mounted() {
+    chrome.storage.local.get(
+      "settings",
+      function(value) {
+        if (!value) return false;
+        this.settings = value.settings;
+      }.bind(this)
+    );
     window.addEventListener(
       "mousemove",
       function(e) {
@@ -112,52 +162,18 @@ export default {
 };
 </script>
 
-<style scoped>
-.card {
-  position: relative;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  min-width: 0;
-  word-wrap: break-word;
-  background-color: #fff;
-  background-clip: border-box;
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
-}
-
-.card-header {
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 0;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
-
-.card-body {
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-  padding: 1.25rem;
-}
-
-.card-footer {
-  padding: 0.75rem 1.25rem;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-top: 1px solid rgba(0, 0, 0, 0.125);
-}
-
-/* user */
-div#chordPlayer-config {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: 20%;
-  background: white;
-}
-
+<style lang="scss" scoped>
 #pop-up {
+  @import "node_modules/bootstrap/scss/bootstrap";
+  @import "node_modules/bootstrap-vue/src/index.scss";
   z-index: 1000;
   position: absolute !important;
+  .card-header div {
+    min-height: 24px;
+  }
+  .card-body p.card-text {
+    min-width: 160.24px;
+    min-height: 24.277px;
+  }
 }
 </style>
