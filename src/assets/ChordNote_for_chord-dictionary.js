@@ -54,6 +54,25 @@ Note.prototype.toString = function(useUnicode, useDouble) {
 				: (useUnicode ? "♯" : "#").repeat(this.offset)
 	);
 };
+Note.prototype.toRoman = function(useUnicode, lowerCase, acciUseUnicode, acciUseDouble) {
+	return (
+		this.offset < 0
+			? acciUseUnicode && acciUseDouble && this.offset == -2
+				? "𝄫"
+				: (acciUseUnicode ? "♭" : "b").repeat(-this.offset)
+			: acciUseDouble && this.offset == 2
+				? (acciUseUnicode ? "𝄪" : "x")
+				: (acciUseUnicode ? "♯" : "#").repeat(this.offset)
+	) + (
+		useUnicode
+			? lowerCase
+				? ["ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ"]
+				: ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"]
+			: lowerCase
+				? ["i", "ii", "iii", "iv", "v", "vi", "vii"]
+				: ["I", "II", "III", "IV", "V", "VI", "VII"]
+	)[this.key];
+};
 var half = [0, 2, 4, 5, 7, 9, 11];
 Note.prototype.toHalf = function() {
 	return ((half[this.key] + this.offset) % 12 + 12) % 12;
@@ -86,13 +105,12 @@ if (!String.prototype.repeat) String.prototype.repeat = function(times) {
 	}
 }
 
-function Chord(string, array, isInterval) {
-	if (!(this instanceof Chord)) return new Chord(string, array);
-	this.string = string;
+function Chord(array, data) {
+	if (!(this instanceof Chord)) return new Chord(array, data);
+	for (var prop in data) if (data.hasOwnProperty(prop)) this[prop] = data[prop];
 	this.original = array;
 	this.firstIndex = array.first;
 	delete array.first;
-	this.isInterval = !!isInterval;
 	var octave = 4;
 	this.display = array.map(function(item, index) {
 		return item + "/" + (array[index - 1] && item.key <= array[index - 1].key ? ++octave : octave);
@@ -166,7 +184,7 @@ function parseContent(input) {
 		
 		if (detect) {
 			
-			var noteObj = Note(note, acci);
+			var noteObj = Note(note, acci), noteUntil = i;
 			
 			var bracketLayer = 0;
 			var has5 = false, has6 = false, has7 = false, third = null, seventh = null, type = null;
@@ -506,6 +524,9 @@ function parseContent(input) {
 				return transpose(0, parseContent.transposeTo, transpose(0, isInterval && parseContent.intervalNote, transpose(0, noteObj, item)));
 			});
 			
+			var data = {string: "", name: "", noteString: "", isInterval: isInterval}, slashPos = i;
+			while ("w<,".includes(idList.charAt(slashPos - 1))) slashPos--;
+			
 			if (currStatus == "/") {
 				if (peek() == "w") plus();
 				plus();
@@ -540,7 +561,15 @@ function parseContent(input) {
 					}
 					
 					if (onDetect) {
-						var onNoteObj = Note(onNote, onAcci);
+						while (curr() == "w") back();
+						var onNoteObj = Note(onNote, onAcci), onNoteUntil = i;
+						data.onString = "";
+						for (var k = slashPos; k < onCurrPos; k++) data.onString += inputList[k];
+						if (isInterval) data.onNoteKey = transpose(0, onNoteObj, parseContent.intervalNote) + "";
+						else data.onNoteInterval = transpose(parseContent.intervalNote, onNoteObj).toRoman();
+						data.onNoteString = "";
+						for (var z = onCurrPos; z <= onNoteUntil; z++) data.onNoteString += inputList[z];
+						onNoteObj = transpose(0, parseContent.transposeTo, transpose(0, isInterval && parseContent.intervalNote, onNoteObj));
 						var half = onNoteObj.toHalf();
 						var inversion = false;
 						for (var y = 0; y < chordNote.length; y++) {
@@ -552,7 +581,7 @@ function parseContent(input) {
 							}
 						}
 						if (!inversion) {
-							chordNote.unshift(transpose(0, parseContent.transposeTo, transpose(0, isInterval && parseContent.intervalNote, onNoteObj)));
+							chordNote.unshift(onNoteObj);
 							chordNote.first = -1;
 						}
 					} else {
@@ -571,9 +600,14 @@ function parseContent(input) {
 			
 			while ("w<,".includes(curr())) back();
 			
-			var original = "";
-			for (var x = currPos; x <= i; x++) original += inputList[x];
-			chordList.push(Chord(original, chordNote, isInterval));
+			for (var x = currPos; x <= i; x++) {
+				if (x <= noteUntil) data.noteString += inputList[x];
+				else if (x < slashPos) data.name += inputList[x];
+				data.string += inputList[x];
+			}
+			if (isInterval) data.noteKey = transpose(0, noteObj, parseContent.intervalNote) + "";
+			else data.noteInterval = transpose(parseContent.intervalNote, noteObj).toRoman();
+			chordList.push(Chord(chordNote, data));
 			
 			function clear(pos) {
 				idList = idList.slice(0, pos) + "=" + idList.slice(pos + 1);
