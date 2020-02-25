@@ -525,7 +525,7 @@ function parseContent(input) {
 			});
 			
 			var data = {string: "", name: "", noteString: "", isInterval: isInterval}, slashPos = i;
-			while ("w<,".includes(idList.charAt(slashPos - 1))) slashPos--;
+			while (slashPos && "w<,".includes(idList.charAt(slashPos - 1))) slashPos--;
 			
 			if (currStatus == "/") {
 				if (peek() == "w") plus();
@@ -565,6 +565,7 @@ function parseContent(input) {
 						var onNoteObj = Note(onNote, onAcci), onNoteUntil = i;
 						data.onString = "";
 						for (var k = slashPos; k < onCurrPos; k++) data.onString += inputList[k];
+						slashPos--;
 						if (isInterval) data.onNoteKey = transpose(0, onNoteObj, parseContent.intervalNote) + "";
 						else data.onNoteInterval = transpose(parseContent.intervalNote, onNoteObj).toRoman();
 						data.onNoteString = "";
@@ -602,7 +603,7 @@ function parseContent(input) {
 			
 			for (var x = currPos; x <= i; x++) {
 				if (x <= noteUntil) data.noteString += inputList[x];
-				else if (x < slashPos) data.name += inputList[x];
+				else if (x <= slashPos) data.name += inputList[x];
 				data.string += inputList[x];
 			}
 			if (isInterval) data.noteKey = transpose(0, noteObj, parseContent.intervalNote) + "";
