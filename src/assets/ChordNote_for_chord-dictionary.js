@@ -525,7 +525,7 @@ function parseContent(input) {
 			});
 			
 			var data = {string: "", name: "", noteString: "", isInterval: isInterval}, slashPos = i;
-			while ("w<,".includes(idList.charAt(slashPos - 1))) slashPos--;
+			while (slashPos && "w<,".includes(idList.charAt(slashPos - 1))) slashPos--;
 			
 			if (currStatus == "/") {
 				if (peek() == "w") plus();
