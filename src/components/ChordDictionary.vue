@@ -3,18 +3,27 @@
     <b-card-group
       deck
       id="pop-up"
+      v-show="note.isAvailable"
       :style="{ top: position.top + 'px' , left: position.left + 'px' }"
     >
-      <b-card :header="chordName" title-tag="h3" no-body>
+      <b-card no-body>
+        <b-card-header>
+          <b-card-title class="mb-0" title-tag="h6">{{note | toName}}</b-card-title>
+          <b-card-sub-title
+            class="mt-2 mb-0"
+            v-if="settings.isShowRoman"
+          >{{this.settings.key | toRoman(note)}}</b-card-sub-title>
+        </b-card-header>
         <b-card-body>
-          <b-card-text>{{chordOriginal | chordOriginalToString}}</b-card-text>
-          <score :chordDisplay="chordDisplay" />
+          <b-card-text class="mb-0">{{note.original | chordOriginalToString}}</b-card-text>
+          <score :chordDisplay="note.display" class="mt-0" />
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :chordVoicing="chordVoicing" :settings="settings" />
+    <player :chordVoicing="note.voicing" :settings="settings" />
     <config
       :settings="settings"
+      v-on:toggleRoman="onToggleRoman"
       v-on:toggleClick="onToggleClick"
       v-on:toggleKey="onToggleKey"
       v-on:toggleHover="onToggleHover"
@@ -41,6 +50,22 @@ export default {
         ChordNote.Note(v.key, v.offset).toString(true, true)
       );
       return value.join(" ");
+    },
+    toName: note => {
+      return note.isInterval ? note.noteKey + note.name : note.string;
+    },
+    toRoman: (key, note) => {
+      if (note.length === 0) return "";
+      if (note.isInterval) return note.noteString + note.name;
+      let name =
+        ChordNote.transpose(key, note.noteString).toRoman() + note.name;
+      if (note["onString"] !== undefined) {
+        name += note.onString;
+      }
+      if (note["onNoteInterval"] !== undefined) {
+        name += note.onNoteInterval;
+      }
+      return name;
     }
   },
   data() {
@@ -53,7 +78,9 @@ export default {
       settings: {
         key: "C",
         transpose: 0,
+        gain: 0,
         inst: "piano",
+        isShowRoman: true,
         isActiveClick: true,
         isActiveKey: true,
         isActiveHover: false
@@ -61,23 +88,28 @@ export default {
     };
   },
   computed: {
-    chordNote() {
+    note() {
       ChordNote.parseContent.intervalNote = this.settings.key;
-      ChordNote.parseContent.transposeTo = this.settings.transpose;
-      console.log(ChordNote.parseContent(this.text));
-      return ChordNote.parseContent(this.text);
-    },
-    chordName() {
-      return this.chordNote.length > 0 ? this.chordNote[0].string : " ";
-    },
-    chordOriginal() {
-      return this.chordNote.length > 0 ? this.chordNote[0].original : [];
-    },
-    chordDisplay() {
-      return this.chordNote.length > 0 ? this.chordNote[0].display : [];
-    },
-    chordVoicing() {
-      return this.chordNote.length > 0 ? this.chordNote[0].voicing : [];
+      // ChordNote.parseContent.transposeTo = this.settings.transpose;
+      let object = [];
+      let notes = ChordNote.parseContent(this.text);
+      console.log(notes);
+      if (notes.length > 0) {
+        object = notes[0];
+        object["isAvailable"] = true;
+      } else {
+        object["isAvailable"] = false;
+        object["string"] = "";
+        object["name"] = "";
+        object["noteString"] = "";
+        object["isInterval"] = false;
+        object["noteKey"] = "";
+        object["original"] = [];
+        object["firstIndex"] = 0;
+        object["display"] = [];
+        object["voicing"] = [];
+      }
+      return object;
     }
   },
   watch: {
@@ -130,7 +162,11 @@ export default {
           break;
         }
       }
+      // console.log(range.toString().trim());
       return range.toString().trim();
+    },
+    onToggleRoman: function() {
+      this.settings.isShowRoman = !this.settings.isShowRoman;
     },
     onToggleClick: function() {
       this.settings.isActiveClick = !this.settings.isActiveClick;

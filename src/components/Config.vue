@@ -2,23 +2,28 @@
   <div id="wrapper">
     <!-- Sidebar -->
     <nav id="sidebar" :class="{'active': isShow}">
-      <b-card no-body header="履歴">
-        <b-card-body></b-card-body>
-      </b-card>
-      <b-card no-body header="キー設定">
+      <b-card no-body header="表示設定">
         <b-card-body>
           <!-- <b-input-group prepend="transpose:" class="mb-2"> -->
           <!-- <b-form-spinbutton inline v-model="settings.transpose" min="-12" max="12"></b-form-spinbutton> -->
           <!-- </b-input-group> -->
-          <b-input-group prepend="key:">
+          <b-form-checkbox
+            switch
+            v-model="settings.isShowRoman"
+            v-on:click="$emit('toggleShowRoman')"
+            class="mb-2"
+          >ローマ数字表記</b-form-checkbox>
+          <b-input-group prepend="キー">
             <b-form-select v-model="settings.key" :options="KEYS"></b-form-select>
           </b-input-group>
-          <p class="small text-muted mb-0">ローマ数字に適用</p>
         </b-card-body>
       </b-card>
-      <b-card no-body header="コード再生設定">
+      <b-card no-body header="再生設定">
         <b-card-body>
-          <b-input-group prepend="楽器:">
+          <b-input-group prepend="音量" class="mb-2">
+            <b-form-input v-model="settings.gain" type="range" min="-30" max="0"></b-form-input>
+          </b-input-group>
+          <b-input-group prepend="楽器" class="mb-2">
             <b-form-select v-model="settings.inst" :options="instOptions"></b-form-select>
           </b-input-group>
           <b-form-checkbox
@@ -32,7 +37,7 @@
             v-on:click="$emit('toggleKey')"
           >キー操作</b-form-checkbox>
           <p class="small text-muted mb-0">(Win) Ctrl + Space</p>
-          <p class="small text-muted mb-2">(Mac) Cmd + Shift + Spac</p>
+          <p class="small text-muted mb-0">(Mac) Cmd + Shift + Space</p>
           <b-form-checkbox
             switch
             v-model="settings.isActiveHover"
@@ -103,5 +108,8 @@ export default {
 }
 select {
   -webkit-appearance: none;
+}
+.custom-range {
+  -webkit-appearance: none !important;
 }
 </style>

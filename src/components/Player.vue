@@ -24,8 +24,8 @@ export default {
     playChord: function() {
       if (this.chordVoicing.length === 0) return false;
       const chordMelody = [["0:0:0", this.chordVoicing]];
-      console.log(this.settings.inst);
-      new Tone.Part(
+      this.insts[this.settings.inst].volume.value = this.settings.gain;
+      const part = new Tone.Part(
         function setPlay(time, note) {
           this.insts[this.settings.inst].triggerAttackRelease(
             note,
@@ -52,7 +52,11 @@ export default {
   mounted() {
     INSTS.forEach(
       function(v) {
-        this.insts[v.key] = new Tone.Sampler(v.samples).toMaster();
+        if (v.isSample) {
+          this.insts[v.key] = new Tone.Sampler(v.samples).toMaster();
+        } else {
+          this.insts[v.key] = new Tone.PolySynth().toMaster();
+        }
       }.bind(this)
     );
     window.addEventListener("keydown", this.keyDown);

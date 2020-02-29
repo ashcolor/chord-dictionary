@@ -20,6 +20,11 @@ const config = {
     path: __dirname + '/dist',
     filename: '[name].js',
   },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
   resolve: {
     extensions: ['.js', '.vue'],
   },
