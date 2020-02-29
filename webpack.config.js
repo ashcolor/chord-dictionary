@@ -10,6 +10,7 @@ const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + '/src',
   entry: {
+    'config/const': './config/const.js',
     'entry': './entry.js',
     'main': './main.js',
     'background': './background.js',
@@ -19,11 +20,6 @@ const config = {
   output: {
     path: __dirname + '/dist',
     filename: '[name].js',
-  },
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-    },
   },
   resolve: {
     extensions: ['.js', '.vue'],

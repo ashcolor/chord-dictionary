@@ -1,10 +1,4 @@
-import Vue from 'vue'
-import App from './App'
-
-global.browser = require('webextension-polyfill')
-Vue.prototype.$browser = global.browser
-
-new Vue({
-  el: '#app',
-  render: h => h(App)
-})
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  this.isActive = chrome.tabs.sendMessage(tabs[0].id, {});
+});
+window.close();

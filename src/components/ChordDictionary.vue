@@ -183,7 +183,7 @@ export default {
       "settings",
       function(value) {
         if (!value) return false;
-        this.settings = value.settings;
+        this.settings = Object.assign(this.settings, value.settings);
       }.bind(this)
     );
     window.addEventListener(

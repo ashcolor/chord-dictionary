@@ -21,7 +21,6 @@
   "dependencies": {
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.5.0",
-    "chord-translator": "^0.1.6",
     "hard-source-webpack-plugin": "^0.13.1",
     "tonal": "^2.2.2",
     "tone": "^13.8.25",
