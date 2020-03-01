@@ -23,6 +23,7 @@
     <player :chordVoicing="note.voicing" :settings="settings" />
     <config
       :settings="settings"
+      v-on:toggleShow="onButtonShow"
       v-on:toggleRoman="onToggleRoman"
       v-on:toggleClick="onToggleClick"
       v-on:toggleKey="onToggleKey"
@@ -76,6 +77,7 @@ export default {
         left: 0
       },
       settings: {
+        isShow: true,
         key: "C",
         transpose: 0,
         gain: 0,
@@ -93,7 +95,7 @@ export default {
       // ChordNote.parseContent.transposeTo = this.settings.transpose;
       let object = [];
       let notes = ChordNote.parseContent(this.text);
-      console.log(notes);
+      // console.log(notes);
       if (notes.length > 0) {
         object = notes[0];
         object["isAvailable"] = true;
@@ -164,6 +166,9 @@ export default {
       }
       // console.log(range.toString().trim());
       return range.toString().trim();
+    },
+    onButtonShow: function() {
+      this.settings.isShow = !this.settings.isShow;
     },
     onToggleRoman: function() {
       this.settings.isShowRoman = !this.settings.isShowRoman;

@@ -1,7 +1,7 @@
 <template>
   <div id="wrapper">
     <!-- Sidebar -->
-    <nav id="sidebar" :class="{'active': isShow}">
+    <nav v-show="settings.isShow" id="sidebar">
       <b-card no-body header="表示設定">
         <b-card-body>
           <!-- <b-input-group prepend="transpose:" class="mb-2"> -->
@@ -21,7 +21,7 @@
       <b-card no-body header="再生設定">
         <b-card-body>
           <b-input-group prepend="音量" class="mb-2">
-            <b-form-input v-model="settings.gain" type="range" min="-30" max="0"></b-form-input>
+            <b-form-input v-model="settings.gain" type="range" min="-20" max="0"></b-form-input>
           </b-input-group>
           <b-input-group prepend="楽器" class="mb-2">
             <b-form-select v-model="settings.inst" :options="instOptions"></b-form-select>
@@ -46,7 +46,7 @@
         </b-card-body>
       </b-card>
     </nav>
-    <b-button id="toggle-button" size="sm" class="mb-2" @click="toggleConfig">
+    <b-button id="toggle-button" size="sm" class="mb-2" v-on:click="$emit('toggleShow')">
       <b-icon icon="gear-fill"></b-icon>
     </b-button>
   </div>
@@ -99,12 +99,9 @@ export default {
 #sidebar {
   position: fixed;
   bottom: 60px;
-  right: -280px;
+  right: 12px;
   z-index: 10;
   width: 280px;
-}
-#sidebar.active {
-  right: 12px;
 }
 select {
   -webkit-appearance: none;

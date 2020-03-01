@@ -5,10 +5,14 @@ chrome.runtime.onMessage.addListener(config => {
         appendCss("main.css");
         appendScript("main.js");
         isLoaded = true;
+        chrome.runtime.sendMessage({ "isActive": true });
     } else {
         const el = document.getElementById("cd-wrapper");
-        el.style.display = el.style.display === 'none' ? '' : 'none';
+        const isActive = el.style.display === 'none';
+        el.style.display = isActive ? '' : 'none';
+        chrome.runtime.sendMessage({ "isActive": isActive });
     }
+
 });
 
 function appendCss(url) {
