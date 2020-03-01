@@ -11,6 +11,7 @@
             switch
             v-model="settings.isShowRoman"
             v-on:click="$emit('toggleShowRoman')"
+            onclick="blur()"
             class="mb-2"
           >ローマ数字表記</b-form-checkbox>
           <b-input-group prepend="キー">
@@ -30,11 +31,13 @@
             switch
             v-model="settings.isActiveClick"
             v-on:click="$emit('toggleClick')"
+            onclick="blur()"
           >クリック</b-form-checkbox>
           <b-form-checkbox
             switch
             v-model="settings.isActiveKey"
             v-on:click="$emit('toggleKey')"
+            onclick="blur()"
           >キー操作</b-form-checkbox>
           <p class="small text-muted mb-0">(Win) Ctrl + Space</p>
           <p class="small text-muted mb-0">(Mac) Cmd + Shift + Space</p>
@@ -42,6 +45,7 @@
             switch
             v-model="settings.isActiveHover"
             v-on:click="$emit('toggleHover')"
+            onclick="blur()"
           >ホバー</b-form-checkbox>
         </b-card-body>
       </b-card>

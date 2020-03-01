@@ -5,6 +5,7 @@ import { INSTS } from "../config/const.js";
 export default {
   name: "Player",
   props: {
+    isActive: Boolean,
     chordVoicing: Array,
     settings: Object
   },
@@ -16,6 +17,7 @@ export default {
   },
   watch: {
     chordVoicing: function(n, o) {
+      if (!this.isActive) return false;
       if (!this.settings.isActiveHover) return false;
       this.playChord();
     }
@@ -38,6 +40,7 @@ export default {
       Tone.Transport.start();
     },
     keyDown: function(e) {
+      if (!this.isActive) return false;
       if (!this.settings.isActiveKey) return false;
       if (!e.ctrlKey && !e.metaKey) return false;
       if (e.keyCode === 32) {
@@ -45,6 +48,7 @@ export default {
       }
     },
     click: function(e) {
+      if (!this.isActive) return false;
       if (!this.settings.isActiveClick) return false;
       this.playChord();
     }

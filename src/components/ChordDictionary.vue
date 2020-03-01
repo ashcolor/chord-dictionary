@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-show="isActive">
     <b-card-group
       deck
       id="pop-up"
@@ -20,7 +20,7 @@
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :chordVoicing="note.voicing" :settings="settings" />
+    <player :isActive="isActive" :chordVoicing="note.voicing" :settings="settings" />
     <config
       :settings="settings"
       v-on:toggleShow="onButtonShow"
@@ -71,6 +71,7 @@ export default {
   },
   data() {
     return {
+      isActive: true,
       text: "",
       position: {
         top: 0,
@@ -184,6 +185,9 @@ export default {
     }
   },
   mounted() {
+    chrome.runtime.onMessage.addListener(object => {
+      this.isActive = object.isActive;
+    });
     chrome.storage.local.get(
       "settings",
       function(value) {

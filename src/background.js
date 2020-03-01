@@ -1,33 +1,47 @@
 let activeTabIds = [];
 
 //アイコンをクリックされたとき
-chrome.runtime.onMessage.addListener(function (message) {
-    setStatus(message.isActive)
+chrome.browserAction.onClicked.addListener(function () {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs.length === 0) return false;
+        const tabId = tabs[0].id;
+
+        if (!(tabId in activeTabIds)) {
+            console.log("new");
+
+            chrome.tabs.executeScript(tabId, { file: "main.js" });
+            chrome.tabs.insertCSS(tabId, { file: "main.css" });
+            activeTabIds[tabId] = true;
+            chrome.browserAction.setBadgeText({ text: "ON" });
+        } else {
+            console.log("change");
+
+            const isActiveTo = !activeTabIds[tabId];
+            chrome.tabs.sendMessage(tabId, { isActive: isActiveTo });
+            chrome.browserAction.setBadgeText({ text: isActiveTo ? "ON" : "" });
+            activeTabIds[tabId] = isActiveTo;
+        }
+    });
 });
 
-//タブが更新されたとき
+// //タブが更新されたとき
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    setStatus(false)
+    console.log("activeTabIds", changeInfo)
+    if (changeInfo.status !== "complete") return false
+    delete activeTabIds[tabId];
+    setStatus()
 });
 
-//アクティブなタブが変更されたとき
+// //アクティブなタブが変更されたとき
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     setStatus();
 });
 
-function setStatus(isActive = null) {
-    chrome.tabs.getSelected(null, function (tab) {
-        if (isActive) {
-            activeTabIds.push(tab.id);
-        } else if (isActive === false) {
-            activeTabIds = activeTabIds.filter(n => n !== tab.id);
-
-        }
-        isActive = activeTabIds.indexOf(tab.id) !== -1
-        console.log("setStatus -> tab.id", tab.id)
-        console.log("setStatus -> activeTabIds", activeTabIds)
+function setStatus() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs.length === 0) return false;
+        const tabId = tabs[0].id;
+        const isActive = tabId in activeTabIds ? activeTabIds[tabId] : false;
         chrome.browserAction.setBadgeText({ text: isActive ? "ON" : "" });
-
     });
-
 }

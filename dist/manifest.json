@@ -1,41 +1,30 @@
 {
   "name": "Chord Dictionary",
-  "description": "chord dictionary",
+  "description": "analyzing or playing chord in the page",
   "version": "1.2.0",
   "manifest_version": 2,
   "icons": {
     "48": "icons/icon_48.png",
     "128": "icons/icon_128.png"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "entry.js"
-      ]
-    }
-  ],
   "web_accessible_resources": [
     "main.js",
     "main.css",
     "sounds/*.mp3"
   ],
   "browser_action": {
-    "default_title": "chord-dictionary",
-    "default_popup": "popup/popup.html"
+    "default_title": "chord-dictionary"
   },
   "background": {
     "scripts": [
       "background.js"
-    ]
-  },
-  "options_ui": {
-    "page": "options/options.html",
-    "chrome_style": true
+    ],
+    "persistent": false
   },
   "permissions": [
+    "<all_urls>",
+    "tabs",
+    "activeTab",
     "storage"
   ]
 }
