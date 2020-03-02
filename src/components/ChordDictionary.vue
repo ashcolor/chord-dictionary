@@ -81,9 +81,9 @@ export default {
         isShow: true,
         key: "C",
         transpose: 0,
-        gain: 0,
+        gain: -5,
         inst: "piano",
-        isShowRoman: true,
+        isShowRoman: false,
         isActiveClick: true,
         isActiveKey: true,
         isActiveHover: false

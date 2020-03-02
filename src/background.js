@@ -7,15 +7,11 @@ chrome.browserAction.onClicked.addListener(function () {
         const tabId = tabs[0].id;
 
         if (!(tabId in activeTabIds)) {
-            console.log("new");
-
             chrome.tabs.executeScript(tabId, { file: "main.js" });
             chrome.tabs.insertCSS(tabId, { file: "main.css" });
             activeTabIds[tabId] = true;
             chrome.browserAction.setBadgeText({ text: "ON" });
         } else {
-            console.log("change");
-
             const isActiveTo = !activeTabIds[tabId];
             chrome.tabs.sendMessage(tabId, { isActive: isActiveTo });
             chrome.browserAction.setBadgeText({ text: isActiveTo ? "ON" : "" });
@@ -26,7 +22,6 @@ chrome.browserAction.onClicked.addListener(function () {
 
 // //タブが更新されたとき
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    console.log("activeTabIds", changeInfo)
     if (changeInfo.status !== "complete") return false
     delete activeTabIds[tabId];
     setStatus()
