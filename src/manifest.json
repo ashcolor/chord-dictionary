@@ -1,6 +1,6 @@
 {
   "name": "Chord Dictionary",
-  "description": "analyzing or playing chord in the page",
+  "description": "アイコンをクリックして起動、ページ上に表示されているコードにカーソルを合わせるとコードの構成音を表示します。",
   "version": "1.2.0",
   "manifest_version": 2,
   "icons": {

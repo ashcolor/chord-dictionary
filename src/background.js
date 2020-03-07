@@ -5,7 +5,6 @@ chrome.browserAction.onClicked.addListener(function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         if (tabs.length === 0) return false;
         const tabId = tabs[0].id;
-
         if (!(tabId in activeTabIds)) {
             chrome.tabs.executeScript(tabId, { file: "main.js" });
             chrome.tabs.insertCSS(tabId, { file: "main.css" });
