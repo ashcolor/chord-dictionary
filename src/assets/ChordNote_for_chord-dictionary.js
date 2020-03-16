@@ -65,7 +65,7 @@ Note.prototype.toRoman = function() {
 				: (Note.useUnicode ? "♯" : "#").repeat(this.offset)
 	) + (
 		Note.romanUseUnicode
-			? lowerCase
+			? Note.romanUseLowerCase
 				? ["ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ"]
 				: ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"]
 			: Note.romanUseLowerCase
