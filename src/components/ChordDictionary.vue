@@ -3,7 +3,7 @@
     <b-card-group
       deck
       id="pop-up"
-      v-show="!!note"
+      v-show="note"
       :style="{ top: position.top + 'px' , left: position.left + 'px' }"
     >
       <b-card no-body>
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import ChordNote from "../assets/ChordNote_for_chord-dictionary.js";
+import { Note, Chord, transpose, parseContent } from "../assets/ChordNote_for_chord-dictionary.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
 import Config from "./Config.vue";
@@ -46,7 +46,6 @@ export default {
   },
   filters: {
     chordOriginalToString: value => {
-      value = value.map(v => v.toString(true, true));
       return value.join(" ");
     },
     subtitle: note => {
@@ -80,6 +79,10 @@ export default {
   },
   computed: {
     note() {
+      Note.useUnicode = true;
+      Note.useDouble = true;
+      Note.romanUseUnicode = true;
+      Note.romanUseLowerCase = false;
       ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
       ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
       return ChordNote.parseContent(this.text);
@@ -168,8 +171,8 @@ export default {
     window.addEventListener(
       "mousemove",
       function(e) {
-        this.position.top = e.pageY + 20;
-        this.position.left = e.pageX + 20;
+        this.position.top = e.pageY + 16;
+        this.position.left = e.pageX + 16;
         this.text = this.getPointedWord(event);
       }.bind(this)
     );
