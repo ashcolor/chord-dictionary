@@ -35,10 +35,10 @@ const KEYS = [
     { value: 4, text: "G" },
     { value: 5, text: "A" },
     { value: 6, text: "B" }
-]
+];
 const OFFSETS = [
     { value: -1, text: "♭" },
     { value: 0, text: "♮" },
     { value: 1, text: "♯" }
-]
+];
 export { INSTS, KEYS, OFFSETS };
