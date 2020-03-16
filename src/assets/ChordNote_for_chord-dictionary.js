@@ -43,32 +43,32 @@ function Note(key, offset) {
 		} else return null;
 	}
 }
-Note.prototype.toString = function(useUnicode, useDouble) {
+Note.prototype.toString = function() {
 	return "CDEFGAB".charAt(this.key) + (
 		this.offset < 0
-			? useUnicode && useDouble && this.offset == -2
+			? Note.useUnicode && Note.useDouble && this.offset == -2
 				? "𝄫"
-				: (useUnicode ? "♭" : "b").repeat(-this.offset)
-			: useDouble && this.offset == 2
-				? (useUnicode ? "𝄪" : "x")
-				: (useUnicode ? "♯" : "#").repeat(this.offset)
+				: (Note.useUnicode ? "♭" : "b").repeat(-this.offset)
+			: Note.useDouble && this.offset == 2
+				? (Note.useUnicode ? "𝄪" : "x")
+				: (Note.useUnicode ? "♯" : "#").repeat(this.offset)
 	);
 };
-Note.prototype.toRoman = function(useUnicode, lowerCase, acciUseUnicode, acciUseDouble) {
+Note.prototype.toRoman = function() {
 	return (
 		this.offset < 0
-			? acciUseUnicode && acciUseDouble && this.offset == -2
+			? Note.useUnicode && Note.useDouble && this.offset == -2
 				? "𝄫"
-				: (acciUseUnicode ? "♭" : "b").repeat(-this.offset)
-			: acciUseDouble && this.offset == 2
-				? (acciUseUnicode ? "𝄪" : "x")
-				: (acciUseUnicode ? "♯" : "#").repeat(this.offset)
+				: (Note.useUnicode ? "♭" : "b").repeat(-this.offset)
+			: Note.useDouble && this.offset == 2
+				? (Note.useUnicode ? "𝄪" : "x")
+				: (Note.useUnicode ? "♯" : "#").repeat(this.offset)
 	) + (
-		useUnicode
+		Note.romanUseUnicode
 			? lowerCase
 				? ["ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ"]
 				: ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"]
-			: lowerCase
+			: Note.romanUseLowerCase
 				? ["i", "ii", "iii", "iv", "v", "vi", "vii"]
 				: ["I", "II", "III", "IV", "V", "VI", "VII"]
 	)[this.key];
@@ -705,8 +705,6 @@ function parseContent(input) {
 		}
 	}
 }
-parseContent.intervalNote = null;
-parseContent.transposeTo = null;
 if (!String.prototype.includes) String.prototype.includes = function(search, start) {
 	return this.indexOf(search, start) != -1;
 };
