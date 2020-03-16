@@ -3,7 +3,7 @@
     <b-card-group
       deck
       id="pop-up"
-      v-show="note.isAvailable"
+      v-show="!!note"
       :style="{ top: position.top + 'px' , left: position.left + 'px' }"
     >
       <b-card no-body>
@@ -81,7 +81,7 @@ export default {
   computed: {
     note() {
       ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
-      // ChordNote.parseContent.transposeTo = this.settings.transpose;
+      ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
       return ChordNote.parseContent(this.text);
     }
   },
