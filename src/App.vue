@@ -15,7 +15,4 @@ export default {
 </script>
 
 <style scoped>
-#cd-wrapper {
-  position: rerative;
-}
 </style>
