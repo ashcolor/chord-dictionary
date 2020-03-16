@@ -8,11 +8,10 @@
     >
       <b-card no-body>
         <b-card-header>
-          <b-card-title class="mb-0" title-tag="h6">{{note | toName}}</b-card-title>
+          <b-card-title class="mb-0" title-tag="h6">{{note.string}}</b-card-title>
           <b-card-sub-title
             class="mt-2 mb-0"
-            v-if="settings.isShowRoman"
-          >{{this.settings.key | toRoman(note)}}</b-card-sub-title>
+          >{{note | subtitle}}</b-card-sub-title>
         </b-card-header>
         <b-card-body>
           <b-card-text class="mb-0">{{note.original | chordOriginalToString}}</b-card-text>
@@ -47,26 +46,15 @@ export default {
   },
   filters: {
     chordOriginalToString: value => {
-      value = value.map(v =>
-        ChordNote.Note(v.key, v.offset).toString(true, true)
-      );
+      value = value.map(v => v.toString(true, true));
       return value.join(" ");
     },
-    toName: note => {
-      return note.isInterval ? note.noteKey + note.name : note.string;
-    },
-    toRoman: (key, note) => {
-      if (note.length === 0) return "";
-      if (note.isInterval) return note.noteString + note.name;
-      let name =
-        ChordNote.transpose(key, note.noteString).toRoman() + note.name;
-      if (note["onString"] !== undefined) {
-        name += note.onString;
-      }
-      if (note["onNoteInterval"] !== undefined) {
-        name += note.onNoteInterval;
-      }
-      return name;
+    subtitle: note => {
+      return note.isInterval
+        ? (note.noteKey || "") + (note.name || "") + (note.onString || "") + (note.onNoteKey || "")
+        : this.settings.isShowRoman
+          ? (note.noteInterval || "") + (note.name || "") + (note.onString || "") + (note.onNoteInterval || "")
+          : "";
     }
   },
   data() {
@@ -92,27 +80,9 @@ export default {
   },
   computed: {
     note() {
-      ChordNote.parseContent.intervalNote = this.settings.key;
+      ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
       // ChordNote.parseContent.transposeTo = this.settings.transpose;
-      let object = [];
-      let notes = ChordNote.parseContent(this.text);
-      // console.log(notes);
-      if (notes.length > 0) {
-        object = notes[0];
-        object["isAvailable"] = true;
-      } else {
-        object["isAvailable"] = false;
-        object["string"] = "";
-        object["name"] = "";
-        object["noteString"] = "";
-        object["isInterval"] = false;
-        object["noteKey"] = "";
-        object["original"] = [];
-        object["firstIndex"] = 0;
-        object["display"] = [];
-        object["voicing"] = [];
-      }
-      return object;
+      return ChordNote.parseContent(this.text);
     }
   },
   watch: {
