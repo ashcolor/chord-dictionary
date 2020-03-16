@@ -16,6 +16,11 @@
           >ローマ数字表記</b-form-checkbox>
           <b-input-group prepend="キー">
             <b-form-select v-model="settings.key" :options="KEYS"></b-form-select>
+            <b-form-select v-model="settings.offset" :options="OFFSETS"></b-form-select>
+          </b-input-group>
+          <b-input-group prepend="移調（ローマ数字機能への影響なし）">
+            <b-form-select v-model="settings.transposeKey" :options="KEYS"></b-form-select>
+            <b-form-select v-model="settings.transposeOffset" :options="OFFSETS"></b-form-select>
           </b-input-group>
         </b-card-body>
       </b-card>
@@ -57,7 +62,7 @@
 </template>
 
 <script>
-import { INSTS, KEYS } from "../config/const";
+import { INSTS, KEYS, OFFSETS } from "../config/const";
 
 export default {
   name: "Config",
@@ -76,6 +81,9 @@ export default {
     },
     KEYS() {
       return KEYS;
+    },
+    OFFSETS() {
+      return OFFSETS;
     }
   },
   methods: {
