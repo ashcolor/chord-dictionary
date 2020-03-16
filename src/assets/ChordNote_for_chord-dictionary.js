@@ -143,8 +143,6 @@ function parseContent(input) {
 		}
 	});
 	
-	var chordList = [];
-	
 	for (i = 0; i < idList.length; i++) {
 		
 		var currPos = i, detect = false, isInterval = false, note, acci;
@@ -608,7 +606,7 @@ function parseContent(input) {
 			}
 			if (isInterval) data.noteKey = transpose(0, noteObj, parseContent.intervalNote) + "";
 			else data.noteInterval = transpose(parseContent.intervalNote, noteObj).toRoman();
-			chordList.push(Chord(chordNote, data));
+			return Chord(chordNote, data);
 			
 			function clear(pos) {
 				idList = idList.slice(0, pos) + "=" + idList.slice(pos + 1);
@@ -706,7 +704,6 @@ function parseContent(input) {
 			return curr();
 		}
 	}
-	return chordList;
 }
 parseContent.intervalNote = null;
 parseContent.transposeTo = null;
