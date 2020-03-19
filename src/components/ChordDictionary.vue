@@ -1,25 +1,30 @@
 <template>
   <div v-show="isActive">
+    <div
+      id="highlight"
+      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , bottom: highlightPos.bottom + 'px' , right: highlightPos.right + 'px' }"
+    ></div>
     <b-card-group
       deck
       id="pop-up"
-      v-show="note"
+      v-show="chord"
       :style="{ top: position.top + 'px' , left: position.left + 'px' }"
     >
       <b-card no-body>
         <b-card-header>
-          <b-card-title class="mb-0" title-tag="h6">{{note.string}}</b-card-title>
+          <b-card-title class="mb-0" title-tag="h6">{{chord.titleElement}}</b-card-title>
           <b-card-sub-title
             class="mt-2 mb-0"
-          >{{note | subtitle}}</b-card-sub-title>
+            v-if="chord.isInterval || settings.isShowRoman"
+          >{{chord.subtitleElement}}</b-card-sub-title>
         </b-card-header>
         <b-card-body>
-          <b-card-text class="mb-0">{{note.original | chordOriginalToString}}</b-card-text>
-          <score :chordDisplay="note.display" class="mt-0" />
+          <b-card-text class="mb-0">{{chord.originalElement}}</b-card-text>
+          <score :chordDisplay="chord" class="mt-0" />
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :isActive="isActive" :chordVoicing="note.voicing" :settings="settings" />
+    <player :isActive="isActive" :chordVoicing="chord.voicing" :settings="settings" />
     <config
       :settings="settings"
       v-on:toggleShow="onButtonShow"
@@ -32,7 +37,7 @@
 </template>
 
 <script>
-import { Note, Chord, transpose, parseContent } from "../assets/ChordNote_for_chord-dictionary.js";
+import { Note, Chord, transpose, parseContent } from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
 import Config from "./Config.vue";
@@ -44,31 +49,25 @@ export default {
     Player,
     Config
   },
-  filters: {
-    chordOriginalToString: value => {
-      return value.join(" ");
-    },
-    subtitle: note => {
-      return note.isInterval
-        ? (note.noteKey || "") + (note.name || "") + (note.onString || "") + (note.onNoteKey || "")
-        : this.settings.isShowRoman
-          ? (note.noteInterval || "") + (note.name || "") + (note.onString || "") + (note.onNoteInterval || "")
-          : "";
-    }
-  },
   data() {
     return {
       isActive: true,
-      text: "",
+      chord: null,
       position: {
         top: 0,
         left: 0
       },
+      highlightPos: {
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0
+      },
       settings: {
         isShow: true,
-        key: "C",
-        transpose: 0,
-        gain: -5,
+        key: null,
+        transpose: null,
+        volume: 70,
         inst: "piano",
         isShowRoman: false,
         isActiveClick: true,
@@ -76,17 +75,6 @@ export default {
         isActiveHover: false
       }
     };
-  },
-  computed: {
-    note() {
-      Note.useUnicode = true;
-      Note.useDouble = true;
-      Note.romanUseUnicode = true;
-      Note.romanUseLowerCase = false;
-      ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
-      ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
-      return ChordNote.parseContent(this.text);
-    }
   },
   watch: {
     settings: {
@@ -99,24 +87,35 @@ export default {
     }
   },
   methods: {
-    getPointedWord(e) {
+    setPointedChord(e) {
       let range;
       let textNode;
       if (document.caretPositionFromPoint) {
         range = document.caretPositionFromPoint(e.clientX, e.clientY);
-        if (!range) return "";
+        if (!range) return;
         textNode = range.offsetNode;
       } else if (document.caretRangeFromPoint) {
         range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (!range) return "";
+        if (!range) return;
         textNode = range.startContainer;
-      }
-      if (!textNode) return "";
-      if (textNode.nodeType !== 3) return "";
-      if (range === null) return "";
-      if (range.startContainer.nodeType !== Node.TEXT_NODE) return "";
+      } else return;
+      if (!textNode || textNode.nodeType !== 3) return;
 
-      //@https://javascript.g.hatena.ne.jp/edvakf/20110213/1297636186
+      Note.useUnicode = true;
+      Note.useDouble = true;
+      Note.romanUseUnicode = true;
+      Note.romanUseLowerCase = false;
+
+      ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
+      ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
+      this.chord = ChordNote.parseContent(textNode.nodeValue, range.startOffset);
+      
+      range.setStart(textNode, this.chord.position);
+      range.setEnd(textNode, this.chord.position + this.chord.string.length);
+      this.highlightPos = range.getBoundingClientRect();
+
+      /*
+      // @https://javascript.g.hatena.ne.jp/edvakf/20110213/1297636186
       let t = range.startContainer;
       let start = range.startOffset;
       let end = start;
@@ -140,6 +139,7 @@ export default {
       }
       // console.log(range.toString().trim());
       return range.toString().trim();
+      */
     },
     onButtonShow: function() {
       this.settings.isShow = !this.settings.isShow;
@@ -163,18 +163,18 @@ export default {
     });
     chrome.storage.local.get(
       "settings",
-      function(value) {
+      (function(value) {
         if (!value) return false;
         this.settings = Object.assign(this.settings, value.settings);
-      }.bind(this)
+      }).bind(this)
     );
     window.addEventListener(
       "mousemove",
-      function(e) {
+      (function(e) {
         this.position.top = e.pageY + 16;
         this.position.left = e.pageX + 16;
-        this.text = this.getPointedWord(event);
-      }.bind(this)
+        this.setPointedChord(e);
+      }).bind(this)
     );
   }
 };
@@ -193,5 +193,27 @@ export default {
     min-width: 160.24px;
     min-height: 24.277px;
   }
+  
+  .note {font-style: bold;}
+  .chord {color: #333; font-style: italic;}
+  .slash {color: #888; font-size: 80%;}
+  .bass {font-size: 80%;}
+  .part {margin-right: 10px;}
+
+  .midi-0 {color: hsl(0, 88%, 46%);}
+  .midi-1 {color: hsl(30, 99%, 33%);}
+  .midi-2 {color: hsl(49, 90%, 46%);}
+  .midi-3 {color: hsl(60, 98%, 33%);}
+  .midi-4 {color: hsl(79, 59%, 46%);}
+  .midi-5 {color: hsl(135, 76%, 33%);}
+  .midi-6 {color: hsl(172, 68%, 46%);}
+  .midi-7 {color: hsl(191, 41%, 33%);}
+  .midi-8 {color: hsl(273, 79%, 46%);}
+  .midi-9 {color: hsl(291, 46%, 33%);}
+  .midi-10 {color: hsl(295, 97%, 46%);}
+  .midi-11 {color: hsl(332, 97%, 33%);}
+}
+#highlight {
+	background-color: yellow;
 }
 </style>

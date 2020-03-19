@@ -27,7 +27,7 @@
       <b-card no-body header="再生設定">
         <b-card-body>
           <b-input-group prepend="音量" class="mb-2">
-            <b-form-input v-model="settings.gain" type="range" min="-20" max="0"></b-form-input>
+            <b-form-input v-model="settings.volume" type="range" min="0" max="100"></b-form-input>
           </b-input-group>
           <b-input-group prepend="楽器" class="mb-2">
             <b-form-select v-model="settings.inst" :options="instOptions"></b-form-select>
