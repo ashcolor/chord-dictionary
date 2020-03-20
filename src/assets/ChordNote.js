@@ -199,13 +199,13 @@ function parseContent(input, withinPos) {
 			
 			addNoteMandatory[-1] = true;
 			
-			while (cont(
+			cont(
 				"p", c => {type = "'"; return true;},
-				"_", c => {if (bracketLayer) return false; third = "m"; seventhPos = i; return true;},
+				"_", c => {third = "m"; seventhPos = i; return true;},
 				"2", c => {sus2 = true; cont("4", c => sus4 = true); return true;},
 				"4", c => {sus4 = true; cont("2", c => sus2 = true); return true;},
 				"79et", c => {has7 = true; highestInterval = c; return true;}
-			));
+			);
 			
 			function requireNum(acci) {
 				var acciPos = i;
@@ -612,23 +612,22 @@ function parseContent(input, withinPos) {
 			}
 			
 			data.position = inputList.slice(0, currPos).join("").length;
-			if (withinPos < data.position + data.string.length) {
-				if (withinPos >= data.position) {
-					
-					if (isInterval) data.noteKey = transpose(0, noteObj, parseContent.intervalNote) + "";
-					else data.noteInterval = transpose(parseContent.intervalNote, noteObj).toRoman();
-					
-					data.titleElement = [el("note midi-" + noteObj.toHalf(), data.noteString), el("chord", data.name)];
-					if (onDetect) data.titleElement.push(el("slash", data.onString), el("bass midi-" + onNoteObj.toHalf(), data.onNoteString));
-					data.titleElement = el("title", data.titleElement);
-					data.subtitleElement = [el("note midi-" + noteObj.toHalf(), isInterval ? data.noteKey : data.noteInterval), el("chord", data.name)];
-					if (onDetect) data.subtitleElement.push(el("slash", data.onString), el("bass midi-" + onNoteObj.toHalf(), data.isInterval ? data.onNoteKey : data.onNoteInterval));
-					data.subtitleElement = el("subtitle", data.subtitleElement);
-					data.originalElement = el("original", chordNote.map(item => el("part midi-" + item.toHalf(), item + "")));
-					
-					return Chord(chordNote, data);
-				}
-			} else return;
+			if (withinPos >= data.position && withinPos < data.position + data.string.length) {
+				
+				if (isInterval) data.noteKey = transpose(0, noteObj, parseContent.intervalNote) + "";
+				else data.noteInterval = transpose(parseContent.intervalNote, noteObj).toRoman();
+				
+				data.titleElement = [el("chord-dictionary-note chord-dictionary-midi-" + noteObj.toHalf(), data.noteString), el("chord-dictionary-chord", data.name)];
+				if (onDetect) data.titleElement.push(el("chord-dictionary-slash", data.onString), el("chord-dictionary-bass chord-dictionary-midi-" + onNoteObj.toHalf(), data.onNoteString));
+				data.titleElement = el("chord-dictionary-title", data.titleElement);
+				data.subtitleElement = [el("chord-dictionary-note chord-dictionary-midi-" + noteObj.toHalf(), isInterval ? data.noteKey : data.noteInterval), el("chord-dictionary-chord", data.name)];
+				if (onDetect) data.subtitleElement.push(el("chord-dictionary-slash", data.onString), el("chord-dictionary-bass chord-dictionary-midi-" + onNoteObj.toHalf(), data.isInterval ? data.onNoteKey : data.onNoteInterval));
+				data.subtitleElement = el("chord-dictionary-subtitle", data.subtitleElement);
+				data.originalElement = el("chord-dictionary-original", chordNote.map(item => el("chord-dictionary-part chord-dictionary-midi-" + item.toHalf(), item + "")));
+				
+				return Chord(chordNote, data);
+				
+			}
 			
 			function clear(pos) {
 				idList = idList.slice(0, pos) + "=" + idList.slice(pos + 1);
@@ -729,4 +728,5 @@ if (!String.prototype.includes) String.prototype.includes = function(search, sta
 if (!Array.prototype.includes) Array.prototype.includes = function(search, start) {
 	return this.indexOf(search, start) != -1;
 };
-export default { Note, Chord, transpose, parseContent }
+var ChordNote = {Note: Note, Chord: Chord, transpose: transpose, parseContent: parseContent};
+export default ChordNote;
