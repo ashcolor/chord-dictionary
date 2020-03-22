@@ -1,26 +1,34 @@
 <template>
   <div v-show="isActive">
     <div
-      id="highlight"
-      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , bottom: highlightPos.bottom + 'px' , right: highlightPos.right + 'px' }"
+      id="chord-dictionary-highlight"
+      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
     ></div>
     <b-card-group
       deck
-      id="pop-up"
+      id="chord-dictionary-pop-up"
       v-show="chord"
       :style="{ top: position.top + 'px' , left: position.left + 'px' }"
     >
       <b-card no-body>
         <b-card-header>
-          <b-card-title class="mb-0" title-tag="h6">{{chord.titleElement}}</b-card-title>
+          <b-card-title
+            class="mb-0"
+            title-tag="h6"
+            v-html="chord.titleElement && chord.titleElement.innerHTML"
+          ></b-card-title>
           <b-card-sub-title
             class="mt-2 mb-0"
             v-if="chord.isInterval || settings.isShowRoman"
-          >{{chord.subtitleElement}}</b-card-sub-title>
+            v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
+          ></b-card-sub-title>
         </b-card-header>
         <b-card-body>
-          <b-card-text class="mb-0">{{chord.originalElement}}</b-card-text>
-          <score :chordDisplay="chord" class="mt-0" />
+          <b-card-text
+            class="mb-0"
+            v-html="chord.originalElement && chord.originalElement.innerHTML"
+          ></b-card-text>
+          <score :chordObject="chord" class="mt-0" />
         </b-card-body>
       </b-card>
     </b-card-group>
@@ -37,7 +45,7 @@
 </template>
 
 <script>
-import { Note, Chord, transpose, parseContent } from "../assets/ChordNote.js";
+import ChordNote from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
 import Config from "./Config.vue";
@@ -52,7 +60,7 @@ export default {
   data() {
     return {
       isActive: true,
-      chord: null,
+      chord: {},
       position: {
         top: 0,
         left: 0
@@ -60,8 +68,8 @@ export default {
       highlightPos: {
         top: 0,
         left: 0,
-        bottom: 0,
-        right: 0
+        width: 0,
+        height: 0
       },
       settings: {
         isShow: true,
@@ -79,9 +87,7 @@ export default {
   watch: {
     settings: {
       handler: function(newValue, oldValue) {
-        chrome.storage.local.set({ settings: newValue }, function() {
-          console.log("[chord-dictionary] settings saved");
-        });
+        chrome.storage.local.set({ settings: newValue });
       },
       deep: true
     }
@@ -101,45 +107,39 @@ export default {
       } else return;
       if (!textNode || textNode.nodeType !== 3) return;
 
-      Note.useUnicode = true;
-      Note.useDouble = true;
-      Note.romanUseUnicode = true;
-      Note.romanUseLowerCase = false;
+      ChordNote.Note.useUnicode = true;
+      ChordNote.Note.useDouble = true;
+      ChordNote.Note.romanUseUnicode = true;
+      ChordNote.Note.romanUseLowerCase = false;
 
-      ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
-      ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
-      this.chord = ChordNote.parseContent(textNode.nodeValue, range.startOffset);
-      
-      range.setStart(textNode, this.chord.position);
-      range.setEnd(textNode, this.chord.position + this.chord.string.length);
-      this.highlightPos = range.getBoundingClientRect();
+      ChordNote.parseContent.intervalNote = ChordNote.Note(
+        this.settings.key,
+        this.settings.offset
+      );
+      ChordNote.parseContent.transposeTo = ChordNote.Note(
+        this.settings.transposeKey,
+        this.settings.transposeOffset
+      );
+      this.chord = ChordNote.parseContent(
+        textNode.nodeValue,
+        range.startOffset
+      );
 
-      /*
-      // @https://javascript.g.hatena.ne.jp/edvakf/20110213/1297636186
-      let t = range.startContainer;
-      let start = range.startOffset;
-      let end = start;
-
-      while (start > 0) {
-        start -= 1;
-        range.setStart(t, start);
-        if (/^\s/.test(range.toString())) {
-          range.setStart(t, (start += 1));
-          break;
-        }
+      if (this.chord) {
+        range.setStart(textNode, this.chord.position);
+        range.setEnd(textNode, this.chord.position + this.chord.string.length);
+        this.highlightPos = range.getBoundingClientRect();
+        document.body.style.cursor = "help";
+      } else {
+        this.chord = {};
+        this.highlightPos = {
+          top: 0,
+          left: 0,
+          width: 0,
+          height: 0
+        };
+        document.body.style.cursor = "";
       }
-      let l = t.nodeValue.length;
-      while (end < l) {
-        end += 1;
-        range.setEnd(t, end);
-        if (/\s$/.test(range.toString())) {
-          range.setEnd(t, (end -= 1));
-          break;
-        }
-      }
-      // console.log(range.toString().trim());
-      return range.toString().trim();
-      */
     },
     onButtonShow: function() {
       this.settings.isShow = !this.settings.isShow;
@@ -163,25 +163,25 @@ export default {
     });
     chrome.storage.local.get(
       "settings",
-      (function(value) {
+      function(value) {
         if (!value) return false;
         this.settings = Object.assign(this.settings, value.settings);
-      }).bind(this)
+      }.bind(this)
     );
     window.addEventListener(
       "mousemove",
-      (function(e) {
+      function(e) {
         this.position.top = e.pageY + 16;
         this.position.left = e.pageX + 16;
         this.setPointedChord(e);
-      }).bind(this)
+      }.bind(this)
     );
   }
 };
 </script>
 
 <style lang="scss" scoped>
-#pop-up {
+#chord-dictionary-pop-up {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
   z-index: 1000;
@@ -193,27 +193,66 @@ export default {
     min-width: 160.24px;
     min-height: 24.277px;
   }
-  
-  .note {font-style: bold;}
-  .chord {color: #333; font-style: italic;}
-  .slash {color: #888; font-size: 80%;}
-  .bass {font-size: 80%;}
-  .part {margin-right: 10px;}
-
-  .midi-0 {color: hsl(0, 88%, 46%);}
-  .midi-1 {color: hsl(30, 99%, 33%);}
-  .midi-2 {color: hsl(49, 90%, 46%);}
-  .midi-3 {color: hsl(60, 98%, 33%);}
-  .midi-4 {color: hsl(79, 59%, 46%);}
-  .midi-5 {color: hsl(135, 76%, 33%);}
-  .midi-6 {color: hsl(172, 68%, 46%);}
-  .midi-7 {color: hsl(191, 41%, 33%);}
-  .midi-8 {color: hsl(273, 79%, 46%);}
-  .midi-9 {color: hsl(291, 46%, 33%);}
-  .midi-10 {color: hsl(295, 97%, 46%);}
-  .midi-11 {color: hsl(332, 97%, 33%);}
 }
-#highlight {
-	background-color: yellow;
+#chord-dictionary-highlight {
+  position: absolute;
+  z-index: -1000;
+  background-color: yellow;
+}
+</style>
+<style>
+.chord-dictionary-note {
+  font-style: bold;
+}
+.chord-dictionary-chord {
+  color: #333;
+  font-style: italic;
+}
+.chord-dictionary-slash {
+  color: #888;
+  font-size: 80%;
+}
+.chord-dictionary-bass {
+  font-size: 80%;
+}
+.chord-dictionary-part {
+  margin-right: 10px;
+}
+
+.chord-dictionary-midi-0 {
+  color: hsl(0, 88%, 46%);
+}
+.chord-dictionary-midi-1 {
+  color: hsl(30, 99%, 33%);
+}
+.chord-dictionary-midi-2 {
+  color: hsl(49, 90%, 46%);
+}
+.chord-dictionary-midi-3 {
+  color: hsl(60, 98%, 33%);
+}
+.chord-dictionary-midi-4 {
+  color: hsl(79, 59%, 46%);
+}
+.chord-dictionary-midi-5 {
+  color: hsl(135, 76%, 33%);
+}
+.chord-dictionary-midi-6 {
+  color: hsl(172, 68%, 46%);
+}
+.chord-dictionary-midi-7 {
+  color: hsl(191, 41%, 33%);
+}
+.chord-dictionary-midi-8 {
+  color: hsl(273, 79%, 46%);
+}
+.chord-dictionary-midi-9 {
+  color: hsl(291, 46%, 33%);
+}
+.chord-dictionary-midi-10 {
+  color: hsl(295, 97%, 46%);
+}
+.chord-dictionary-midi-11 {
+  color: hsl(332, 97%, 33%);
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div id="score"></div>
+  <div id="chord-dictionary-score"></div>
 </template>
 
 <script>
@@ -12,14 +12,14 @@ export default {
   },
   watch: {
     chordObject: function(val) {
-      if (val) this.dispScore(val);
+      if (val.display !== undefined) this.dispScore(val);
     }
   },
   methods: {
-    dispScore: chordObject => {
+    dispScore: function(chordObject) {
       const VF = Vex.Flow;
 
-      const div = document.getElementById("score");
+      const div = document.getElementById("chord-dictionary-score");
       if (div === null) return false;
       div.textContent = null;
 
@@ -31,10 +31,29 @@ export default {
       stave.addClef("treble");
       stave.setContext(context).draw();
 
-      const notes = new VF.StaveNote({ keys: chordObject.display, duration: "w" });
+      const display = chordObject.display.map(note =>
+        note
+          .replace("♭", "b")
+          .replace("𝄫", "bb")
+          .replace("♯", "#")
+          .replace("𝄪", "##")
+      );
+
+      const notes = new VF.StaveNote({
+        keys: display,
+        duration: "w"
+      });
 
       chordObject.original.forEach((note, index) => {
-        if (note.offset) notes.addAccidental(index, new VF.Accidental(note.offset < 0 ? "b".repeat(-note.offset) : "#".repeat(note.offset)));
+        if (note.offset)
+          notes.addAccidental(
+            index,
+            new VF.Accidental(
+              note.offset < 0
+                ? "b".repeat(-note.offset)
+                : "#".repeat(note.offset)
+            )
+          );
       });
 
       const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
@@ -47,7 +66,7 @@ export default {
 </script>
 
 <style scoped>
-#score {
+#chord-dictionary-score {
   margin-top: 10px;
   height: 100px;
 }

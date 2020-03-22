@@ -1,7 +1,7 @@
 <template>
-  <div id="wrapper">
+  <div id="chord-dictionary-wrapper">
     <!-- Sidebar -->
-    <nav v-show="settings.isShow" id="sidebar">
+    <nav v-show="settings.isShow" id="chord-dictionary-sidebar">
       <b-card no-body header="表示設定">
         <b-card-body>
           <!-- <b-input-group prepend="transpose:" class="mb-2"> -->
@@ -18,10 +18,11 @@
             <b-form-select v-model="settings.key" :options="KEYS"></b-form-select>
             <b-form-select v-model="settings.offset" :options="OFFSETS"></b-form-select>
           </b-input-group>
-          <b-input-group prepend="移調（ローマ数字機能への影響なし）">
+          <b-input-group prepend="移調">
             <b-form-select v-model="settings.transposeKey" :options="KEYS"></b-form-select>
             <b-form-select v-model="settings.transposeOffset" :options="OFFSETS"></b-form-select>
           </b-input-group>
+          <p class="small text-muted mb-0">（移調はローマ数字機能への影響なし）</p>
         </b-card-body>
       </b-card>
       <b-card no-body header="再生設定">
@@ -55,7 +56,12 @@
         </b-card-body>
       </b-card>
     </nav>
-    <b-button id="toggle-button" size="sm" class="mb-2" v-on:click="$emit('toggleShow')">
+    <b-button
+      id="chord-dictionary-toggle-button"
+      size="sm"
+      class="mb-2"
+      v-on:click="$emit('toggleShow')"
+    >
       <b-icon icon="gear-fill"></b-icon>
     </b-button>
   </div>
@@ -96,19 +102,19 @@ export default {
 </script>
 
 <style lang="scss">
-#wrapper {
+#chord-dictionary-wrapper {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
   display: flex;
   align-items: stretch;
 }
-#toggle-button {
+#chord-dictionary-toggle-button {
   position: fixed;
   bottom: 10px;
   right: 10px;
   z-index: 11;
 }
-#sidebar {
+#chord-dictionary-sidebar {
   position: fixed;
   bottom: 60px;
   right: 12px;
@@ -117,8 +123,10 @@ export default {
 }
 select {
   -webkit-appearance: none;
+  appearance: none;
 }
 .custom-range {
   -webkit-appearance: none !important;
+  appearance: none !important;
 }
 </style>
