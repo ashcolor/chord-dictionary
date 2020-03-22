@@ -33,10 +33,10 @@ export default {
 
       const display = chordObject.display.map(note =>
         note
-          .replace("♭", "b")
           .replace("𝄫", "bb")
-          .replace("♯", "#")
+          .replace("♭", "b")
           .replace("𝄪", "##")
+          .replace("♯", "#")
       );
 
       const notes = new VF.StaveNote({

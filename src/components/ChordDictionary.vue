@@ -14,7 +14,7 @@
             class="mb-0"
           />
           <b-card-sub-title
-            v-if="chord.isInterval || settings.isShowRoman"
+            v-show="chord.isInterval || settings.isShowRoman"
             v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
             class="mt-2 mb-0"
           />
@@ -54,11 +54,14 @@ export default {
   data() {
     return {
       isActive: true,
-      chord: {},
+      chord: null,
       settings: {
         isShow: true,
-        key: null,
-        transpose: null,
+        key: 0,
+        offset: 0,
+        isTransport: false,
+        transposeKey: 0,
+        transposeOffset: 0,
         volume: 70,
         inst: "piano",
         isShowRoman: false,
@@ -99,10 +102,12 @@ export default {
         this.settings.key,
         this.settings.offset
       );
-      ChordNote.parseContent.transposeTo = ChordNote.Note(
-        this.settings.transposeKey,
-        this.settings.transposeOffset
-      );
+      if (this.settings.isTransport) {
+        ChordNote.parseContent.transposeTo = ChordNote.Note(
+          this.settings.transposeKey,
+          this.settings.transposeOffset
+        );
+      }
       this.chord = ChordNote.parseContent(text, offset);
     }
   },
