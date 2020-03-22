@@ -16,7 +16,8 @@ export default {
     };
   },
   watch: {
-    chordVoicing: function() {
+    chordVoicing: function(newVal, oldVal) {
+      if (JSON.stringify(newVal) === JSON.stringify(oldVal)) return false;
       if (!this.isActive) return false;
       if (!this.settings.isActiveHover) return false;
       this.playChord();
@@ -33,16 +34,6 @@ export default {
         this.chordVoicing.map(midi => Tone.Frequency(midi, "midi")),
         1.5
       );
-      /*
-      const part = new Tone.Part(
-        function setPlay(time, note) {
-          this.insts[this.settings.inst].releaseAll();
-          this.insts[this.settings.inst].triggerAttackRelease(note, 1.5, time);
-        }.bind(this),
-        [["0:0:0", this.chordVoicing.map(midi => Tone.Frequency(midi, "midi"))]]
-      ).start();
-      Tone.Transport.start();
-      */
     },
     keyDown: function(e) {
       if (!this.isActive) return false;

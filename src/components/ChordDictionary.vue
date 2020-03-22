@@ -1,46 +1,40 @@
 <template>
   <div v-show="isActive">
-    <div
-      id="chord-dictionary-highlight"
-      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
-    ></div>
     <b-card-group
-      deck
+      v-if="chord"
       id="chord-dictionary-pop-up"
-      v-show="chord"
       :style="{ top: position.top + 'px' , left: position.left + 'px' }"
+      deck
     >
       <b-card no-body>
         <b-card-header>
           <b-card-title
-            class="mb-0"
             title-tag="h6"
             v-html="chord.titleElement && chord.titleElement.innerHTML"
-          ></b-card-title>
+            class="mb-0"
+          />
           <b-card-sub-title
-            class="mt-2 mb-0"
             v-if="chord.isInterval || settings.isShowRoman"
             v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
-          ></b-card-sub-title>
+            class="mt-2 mb-0"
+          />
         </b-card-header>
         <b-card-body>
           <b-card-text
-            class="mb-0"
             v-html="chord.originalElement && chord.originalElement.innerHTML"
-          ></b-card-text>
+            class="mb-0"
+          />
           <score :chordObject="chord" class="mt-0" />
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :isActive="isActive" :chordVoicing="chord.voicing" :settings="settings" />
-    <config
-      :settings="settings"
-      v-on:toggleShow="onButtonShow"
-      v-on:toggleRoman="onToggleRoman"
-      v-on:toggleClick="onToggleClick"
-      v-on:toggleKey="onToggleKey"
-      v-on:toggleHover="onToggleHover"
+    <player :isActive="isActive" :chordVoicing="chord ? chord.voicing : {}" :settings="settings" />
+    <div
+      v-show="chord"
+      id="chord-dictionary-highlight"
+      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
     />
+    <config :settings="settings" />
   </div>
 </template>
 
@@ -61,16 +55,6 @@ export default {
     return {
       isActive: true,
       chord: {},
-      position: {
-        top: 0,
-        left: 0
-      },
-      highlightPos: {
-        top: 0,
-        left: 0,
-        width: 0,
-        height: 0
-      },
       settings: {
         isShow: true,
         key: null,
@@ -81,37 +65,36 @@ export default {
         isActiveClick: true,
         isActiveKey: true,
         isActiveHover: false
+      },
+      position: {
+        top: 0,
+        left: 0
+      },
+      range: null,
+      textNode: null,
+      highlightPos: {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0
       }
     };
   },
-  watch: {
-    settings: {
-      handler: function(newValue, oldValue) {
-        chrome.storage.local.set({ settings: newValue });
-      },
-      deep: true
-    }
-  },
   methods: {
-    setPointedChord(e) {
-      let range;
-      let textNode;
+    setPointedChord: function(e) {
       if (document.caretPositionFromPoint) {
-        range = document.caretPositionFromPoint(e.clientX, e.clientY);
-        if (!range) return;
-        textNode = range.offsetNode;
+        this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.offsetNode;
       } else if (document.caretRangeFromPoint) {
-        range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (!range) return;
-        textNode = range.startContainer;
+        this.range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.startContainer;
       } else return;
-      if (!textNode || textNode.nodeType !== 3) return;
-
-      ChordNote.Note.useUnicode = true;
-      ChordNote.Note.useDouble = true;
-      ChordNote.Note.romanUseUnicode = true;
-      ChordNote.Note.romanUseLowerCase = false;
-
+      if (!this.textNode || this.textNode.nodeType !== 3) return;
+      this.setChord(this.textNode.nodeValue, this.range.startOffset);
+    },
+    setChord: function(text, offset = 0) {
       ChordNote.parseContent.intervalNote = ChordNote.Note(
         this.settings.key,
         this.settings.offset
@@ -120,44 +103,27 @@ export default {
         this.settings.transposeKey,
         this.settings.transposeOffset
       );
-      this.chord = ChordNote.parseContent(
-        textNode.nodeValue,
-        range.startOffset
-      );
-
-      if (this.chord) {
-        range.setStart(textNode, this.chord.position);
-        range.setEnd(textNode, this.chord.position + this.chord.string.length);
-        this.highlightPos = range.getBoundingClientRect();
+      this.chord = ChordNote.parseContent(text, offset);
+    }
+  },
+  watch: {
+    chord: function(val) {
+      if (val) {
+        this.range.setStart(this.textNode, val.position);
+        this.range.setEnd(this.textNode, val.position + val.string.length);
+        this.highlightPos = this.range.getBoundingClientRect();
         document.body.style.cursor = "help";
       } else {
-        this.chord = {};
-        this.highlightPos = {
-          top: 0,
-          left: 0,
-          width: 0,
-          height: 0
-        };
         document.body.style.cursor = "";
       }
-    },
-    onButtonShow: function() {
-      this.settings.isShow = !this.settings.isShow;
-    },
-    onToggleRoman: function() {
-      this.settings.isShowRoman = !this.settings.isShowRoman;
-    },
-    onToggleClick: function() {
-      this.settings.isActiveClick = !this.settings.isActiveClick;
-    },
-    onToggleKey: function() {
-      this.settings.isActiveKey = !this.settings.isActiveKey;
-    },
-    onToggleHover: function() {
-      this.settings.isActiveHover = !this.settings.isActiveHover;
     }
   },
   mounted() {
+    ChordNote.Note.useUnicode = true;
+    ChordNote.Note.useDouble = true;
+    ChordNote.Note.romanUseUnicode = true;
+    ChordNote.Note.romanUseLowerCase = false;
+
     chrome.runtime.onMessage.addListener(object => {
       this.isActive = object.isActive;
     });
