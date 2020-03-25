@@ -44,33 +44,34 @@ function Note(key, offset) {
 Note.prototype.toString = function() {
 	return "CDEFGAB".charAt(this.key) + (
 		this.offset < 0
-			? Note.useUnicode && Note.useDouble && this.offset == -2
+			? Note.settingsEnabled && Note.useUnicode && Note.useDouble && this.offset == -2
 				? "𝄫"
-				: (Note.useUnicode ? "♭" : "b").repeat(-this.offset)
-			: Note.useDouble && this.offset == 2
-				? (Note.useUnicode ? "𝄪" : "x")
-				: (Note.useUnicode ? "♯" : "#").repeat(this.offset)
+				: (Note.settingsEnabled && Note.useUnicode ? "♭" : "b").repeat(-this.offset)
+			: Note.settingsEnabled && Note.useDouble && this.offset == 2
+				? (Note.settingsEnabled && Note.useUnicode ? "𝄪" : "x")
+				: (Note.settingsEnabled && Note.useUnicode ? "♯" : "#").repeat(this.offset)
 	);
 };
 Note.prototype.toRoman = function() {
 	return (
 		this.offset < 0
-			? Note.useUnicode && Note.useDouble && this.offset == -2
+			? Note.settingsEnabled && Note.useUnicode && Note.useDouble && this.offset == -2
 				? "𝄫"
-				: (Note.useUnicode ? "♭" : "b").repeat(-this.offset)
-			: Note.useDouble && this.offset == 2
-				? (Note.useUnicode ? "𝄪" : "x")
-				: (Note.useUnicode ? "♯" : "#").repeat(this.offset)
+				: (Note.settingsEnabled && Note.useUnicode ? "♭" : "b").repeat(-this.offset)
+			: Note.settingsEnabled && Note.useDouble && this.offset == 2
+				? (Note.settingsEnabled && Note.useUnicode ? "𝄪" : "x")
+				: (Note.settingsEnabled && Note.useUnicode ? "♯" : "#").repeat(this.offset)
 	) + (
-		Note.romanUseUnicode
-			? Note.romanUseLowerCase
+		Note.settingsEnabled && Note.romanUseUnicode
+			? Note.settingsEnabled && Note.romanUseLowerCase
 				? ["ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ"]
 				: ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"]
-			: Note.romanUseLowerCase
+			: Note.settingsEnabled && Note.romanUseLowerCase
 				? ["i", "ii", "iii", "iv", "v", "vi", "vii"]
 				: ["I", "II", "III", "IV", "V", "VI", "VII"]
 	)[this.key];
 };
+Note.settingsEnabled = true;
 var half = [0, 2, 4, 5, 7, 9, 11];
 Note.prototype.toHalf = function() {
 	return ((half[this.key] + this.offset) % 12 + 12) % 12;
@@ -118,9 +119,11 @@ function Chord(array, data) {
 	this.firstIndex = array.first;
 	delete array.first;
 	var octave = 4;
+	Note.settingsEnabled = false;
 	this.display = array.map(function(item, index) {
 		return item + "/" + (array[index - 1] && item.key <= array[index - 1].key ? ++octave : octave);
 	});
+	Note.settingsEnabled = true;
 	this.voicing = array.map(item => item.toHalf());
 	var prev = 60, index = 0;
 	for (var a = 1; a < this.voicing.length; a++) if (this.voicing[a] < this.voicing[index]) index = a;
