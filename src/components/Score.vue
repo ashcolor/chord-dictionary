@@ -31,16 +31,8 @@ export default {
       stave.addClef("treble");
       stave.setContext(context).draw();
 
-      const display = chordObject.display.map(note =>
-        note
-          .replace("𝄫", "bb")
-          .replace("♭", "b")
-          .replace("𝄪", "##")
-          .replace("♯", "#")
-      );
-
       const notes = new VF.StaveNote({
-        keys: display,
+        keys: chordObject.display,
         duration: "w"
       });
 

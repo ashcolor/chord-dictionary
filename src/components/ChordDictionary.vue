@@ -44,6 +44,12 @@ import Score from "./Score.vue";
 import Player from "./Player.vue";
 import Config from "./Config.vue";
 
+var offsetBase = document.createElement("div");
+offsetBase.style.position = "absolute";
+offsetBase.style.top = 0;
+offsetBase.style.left = 0;
+document.body.appendChild(offsetBase);
+
 export default {
   name: "ChordDictionary",
   components: {
@@ -116,7 +122,14 @@ export default {
       if (val) {
         this.range.setStart(this.textNode, val.position);
         this.range.setEnd(this.textNode, val.position + val.string.length);
-        this.highlightPos = this.range.getBoundingClientRect();
+        var rangeRect = this.range.getBoundingClientRect();
+		var offsetRect = offsetBase.getBoundingClientRect();
+		this.highlightPos = {
+			top: rangeRect.top - offsetRect.top,
+			left: rangeRect.left - offsetRect.left,
+			width: rangeRect.width,
+			height: rangeRect.height
+		};
         document.body.style.cursor = "help";
       } else {
         document.body.style.cursor = "";

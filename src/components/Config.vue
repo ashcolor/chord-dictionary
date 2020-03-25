@@ -19,7 +19,7 @@
             <b-form-select v-model="settings.transposeKey" :options="KEYS"></b-form-select>
             <b-form-select v-model="settings.transposeOffset" :options="OFFSETS"></b-form-select>
           </b-input-group>
-          <p class="small text-muted mb-0">ローマ数字機能への影響なし</p>
+          <p v-show="settings.isTransport" class="small text-muted mb-0">ローマ数字機能への影響なし</p>
         </b-card-body>
       </b-card>
       <b-card no-body header="再生設定">
@@ -32,8 +32,8 @@
           </b-input-group>
           <b-form-checkbox v-model="settings.isActiveClick" onclick="blur()" switch>クリック</b-form-checkbox>
           <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>キー操作</b-form-checkbox>
-          <p class="small text-muted mb-0">(Win) Ctrl + Space</p>
-          <p class="small text-muted mb-0">(Mac) Cmd + Shift + Space</p>
+          <p v-show="settings.isActiveKey" class="small text-muted mb-0">(Win) Ctrl + Space</p>
+          <p v-show="settings.isActiveKey" class="small text-muted mb-0">(Mac) Cmd + Shift + Space</p>
           <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>ホバー</b-form-checkbox>
         </b-card-body>
       </b-card>
