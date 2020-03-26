@@ -1,42 +1,54 @@
 <template>
   <div v-show="isActive">
     <b-card-group
-      deck
-      id="pop-up"
-      v-show="note.isAvailable"
+      v-if="chord"
+      id="chord-dictionary-pop-up"
       :style="{ top: position.top + 'px' , left: position.left + 'px' }"
+      deck
     >
       <b-card no-body>
         <b-card-header>
-          <b-card-title class="mb-0" title-tag="h6">{{note | toName}}</b-card-title>
+          <b-card-title
+            title-tag="h6"
+            v-html="chord.titleElement && chord.titleElement.innerHTML"
+            class="mb-0"
+          />
           <b-card-sub-title
+            v-show="chord.isInterval || settings.isShowRoman"
+            v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
             class="mt-2 mb-0"
-            v-if="settings.isShowRoman"
-          >{{this.settings.key | toRoman(note)}}</b-card-sub-title>
+          />
         </b-card-header>
         <b-card-body>
-          <b-card-text class="mb-0">{{note.original | chordOriginalToString}}</b-card-text>
-          <score :chordDisplay="note.display" class="mt-0" />
+          <b-card-text
+            v-html="chord.originalElement && chord.originalElement.innerHTML"
+            class="mb-0"
+          />
+          <score :chordObject="chord" class="mt-0" />
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :isActive="isActive" :chordVoicing="note.voicing" :settings="settings" />
-    <config
-      :settings="settings"
-      v-on:toggleShow="onButtonShow"
-      v-on:toggleRoman="onToggleRoman"
-      v-on:toggleClick="onToggleClick"
-      v-on:toggleKey="onToggleKey"
-      v-on:toggleHover="onToggleHover"
+    <player :isActive="isActive" :chordVoicing="chord ? chord.voicing : {}" :settings="settings" />
+    <div
+      v-show="chord"
+      id="chord-dictionary-highlight"
+      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
     />
+    <config :settings="settings" />
   </div>
 </template>
 
 <script>
-import ChordNote from "../assets/ChordNote_for_chord-dictionary.js";
+import ChordNote from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
 import Config from "./Config.vue";
+
+var offsetBase = document.createElement("div");
+offsetBase.style.position = "absolute";
+offsetBase.style.top = 0;
+offsetBase.style.left = 0;
+document.body.appendChild(offsetBase);
 
 export default {
   name: "ChordDictionary",
@@ -45,146 +57,91 @@ export default {
     Player,
     Config
   },
-  filters: {
-    chordOriginalToString: value => {
-      value = value.map(v =>
-        ChordNote.Note(v.key, v.offset).toString(true, true)
-      );
-      return value.join(" ");
-    },
-    toName: note => {
-      return note.isInterval ? note.noteKey + note.name : note.string;
-    },
-    toRoman: (key, note) => {
-      if (note.length === 0) return "";
-      if (note.isInterval) return note.noteString + note.name;
-      let name =
-        ChordNote.transpose(key, note.noteString).toRoman() + note.name;
-      if (note["onString"] !== undefined) {
-        name += note.onString;
-      }
-      if (note["onNoteInterval"] !== undefined) {
-        name += note.onNoteInterval;
-      }
-      return name;
-    }
-  },
   data() {
     return {
       isActive: true,
-      text: "",
-      position: {
-        top: 0,
-        left: 0
-      },
+      chord: null,
       settings: {
         isShow: true,
-        key: "C",
-        transpose: 0,
-        gain: -5,
+        key: 0,
+        offset: 0,
+        isTransport: false,
+        transposeKey: 0,
+        transposeOffset: 0,
+        volume: 70,
         inst: "piano",
         isShowRoman: false,
         isActiveClick: true,
         isActiveKey: true,
         isActiveHover: false
+      },
+      position: {
+        top: 0,
+        left: 0
+      },
+      range: null,
+      textNode: null,
+      highlightPos: {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0
       }
     };
   },
-  computed: {
-    note() {
-      ChordNote.parseContent.intervalNote = this.settings.key;
-      // ChordNote.parseContent.transposeTo = this.settings.transpose;
-      let object = [];
-      let notes = ChordNote.parseContent(this.text);
-      // console.log(notes);
-      if (notes.length > 0) {
-        object = notes[0];
-        object["isAvailable"] = true;
-      } else {
-        object["isAvailable"] = false;
-        object["string"] = "";
-        object["name"] = "";
-        object["noteString"] = "";
-        object["isInterval"] = false;
-        object["noteKey"] = "";
-        object["original"] = [];
-        object["firstIndex"] = 0;
-        object["display"] = [];
-        object["voicing"] = [];
+  methods: {
+    setPointedChord: function(e) {
+      if (document.caretPositionFromPoint) {
+        this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.offsetNode;
+      } else if (document.caretRangeFromPoint) {
+        this.range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.startContainer;
+      } else return;
+      if (!this.textNode || this.textNode.nodeType !== 3) return;
+      this.setChord(this.textNode.nodeValue, this.range.startOffset);
+    },
+    setChord: function(text, offset = 0) {
+      ChordNote.parseContent.intervalNote = ChordNote.Note(
+        this.settings.key,
+        this.settings.offset
+      );
+      if (this.settings.isTransport) {
+        ChordNote.parseContent.transposeTo = ChordNote.Note(
+          this.settings.transposeKey,
+          this.settings.transposeOffset
+        );
       }
-      return object;
+      this.chord = ChordNote.parseContent(text, offset);
     }
   },
   watch: {
-    settings: {
-      handler: function(newValue, oldValue) {
-        chrome.storage.local.set({ settings: newValue }, function() {
-          console.log("[chord-dictionary] settings saved");
-        });
-      },
-      deep: true
-    }
-  },
-  methods: {
-    getPointedWord(e) {
-      let range;
-      let textNode;
-      if (document.caretPositionFromPoint) {
-        range = document.caretPositionFromPoint(e.clientX, e.clientY);
-        if (!range) return "";
-        textNode = range.offsetNode;
-      } else if (document.caretRangeFromPoint) {
-        range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (!range) return "";
-        textNode = range.startContainer;
+    chord: function(val) {
+      if (val) {
+        this.range.setStart(this.textNode, val.position);
+        this.range.setEnd(this.textNode, val.position + val.string.length);
+        var rangeRect = this.range.getBoundingClientRect();
+        var offsetRect = offsetBase.getBoundingClientRect();
+        this.highlightPos = {
+          top: rangeRect.top - offsetRect.top,
+          left: rangeRect.left - offsetRect.left,
+          width: rangeRect.width,
+          height: rangeRect.height
+        };
+        document.body.style.cursor = "help";
+      } else {
+        document.body.style.cursor = "";
       }
-      if (!textNode) return "";
-      if (textNode.nodeType !== 3) return "";
-      if (range === null) return "";
-      if (range.startContainer.nodeType !== Node.TEXT_NODE) return "";
-
-      //@https://javascript.g.hatena.ne.jp/edvakf/20110213/1297636186
-      let t = range.startContainer;
-      let start = range.startOffset;
-      let end = start;
-
-      while (start > 0) {
-        start -= 1;
-        range.setStart(t, start);
-        if (/^\s/.test(range.toString())) {
-          range.setStart(t, (start += 1));
-          break;
-        }
-      }
-      let l = t.nodeValue.length;
-      while (end < l) {
-        end += 1;
-        range.setEnd(t, end);
-        if (/\s$/.test(range.toString())) {
-          range.setEnd(t, (end -= 1));
-          break;
-        }
-      }
-      // console.log(range.toString().trim());
-      return range.toString().trim();
-    },
-    onButtonShow: function() {
-      this.settings.isShow = !this.settings.isShow;
-    },
-    onToggleRoman: function() {
-      this.settings.isShowRoman = !this.settings.isShowRoman;
-    },
-    onToggleClick: function() {
-      this.settings.isActiveClick = !this.settings.isActiveClick;
-    },
-    onToggleKey: function() {
-      this.settings.isActiveKey = !this.settings.isActiveKey;
-    },
-    onToggleHover: function() {
-      this.settings.isActiveHover = !this.settings.isActiveHover;
     }
   },
   mounted() {
+    ChordNote.Note.useUnicode = true;
+    ChordNote.Note.useDouble = true;
+    ChordNote.Note.romanUseUnicode = true;
+    ChordNote.Note.romanUseLowerCase = false;
+
     chrome.runtime.onMessage.addListener(object => {
       this.isActive = object.isActive;
     });
@@ -198,9 +155,9 @@ export default {
     window.addEventListener(
       "mousemove",
       function(e) {
-        this.position.top = e.pageY + 20;
-        this.position.left = e.pageX + 20;
-        this.text = this.getPointedWord(event);
+        this.position.top = e.pageY + 16;
+        this.position.left = e.pageX + 16;
+        this.setPointedChord(e);
       }.bind(this)
     );
   }
@@ -208,7 +165,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#pop-up {
+#chord-dictionary-pop-up {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
   z-index: 1000;
@@ -220,5 +177,66 @@ export default {
     min-width: 160.24px;
     min-height: 24.277px;
   }
+}
+#chord-dictionary-highlight {
+  position: absolute;
+  z-index: -1000;
+  background-color: yellow;
+}
+</style>
+<style>
+.chord-dictionary-note {
+  font-style: bold;
+}
+.chord-dictionary-chord {
+  color: #333;
+  font-style: italic;
+}
+.chord-dictionary-slash {
+  color: #888;
+  font-size: 80%;
+}
+.chord-dictionary-bass {
+  font-size: 80%;
+}
+.chord-dictionary-part {
+  margin-right: 10px;
+}
+
+.chord-dictionary-midi-0 {
+  color: hsl(0, 88%, 46%);
+}
+.chord-dictionary-midi-1 {
+  color: hsl(30, 99%, 33%);
+}
+.chord-dictionary-midi-2 {
+  color: hsl(49, 90%, 46%);
+}
+.chord-dictionary-midi-3 {
+  color: hsl(60, 98%, 33%);
+}
+.chord-dictionary-midi-4 {
+  color: hsl(79, 59%, 46%);
+}
+.chord-dictionary-midi-5 {
+  color: hsl(135, 76%, 33%);
+}
+.chord-dictionary-midi-6 {
+  color: hsl(172, 68%, 46%);
+}
+.chord-dictionary-midi-7 {
+  color: hsl(191, 41%, 33%);
+}
+.chord-dictionary-midi-8 {
+  color: hsl(273, 79%, 46%);
+}
+.chord-dictionary-midi-9 {
+  color: hsl(291, 46%, 33%);
+}
+.chord-dictionary-midi-10 {
+  color: hsl(295, 97%, 46%);
+}
+.chord-dictionary-midi-11 {
+  color: hsl(332, 97%, 33%);
 }
 </style>

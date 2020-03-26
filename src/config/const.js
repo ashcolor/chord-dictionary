@@ -28,17 +28,17 @@ const INSTS = [
     }
 ];
 const KEYS = [
-    { value: "C", text: "C" },
-    { value: "D♭", text: "C♯/D♭" },
-    { value: "D", text: "D" },
-    { value: "E♭", text: "D♯/E♭" },
-    { value: "E", text: "E" },
-    { value: "F", text: "F" },
-    { value: "G♭", text: "F♯/G♭" },
-    { value: "G", text: "G" },
-    { value: "A♭", text: "G♯/A♭" },
-    { value: "A", text: "A" },
-    { value: "B♭", text: "A♯/B♭" },
-    { value: "B", text: "B" }
-]
-export { INSTS, KEYS };
+    { value: 0, text: "C" },
+    { value: 1, text: "D" },
+    { value: 2, text: "E" },
+    { value: 3, text: "F" },
+    { value: 4, text: "G" },
+    { value: 5, text: "A" },
+    { value: 6, text: "B" }
+];
+const OFFSETS = [
+    { value: -1, text: "♭" },
+    { value: 0, text: "♮" },
+    { value: 1, text: "♯" }
+];
+export { INSTS, KEYS, OFFSETS };

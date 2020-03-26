@@ -1,5 +1,5 @@
 <template>
-  <div id="score"></div>
+  <div id="chord-dictionary-score"></div>
 </template>
 
 <script>
@@ -8,18 +8,18 @@ import Vex from "vexflow";
 export default {
   name: "ChordScore",
   props: {
-    chordDisplay: Array
+    chordObject: Object
   },
   watch: {
-    chordDisplay: function(val) {
-      this.dispScore(val);
+    chordObject: function(val) {
+      if (val.display !== undefined) this.dispScore(val);
     }
   },
   methods: {
-    dispScore: chordDisplay => {
+    dispScore: function(chordObject) {
       const VF = Vex.Flow;
 
-      const div = document.getElementById("score");
+      const div = document.getElementById("chord-dictionary-score");
       if (div === null) return false;
       div.textContent = null;
 
@@ -31,25 +31,25 @@ export default {
       stave.addClef("treble");
       stave.setContext(context).draw();
 
-      if (typeof chordDisplay !== "object") return false;
-      if (!chordDisplay.length > 0) return false;
+      const notes = new VF.StaveNote({
+        keys: chordObject.display,
+        duration: "w"
+      });
 
-      const notes = [new VF.StaveNote({ keys: chordDisplay, duration: "w" })];
-
-      chordDisplay.forEach((note, index) => {
-        if (note.indexOf("##") != -1) {
-          notes[0].addAccidental(index, new VF.Accidental("##"));
-        } else if (note.indexOf("bb") != -1) {
-          notes[0].addAccidental(index, new VF.Accidental("bb"));
-        } else if (note.indexOf("#") != -1) {
-          notes[0].addAccidental(index, new VF.Accidental("#"));
-        } else if (note.indexOf("b") != -1) {
-          notes[0].addAccidental(index, new VF.Accidental("b"));
-        }
+      chordObject.original.forEach((note, index) => {
+        if (note.offset)
+          notes.addAccidental(
+            index,
+            new VF.Accidental(
+              note.offset < 0
+                ? "b".repeat(-note.offset)
+                : "#".repeat(note.offset)
+            )
+          );
       });
 
       const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
-      voice.addTickables(notes);
+      voice.addTickables([notes]);
       new VF.Formatter().joinVoices([voice]).format([voice], 800);
       voice.draw(context, stave);
     }
@@ -58,7 +58,7 @@ export default {
 </script>
 
 <style scoped>
-#score {
+#chord-dictionary-score {
   margin-top: 10px;
   height: 100px;
 }

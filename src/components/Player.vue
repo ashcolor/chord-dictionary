@@ -16,7 +16,8 @@ export default {
     };
   },
   watch: {
-    chordVoicing: function(n, o) {
+    chordVoicing: function(newVal, oldVal) {
+      if (JSON.stringify(newVal) === JSON.stringify(oldVal)) return false;
       if (!this.isActive) return false;
       if (!this.settings.isActiveHover) return false;
       this.playChord();
@@ -24,20 +25,15 @@ export default {
   },
   methods: {
     playChord: function() {
-      if (this.chordVoicing.length === 0) return false;
-      const chordMelody = [["0:0:0", this.chordVoicing]];
-      this.insts[this.settings.inst].volume.value = this.settings.gain;
-      const part = new Tone.Part(
-        function setPlay(time, note) {
-          this.insts[this.settings.inst].triggerAttackRelease(
-            note,
-            Tone.Time("4n") * 2,
-            time
-          );
-        }.bind(this),
-        chordMelody
-      ).start();
-      Tone.Transport.start();
+      if (!this.chordVoicing || !this.chordVoicing.length) return false;
+      this.insts[this.settings.inst].volume.value = Tone.gainToDb(
+        this.settings.volume / 100
+      );
+      this.insts[this.settings.inst].releaseAll();
+      this.insts[this.settings.inst].triggerAttackRelease(
+        this.chordVoicing.map(midi => Tone.Frequency(midi, "midi")),
+        1.5
+      );
     },
     keyDown: function(e) {
       if (!this.isActive) return false;
