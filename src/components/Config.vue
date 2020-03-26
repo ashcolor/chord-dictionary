@@ -4,17 +4,12 @@
     <nav v-show="settings.isShow" id="chord-dictionary-sidebar">
       <b-card no-body header="表示設定">
         <b-card-body>
-          <b-form-checkbox
-            v-model="settings.isShowRoman"
-            class="mb-2"
-            onclick="blur()"
-            switch
-          >ローマ数字表記</b-form-checkbox>
-          <b-input-group prepend="キー">
+          <b-form-checkbox v-model="settings.isShowRoman" onclick="blur()" switch>ローマ数字表記</b-form-checkbox>
+          <b-input-group prepend="キー" class="mb-2">
             <b-form-select v-model="settings.key" :options="KEYS"></b-form-select>
             <b-form-select v-model="settings.offset" :options="OFFSETS"></b-form-select>
           </b-input-group>
-          <b-form-checkbox v-model="settings.isTransport" class="mb-2" onclick="blur()" switch>移調</b-form-checkbox>
+          <b-form-checkbox v-model="settings.isTransport" onclick="blur()" switch>移調</b-form-checkbox>
           <b-input-group v-show="settings.isTransport" prepend="移調先">
             <b-form-select v-model="settings.transposeKey" :options="KEYS"></b-form-select>
             <b-form-select v-model="settings.transposeOffset" :options="OFFSETS"></b-form-select>

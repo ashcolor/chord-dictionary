@@ -123,13 +123,13 @@ export default {
         this.range.setStart(this.textNode, val.position);
         this.range.setEnd(this.textNode, val.position + val.string.length);
         var rangeRect = this.range.getBoundingClientRect();
-		var offsetRect = offsetBase.getBoundingClientRect();
-		this.highlightPos = {
-			top: rangeRect.top - offsetRect.top,
-			left: rangeRect.left - offsetRect.left,
-			width: rangeRect.width,
-			height: rangeRect.height
-		};
+        var offsetRect = offsetBase.getBoundingClientRect();
+        this.highlightPos = {
+          top: rangeRect.top - offsetRect.top,
+          left: rangeRect.left - offsetRect.left,
+          width: rangeRect.width,
+          height: rangeRect.height
+        };
         document.body.style.cursor = "help";
       } else {
         document.body.style.cursor = "";
