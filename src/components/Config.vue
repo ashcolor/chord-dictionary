@@ -1,5 +1,5 @@
 <template>
-  <div id="chord-dictionary-wrapper">
+  <div id="chord-dictionary-config">
     <!-- Sidebar -->
     <nav v-show="settings.isShow" id="chord-dictionary-sidebar">
       <b-card no-body header="表示設定">
@@ -86,7 +86,7 @@ export default {
 </script>
 
 <style lang="scss">
-#chord-dictionary-wrapper {
+#chord-dictionary-config {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
   text-align: left;

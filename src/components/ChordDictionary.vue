@@ -155,6 +155,8 @@ export default {
           this.settings.transposeKey,
           this.settings.transposeOffset
         );
+      } else {
+        ChordNote.parseContent.transposeTo = ChordNote.Note(0, 0);
       }
       return (this.chord = ChordNote.parseContent(text, offset));
     }
