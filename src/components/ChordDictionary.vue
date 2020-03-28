@@ -179,13 +179,6 @@ export default {
   @import "node_modules/bootstrap-vue/src/index.scss";
   text-align: left;
   position: absolute !important;
-  .card-header div {
-    min-height: 24px;
-  }
-  .card-body p.card-text {
-    min-width: 160.24px;
-    min-height: 24.277px;
-  }
 }
 #chord-dictionary-highlight {
   position: absolute;
