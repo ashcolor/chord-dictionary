@@ -140,6 +140,15 @@ export default {
         if (!this.range) return;
         this.textNode = this.range.startContainer;
       } else return;
+
+      if (
+        this.textNode.parentNode.classList.value.indexOf(
+          "chord-dictionary-no-event"
+        ) >= 0
+      ) {
+        return;
+      }
+
       if (!this.textNode || this.textNode.nodeType !== 3) return;
       if (!this.setChord(this.textNode.nodeValue, this.range.startOffset)) {
         this.setChord(this.textNode.nodeValue, this.range.startOffset - 1);

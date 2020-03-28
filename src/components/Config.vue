@@ -27,8 +27,14 @@
           </b-input-group>
           <b-form-checkbox v-model="settings.isActiveClick" onclick="blur()" switch>クリック</b-form-checkbox>
           <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>キー操作</b-form-checkbox>
-          <p v-show="settings.isActiveKey" class="small text-muted mb-0">(Win) Ctrl + Space</p>
-          <p v-show="settings.isActiveKey" class="small text-muted mb-0">(Mac) Cmd + Shift + Space</p>
+          <p
+            v-show="settings.isActiveKey"
+            class="small text-muted mb-0 chord-dictionary-no-event"
+          >(Win) Ctrl + Space</p>
+          <p
+            v-show="settings.isActiveKey"
+            class="small text-muted mb-0 chord-dictionary-no-event"
+          >(Mac) Cmd + Shift + Space</p>
           <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>ホバー</b-form-checkbox>
         </b-card-body>
       </b-card>
