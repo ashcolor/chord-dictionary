@@ -34,7 +34,7 @@
       id="chord-dictionary-highlight"
       :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
     />
-    <config :settings="settings" />
+    <setting :settings="settings" />
   </div>
 </template>
 
@@ -42,7 +42,7 @@
 import ChordNote from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
-import Config from "./Config.vue";
+import Setting from "./setting.vue";
 
 var offsetBase = document.createElement("div");
 offsetBase.style.position = "absolute";
@@ -55,7 +55,7 @@ export default {
   components: {
     Score,
     Player,
-    Config
+    Setting
   },
   data() {
     return {
