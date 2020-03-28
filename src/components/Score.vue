@@ -12,17 +12,19 @@ export default {
   },
   watch: {
     chordObject: function(val) {
-      if (val.display !== undefined) this.dispScore(val);
+      this.dispScore(val);
     }
+  },
+  mounted() {
+    this.dispScore(this.chordObject);
   },
   methods: {
     dispScore: function(chordObject) {
-      const VF = Vex.Flow;
-
+      if (this.chordObject.display === undefined) return;
       const div = document.getElementById("chord-dictionary-score");
-      if (div === null) return false;
       div.textContent = null;
 
+      const VF = Vex.Flow;
       const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
       renderer.resize(150, 120);
       const context = renderer.getContext();

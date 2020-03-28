@@ -89,34 +89,6 @@ export default {
       }
     };
   },
-  methods: {
-    setPointedChord: function(e) {
-      if (document.caretPositionFromPoint) {
-        this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
-        if (!this.range) return;
-        this.textNode = this.range.offsetNode;
-      } else if (document.caretRangeFromPoint) {
-        this.range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (!this.range) return;
-        this.textNode = this.range.startContainer;
-      } else return;
-      if (!this.textNode || this.textNode.nodeType !== 3) return;
-      this.setChord(this.textNode.nodeValue, this.range.startOffset);
-    },
-    setChord: function(text, offset = 0) {
-      ChordNote.parseContent.intervalNote = ChordNote.Note(
-        this.settings.key,
-        this.settings.offset
-      );
-      if (this.settings.isTransport) {
-        ChordNote.parseContent.transposeTo = ChordNote.Note(
-          this.settings.transposeKey,
-          this.settings.transposeOffset
-        );
-      }
-      this.chord = ChordNote.parseContent(text, offset);
-    }
-  },
   watch: {
     chord: function(val) {
       if (val) {
@@ -160,6 +132,34 @@ export default {
         this.setPointedChord(e);
       }.bind(this)
     );
+  },
+  methods: {
+    setPointedChord: function(e) {
+      if (document.caretPositionFromPoint) {
+        this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.offsetNode;
+      } else if (document.caretRangeFromPoint) {
+        this.range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.startContainer;
+      } else return;
+      if (!this.textNode || this.textNode.nodeType !== 3) return;
+      this.setChord(this.textNode.nodeValue, this.range.startOffset);
+    },
+    setChord: function(text, offset = 0) {
+      ChordNote.parseContent.intervalNote = ChordNote.Note(
+        this.settings.key,
+        this.settings.offset
+      );
+      if (this.settings.isTransport) {
+        ChordNote.parseContent.transposeTo = ChordNote.Note(
+          this.settings.transposeKey,
+          this.settings.transposeOffset
+        );
+      }
+      this.chord = ChordNote.parseContent(text, offset);
+    }
   }
 };
 </script>
