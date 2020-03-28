@@ -40,10 +40,10 @@
       </b-card>
     </nav>
     <b-button
+      :pressed.sync="settings.isShow"
       id="chord-dictionary-toggle-button"
       size="sm"
       class="mb-2"
-      v-on:click="$emit('toggleShow')"
     >
       <b-icon icon="gear-fill"></b-icon>
     </b-button>
