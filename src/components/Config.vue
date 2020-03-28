@@ -89,6 +89,7 @@ export default {
 #chord-dictionary-wrapper {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
+  text-align: left;
   display: flex;
   align-items: stretch;
 }

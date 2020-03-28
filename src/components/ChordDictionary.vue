@@ -91,21 +91,17 @@ export default {
   },
   watch: {
     chord: function(val) {
-      if (val) {
-        this.range.setStart(this.textNode, val.position);
-        this.range.setEnd(this.textNode, val.position + val.string.length);
-        var rangeRect = this.range.getBoundingClientRect();
-        var offsetRect = offsetBase.getBoundingClientRect();
-        this.highlightPos = {
-          top: rangeRect.top - offsetRect.top,
-          left: rangeRect.left - offsetRect.left,
-          width: rangeRect.width,
-          height: rangeRect.height
-        };
-        document.body.style.cursor = "help";
-      } else {
-        document.body.style.cursor = "";
-      }
+      if (!val) return false;
+      this.range.setStart(this.textNode, val.position);
+      this.range.setEnd(this.textNode, val.position + val.string.length);
+      var rangeRect = this.range.getBoundingClientRect();
+      var offsetRect = offsetBase.getBoundingClientRect();
+      this.highlightPos = {
+        top: rangeRect.top - offsetRect.top,
+        left: rangeRect.left - offsetRect.left,
+        width: rangeRect.width,
+        height: rangeRect.height
+      };
     }
   },
   mounted() {
@@ -145,7 +141,9 @@ export default {
         this.textNode = this.range.startContainer;
       } else return;
       if (!this.textNode || this.textNode.nodeType !== 3) return;
-      this.setChord(this.textNode.nodeValue, this.range.startOffset);
+      if (!this.setChord(this.textNode.nodeValue, this.range.startOffset)) {
+        this.setChord(this.textNode.nodeValue, this.range.startOffset - 1);
+      }
     },
     setChord: function(text, offset = 0) {
       ChordNote.parseContent.intervalNote = ChordNote.Note(
@@ -158,7 +156,7 @@ export default {
           this.settings.transposeOffset
         );
       }
-      this.chord = ChordNote.parseContent(text, offset);
+      return (this.chord = ChordNote.parseContent(text, offset));
     }
   }
 };
@@ -168,7 +166,7 @@ export default {
 #chord-dictionary-pop-up {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
-  z-index: 1000;
+  text-align: left;
   position: absolute !important;
   .card-header div {
     min-height: 24px;
