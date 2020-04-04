@@ -1,6 +1,6 @@
 let activeTabIds = [];
 
-//アイコンをクリックされたとき
+//アイコンがクリックされたとき
 chrome.browserAction.onClicked.addListener(function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         if (tabs.length === 0) return false;
@@ -19,15 +19,21 @@ chrome.browserAction.onClicked.addListener(function () {
     });
 });
 
-// //タブが更新されたとき
+//タブが更新されたとき
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status !== "complete") return false
     delete activeTabIds[tabId];
     setStatus()
 });
 
-// //アクティブなタブが変更されたとき
+//アクティブなタブが変更されたとき
 chrome.tabs.onActivated.addListener(function (activeInfo) {
+    console.log("activeInfo", activeInfo)
+    setStatus();
+});
+
+//アクティブなウィンドウが変更されたとき
+chrome.windows.onFocusChanged.addListener(function (windowId) {
     setStatus();
 });
 
