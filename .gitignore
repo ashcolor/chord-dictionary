@@ -1,6 +1,6 @@
-/node_modules
-/*.log
-/.history
-/.test
-/dist
-/dist-zip
+/node_modules/
+/*.log/
+/.history/
+/.test/
+/dist/
+/dist-zip/
