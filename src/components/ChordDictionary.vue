@@ -34,7 +34,7 @@
       id="chord-dictionary-highlight"
       :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
     />
-    <config :settings="settings" />
+    <setting :settings="settings" />
   </div>
 </template>
 
@@ -42,7 +42,7 @@
 import ChordNote from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
-import Config from "./Config.vue";
+import Setting from "./setting.vue";
 
 var offsetBase = document.createElement("div");
 offsetBase.style.position = "absolute";
@@ -55,7 +55,7 @@ export default {
   components: {
     Score,
     Player,
-    Config
+    Setting
   },
   data() {
     return {
@@ -89,51 +89,19 @@ export default {
       }
     };
   },
-  methods: {
-    setPointedChord: function(e) {
-      if (document.caretPositionFromPoint) {
-        this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
-        if (!this.range) return;
-        this.textNode = this.range.offsetNode;
-      } else if (document.caretRangeFromPoint) {
-        this.range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (!this.range) return;
-        this.textNode = this.range.startContainer;
-      } else return;
-      if (!this.textNode || this.textNode.nodeType !== 3) return;
-      this.setChord(this.textNode.nodeValue, this.range.startOffset);
-    },
-    setChord: function(text, offset = 0) {
-      ChordNote.parseContent.intervalNote = ChordNote.Note(
-        this.settings.key,
-        this.settings.offset
-      );
-      if (this.settings.isTransport) {
-        ChordNote.parseContent.transposeTo = ChordNote.Note(
-          this.settings.transposeKey,
-          this.settings.transposeOffset
-        );
-      }
-      this.chord = ChordNote.parseContent(text, offset);
-    }
-  },
   watch: {
     chord: function(val) {
-      if (val) {
-        this.range.setStart(this.textNode, val.position);
-        this.range.setEnd(this.textNode, val.position + val.string.length);
-        var rangeRect = this.range.getBoundingClientRect();
-        var offsetRect = offsetBase.getBoundingClientRect();
-        this.highlightPos = {
-          top: rangeRect.top - offsetRect.top,
-          left: rangeRect.left - offsetRect.left,
-          width: rangeRect.width,
-          height: rangeRect.height
-        };
-        document.body.style.cursor = "help";
-      } else {
-        document.body.style.cursor = "";
-      }
+      if (!val) return false;
+      this.range.setStart(this.textNode, val.position);
+      this.range.setEnd(this.textNode, val.position + val.string.length);
+      var rangeRect = this.range.getBoundingClientRect();
+      var offsetRect = offsetBase.getBoundingClientRect();
+      this.highlightPos = {
+        top: rangeRect.top - offsetRect.top,
+        left: rangeRect.left - offsetRect.left,
+        width: rangeRect.width,
+        height: rangeRect.height
+      };
     }
   },
   mounted() {
@@ -160,6 +128,47 @@ export default {
         this.setPointedChord(e);
       }.bind(this)
     );
+  },
+  methods: {
+    setPointedChord: function(e) {
+      if (document.caretPositionFromPoint) {
+        this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.offsetNode;
+      } else if (document.caretRangeFromPoint) {
+        this.range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        if (!this.range) return;
+        this.textNode = this.range.startContainer;
+      } else return;
+
+      if (
+        this.textNode.parentNode.classList.value.indexOf(
+          "chord-dictionary-no-event"
+        ) >= 0
+      ) {
+        return;
+      }
+
+      if (!this.textNode || this.textNode.nodeType !== 3) return;
+      if (!this.setChord(this.textNode.nodeValue, this.range.startOffset)) {
+        this.setChord(this.textNode.nodeValue, this.range.startOffset - 1);
+      }
+    },
+    setChord: function(text, offset = 0) {
+      ChordNote.parseContent.intervalNote = ChordNote.Note(
+        this.settings.key,
+        this.settings.offset
+      );
+      if (this.settings.isTransport) {
+        ChordNote.parseContent.transposeTo = ChordNote.Note(
+          this.settings.transposeKey,
+          this.settings.transposeOffset
+        );
+      } else {
+        ChordNote.parseContent.transposeTo = ChordNote.Note(0, 0);
+      }
+      return (this.chord = ChordNote.parseContent(text, offset));
+    }
   }
 };
 </script>
@@ -168,15 +177,8 @@ export default {
 #chord-dictionary-pop-up {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
-  z-index: 1000;
+  text-align: left;
   position: absolute !important;
-  .card-header div {
-    min-height: 24px;
-  }
-  .card-body p.card-text {
-    min-width: 160.24px;
-    min-height: 24.277px;
-  }
 }
 #chord-dictionary-highlight {
   position: absolute;
