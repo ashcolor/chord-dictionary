@@ -203,8 +203,8 @@ function parseContent(input, withinPos) {
 			addNoteMandatory[-1] = true;
 			
 			cont(
-				"p", c => {type = "'"; return true;},
-				"_", c => {third = "m"; seventhPos = i; return true;},
+				"p", c => {if (!nextIs("5")) {type = "'"; return true;}},
+				"_", c => {if (!nextIs("5")) {third = "m"; seventhPos = i; return true;}},
 				"2", c => {sus2 = true; cont("4", c => sus4 = true); return true;},
 				"4", c => {sus4 = true; cont("2", c => sus2 = true); return true;},
 				"79et", c => {has7 = true; highestInterval = c; return true;}
@@ -390,7 +390,7 @@ function parseContent(input, withinPos) {
 				},
 				"<", c => {
 					bracketLayer++;
-					return peek() != ">" && !(peek() == "w" && idList.charAt(i + 2) == ">");
+					return !nextIs(">");
 				},
 				">", c => {
 					bracketLayer--;
@@ -423,9 +423,7 @@ function parseContent(input, withinPos) {
 				}
 				if (type == "o") {
 					if (has6 && has7 && !seventh) {
-						var j = i;
-						while (!"67o".includes(idList.charAt(j))) j--;
-						clearAndReset(j);
+						clearAnyAndReset("67o");
 						continue;
 					}
 					if (!noThird) chordNote.push(third == "M" ? "E" : "Eb");
@@ -465,9 +463,7 @@ function parseContent(input, withinPos) {
 			if (addNote.includes("Db")) chordNote.push("Db");
 			if (addNote.includes("D") || "9et".includes(highestInterval) && addNoteMandatory[addNote.indexOf("Db")] && addNoteMandatory[addNote.indexOf("D#")]) {
 				if (chordNote.includes("D")) {
-					var j = i;
-					while (!"9ets".includes(idList.charAt(j))) j--;
-					clearAndReset(j);
+					clearAnyAndReset("9ets");
 					continue;
 				} else chordNote.push("D");
 			}
@@ -476,9 +472,7 @@ function parseContent(input, withinPos) {
 			if (addNote.includes("Fb")) chordNote.push("Fb");
 			if (addNote.includes("F") || "et".includes(highestInterval) && addNoteMandatory[addNote.indexOf("Fb")] && addNoteMandatory[addNote.indexOf("F#")]) {
 				if (chordNote.includes("F")) {
-					var j = i;
-					while (!"ets".includes(idList.charAt(j))) j--;
-					clearAndReset(j);
+					clearAnyAndReset("ets");
 					continue;
 				} else chordNote.push("F");
 			}
@@ -487,9 +481,7 @@ function parseContent(input, withinPos) {
 			if (addNote.includes("Ab")) chordNote.push("Ab");
 			if (addNote.includes("A") || highestInterval == "t" && addNoteMandatory[addNote.indexOf("Ab")] && addNoteMandatory[addNote.indexOf("A#")]) {
 				if (chordNote.includes("A")) {
-					var j = i;
-					while (!"t6".includes(idList.charAt(j))) j--;
-					clearAndReset(j);
+					clearAnyAndReset("t6");
 					continue;
 				} else chordNote.push("A");
 			}
@@ -608,6 +600,8 @@ function parseContent(input, withinPos) {
 			
 			while ("w<,".includes(curr())) back();
 			
+			if (!onDetect) slashPos = i;
+			
 			for (var x = currPos; x <= i; x++) {
 				if (x <= noteUntil) data.noteString += inputList[x];
 				else if (x <= slashPos) data.name += inputList[x];
@@ -632,12 +626,20 @@ function parseContent(input, withinPos) {
 				
 			}
 			
+			function nextIs(id) {
+				return peek() == id || peek() == "w" && idList.charAt(i + 2) == id;
+			}
 			function clear(pos) {
 				idList = idList.slice(0, pos) + "=" + idList.slice(pos + 1);
 			}
 			function clearAndReset(pos) {
 				clear(pos);
 				i = currPos - 1;
+			}
+			function clearAnyAndReset(id) {
+				var j = i;
+				while (!id.includes(idList.charAt(j))) j--;
+				clearAndReset(j);
 			}
 			function addNotes(acci, note, acciPos) {
 				if ("29".includes(note)) {
