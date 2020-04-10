@@ -39,11 +39,11 @@
           <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>{{ $t("shortcut") }}</b-form-checkbox>
           <p
             v-show="settings.isActiveKey"
-            class="small text-muted mb-0 chord-dictionary-no-event"
+            class="small text-muted mb-0"
           >(Win) Ctrl + Space</p>
           <p
             v-show="settings.isActiveKey"
-            class="small text-muted mb-0 chord-dictionary-no-event"
+            class="small text-muted mb-0"
           >(Mac) Cmd + Shift + Space</p>
           <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>{{ $t("hover") }}</b-form-checkbox>
         </b-card-body>
@@ -120,13 +120,13 @@ export default {
   position: fixed;
   bottom: 10px;
   right: 10px;
-  z-index: 11;
+  z-index: 11000;
 }
 #chord-dictionary-sidebar {
   position: fixed;
   bottom: 60px;
   right: 12px;
-  z-index: 10;
+  z-index: 10000;
   width: 280px;
 }
 select {
@@ -134,7 +134,38 @@ select {
   appearance: none;
 }
 .custom-range {
-  -webkit-appearance: none !important;
-  appearance: none !important;
+  width: 100%;
+  height: 1.4rem;
+  padding: 0;
+  background-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.custom-range:focus {
+  outline: none;
+}
+.custom-range:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 1px #fff,0 0 0 .2rem rgba(0,123,255,.25);
+}
+.custom-range::-webkit-slider-thumb {
+  width: 1rem;
+  height: 1rem;
+  margin-top: -.25rem;
+  background-color: #007bff;
+  border: 0;
+  border-radius: 1rem;
+  -webkit-transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  -webkit-appearance: none;
+  appearance: none;
+}
+@media (prefers-reduced-motion:reduce) {
+  .custom-range::-webkit-slider-thumb {
+    -webkit-transition: none;
+    transition: none;
+  }
+}
+.custom-range::-webkit-slider-thumb:active {
+  background-color: #b3d7ff;
 }
 </style>

@@ -19,15 +19,15 @@ const wrapperId = "chord-dictionary-wrapper";
 const el = document.createElement("app");
 el.id = appId;
 const wrapperEl = document.getElementById(wrapperId);
-if (!wrapperEl) {
-  document.body.appendChild(el);
-  new Vue({
-    render: h => h(App),
-    i18n: new VueI18n({
-      locale: 'en',
-      messages: langs
-    })
-  }).$mount("#" + appId);
-} else {
-  wrapperEl.remove();
-}
+if (wrapperEl) wrapperEl.remove();
+document.body.appendChild(el);
+new Vue({
+  render: h => h(App),
+  i18n: new VueI18n({
+    locale: 'en',
+    messages: langs
+  })
+}).$mount("#" + appId);
+window.addEventListener("beforeunload", function() {
+  chrome.runtime.sendMessage(null, "reload");
+});

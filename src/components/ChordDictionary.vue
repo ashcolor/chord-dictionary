@@ -24,11 +24,11 @@
             v-html="chord.originalElement && chord.originalElement.innerHTML"
             class="mb-0"
           />
-          <score :chordObject="chord" class="mt-0" />
+          <score :chord="chord" class="mt-0" />
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :isActive="isActive" :chordVoicing="chord ? chord.voicing : {}" :settings="settings" />
+    <player :isActive="isActive" :chord="chord" :settings="settings" />
     <div
       v-show="chord"
       id="chord-dictionary-highlight"
@@ -152,25 +152,16 @@ export default {
         if (!this.range) return;
         this.textNode = this.range.startContainer;
       } else return;
-      if (!this.textNode || this.textNode.nodeType !== 3 || this.textNode.parentNode.className.includes("chord-dictionary-no-event")) return;
-      if (!this.setChord(this.textNode.nodeValue, this.range.startOffset)) {
-        this.setChord(this.textNode.nodeValue, this.range.startOffset - 1);
-      }
-    },
-    setChord: function(text, offset = 0) {
+      if (!this.textNode || this.textNode.nodeType !== 3 || this.$el.contains(this.textNode)) return;
       ChordNote.parseContent.intervalNote = ChordNote.Note(
         this.settings.key,
         this.settings.offset
       );
-      if (this.settings.isTranspose) {
-        ChordNote.parseContent.transposeTo = ChordNote.Note(
-          this.settings.transposeKey,
-          this.settings.transposeOffset
-        );
-      } else {
-        ChordNote.parseContent.transposeTo = ChordNote.Note(0, 0);
-      }
-      return (this.chord = ChordNote.parseContent(text, offset));
+      ChordNote.parseContent.transposeTo = ChordNote.Note(
+        this.settings.isTranspose && this.settings.transposeKey,
+        this.settings.isTranspose && this.settings.transposeOffset
+      );
+      this.chord = ChordNote.parseContent(this.textNode.nodeValue, this.range.startOffset);
     }
   }
 };
@@ -182,6 +173,7 @@ export default {
   @import "node_modules/bootstrap-vue/src/index.scss";
   text-align: left;
   position: absolute !important;
+  z-index: 12000;
 }
 #chord-dictionary-highlight {
   position: absolute;
