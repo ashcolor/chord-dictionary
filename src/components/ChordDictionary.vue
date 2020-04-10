@@ -63,9 +63,10 @@ export default {
       chord: null,
       settings: {
         isShow: true,
+        language: "",
         key: 0,
         offset: 0,
-        isTransport: false,
+        isTranspose: false,
         transposeKey: 0,
         transposeOffset: 0,
         volume: 70,
@@ -116,8 +117,19 @@ export default {
     chrome.storage.local.get(
       "settings",
       function(value) {
-        if (!value) return false;
-        this.settings = Object.assign(this.settings, value.settings);
+        if (value) this.settings = Object.assign(this.settings, value.settings);
+        this.settings.language = this.settings.language || (function(languages) {
+          for (var i = 0; i < languages.length; i++) {
+            if (!languages[i]) continue;
+            if (/^zh-(hk|mo)/i.test(languages[i])) return "hk";
+            if (/^zh-(tw|hant)/i.test(languages[i])) return "tw";
+            if (/^zh/i.test(languages[i])) return "cn";
+            if (/^ja/i.test(languages[i])) return "ja";
+            if (/^ko/i.test(languages[i])) return "ko";
+            if (/^en/i.test(languages[i])) return "en";
+          }
+          return "en";
+        })([].concat(window.navigator.language, window.navigator.userLanguage, window.navigator.browserLanguage, window.navigator.systemLanguage, window.navigator.languages));
       }.bind(this)
     );
     window.addEventListener(
@@ -140,16 +152,7 @@ export default {
         if (!this.range) return;
         this.textNode = this.range.startContainer;
       } else return;
-
-      if (
-        this.textNode.parentNode.classList.value.indexOf(
-          "chord-dictionary-no-event"
-        ) >= 0
-      ) {
-        return;
-      }
-
-      if (!this.textNode || this.textNode.nodeType !== 3) return;
+      if (!this.textNode || this.textNode.nodeType !== 3 || this.textNode.parentNode.className.includes("chord-dictionary-no-event")) return;
       if (!this.setChord(this.textNode.nodeValue, this.range.startOffset)) {
         this.setChord(this.textNode.nodeValue, this.range.startOffset - 1);
       }
@@ -159,7 +162,7 @@ export default {
         this.settings.key,
         this.settings.offset
       );
-      if (this.settings.isTransport) {
+      if (this.settings.isTranspose) {
         ChordNote.parseContent.transposeTo = ChordNote.Note(
           this.settings.transposeKey,
           this.settings.transposeOffset

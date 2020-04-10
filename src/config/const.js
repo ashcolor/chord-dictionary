@@ -1,7 +1,6 @@
 const INSTS = [
     {
         "key": 'piano',
-        "name": 'ピアノ',
         "isSample": true,
         "samples": {
             C2: chrome.extension.getURL("sounds/piano-c2.mp3"),
@@ -12,7 +11,6 @@ const INSTS = [
     },
     {
         "key": 'guitar',
-        "name": 'ギター',
         "isSample": true,
         "samples": {
             E3: chrome.extension.getURL("sounds/guitar-e2.mp3"),
@@ -22,7 +20,6 @@ const INSTS = [
     },
     {
         "key": 'synth',
-        "name": 'シンセ',
         "isSample": false,
         "samples": {}
     }
