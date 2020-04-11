@@ -33,7 +33,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 //アクティブなウィンドウが変更されたとき
 chrome.windows.onFocusChanged.addListener(setStatus);
 
-function setStatus () {
+function setStatus() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.browserAction.setBadgeText({ text: tabs[0] && activeTabIds[tabs[0].id] ? "ON" : "" });
   });
