@@ -66,8 +66,8 @@ export default {
       //音符の描画位置が高すぎる場合の調整
       const box = voice.getBoundingBox();
       this.width = box.w + 65;
-      this.offsetH = box.y < 10 ? 10 - box.y : 0;
-      renderer.resize(20 + this.width, 100 + this.offsetH);
+      this.offsetH = box.y < 20 ? 20 - box.y : 0;
+      renderer.resize(20 + this.width, 110 + this.offsetH);
       stave.setWidth(this.width);
       stave.setY(this.offsetH);
 

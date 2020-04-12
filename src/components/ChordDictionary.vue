@@ -3,7 +3,7 @@
     <b-card-group
       v-if="chord"
       id="chord-dictionary-pop-up"
-      :style="{ top: position.top + 'px' , left: position.left + 'px' }"
+      :style="position"
       deck
     >
       <b-card no-body>
@@ -32,7 +32,7 @@
     <div
       v-show="chord"
       id="chord-dictionary-highlight"
-      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
+      :style="highlightPos"
     />
     <setting :settings="settings" />
   </div>
@@ -62,8 +62,8 @@ export default {
       isActive: true,
       chord: null,
       settings: {
-        isShow: true,
-        language: "",
+        isShow: null,
+        language: null,
         key: 0,
         offset: 0,
         isTranspose: false,
@@ -76,18 +76,10 @@ export default {
         isActiveKey: true,
         isActiveHover: false
       },
-      position: {
-        top: 0,
-        left: 0
-      },
+      position: {},
       range: null,
       textNode: null,
-      highlightPos: {
-        top: 0,
-        left: 0,
-        width: 0,
-        height: 0
-      }
+      highlightPos: {}
     };
   },
   watch: {
@@ -98,10 +90,10 @@ export default {
       var rangeRect = this.range.getBoundingClientRect();
       var offsetRect = offsetBase.getBoundingClientRect();
       this.highlightPos = {
-        top: rangeRect.top - offsetRect.top,
-        left: rangeRect.left - offsetRect.left,
-        width: rangeRect.width,
-        height: rangeRect.height
+        top: rangeRect.top - offsetRect.top + "px",
+        left: rangeRect.left - offsetRect.left + "px",
+        width: rangeRect.width + "px",
+        height: rangeRect.height + "px"
       };
     }
   },
@@ -130,13 +122,14 @@ export default {
           }
           return "en";
         })([].concat(window.navigator.language, window.navigator.userLanguage, window.navigator.browserLanguage, window.navigator.systemLanguage, window.navigator.languages));
+        if (this.settings.isShow === null) this.settings.isShow = true;
       }.bind(this)
     );
     window.addEventListener(
       "mousemove",
       function(e) {
-        this.position.top = e.pageY + 16;
-        this.position.left = e.pageX + 16;
+        this.position.top = e.pageY + 16 + "px";
+        this.position.left = e.pageX + 16 + "px";
         this.setPointedChord(e);
       }.bind(this)
     );
@@ -168,72 +161,71 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#chord-dictionary-pop-up {
+#chord-dictionary-wrapper #chord-dictionary-pop-up {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
   text-align: left;
   position: absolute !important;
-  z-index: 12000;
+  z-index: 2147483647;
 }
-#chord-dictionary-highlight {
+#chord-dictionary-wrapper #chord-dictionary-highlight {
   position: absolute;
-  z-index: -1000;
   background-color: yellow;
+  z-index: -2147483648;
 }
 </style>
 <style>
-.chord-dictionary-note {
+#chord-dictionary-wrapper .chord-dictionary-note {
   font-style: bold;
 }
-.chord-dictionary-chord {
+#chord-dictionary-wrapper .chord-dictionary-chord {
   color: #333;
   font-style: italic;
 }
-.chord-dictionary-slash {
+#chord-dictionary-wrapper .chord-dictionary-slash {
   color: #888;
   font-size: 80%;
 }
-.chord-dictionary-bass {
+#chord-dictionary-wrapper .chord-dictionary-bass {
   font-size: 80%;
 }
-.chord-dictionary-part {
+#chord-dictionary-wrapper .chord-dictionary-part {
   margin-right: 10px;
 }
-
-.chord-dictionary-midi-0 {
+#chord-dictionary-wrapper .chord-dictionary-midi-0 {
   color: hsl(0, 88%, 46%);
 }
-.chord-dictionary-midi-1 {
+#chord-dictionary-wrapper .chord-dictionary-midi-1 {
   color: hsl(30, 99%, 33%);
 }
-.chord-dictionary-midi-2 {
+#chord-dictionary-wrapper .chord-dictionary-midi-2 {
   color: hsl(49, 90%, 46%);
 }
-.chord-dictionary-midi-3 {
+#chord-dictionary-wrapper .chord-dictionary-midi-3 {
   color: hsl(60, 98%, 33%);
 }
-.chord-dictionary-midi-4 {
+#chord-dictionary-wrapper .chord-dictionary-midi-4 {
   color: hsl(79, 59%, 46%);
 }
-.chord-dictionary-midi-5 {
+#chord-dictionary-wrapper .chord-dictionary-midi-5 {
   color: hsl(135, 76%, 33%);
 }
-.chord-dictionary-midi-6 {
+#chord-dictionary-wrapper .chord-dictionary-midi-6 {
   color: hsl(172, 68%, 46%);
 }
-.chord-dictionary-midi-7 {
+#chord-dictionary-wrapper .chord-dictionary-midi-7 {
   color: hsl(191, 41%, 33%);
 }
-.chord-dictionary-midi-8 {
+#chord-dictionary-wrapper .chord-dictionary-midi-8 {
   color: hsl(273, 79%, 46%);
 }
-.chord-dictionary-midi-9 {
+#chord-dictionary-wrapper .chord-dictionary-midi-9 {
   color: hsl(291, 46%, 33%);
 }
-.chord-dictionary-midi-10 {
+#chord-dictionary-wrapper .chord-dictionary-midi-10 {
   color: hsl(295, 97%, 46%);
 }
-.chord-dictionary-midi-11 {
+#chord-dictionary-wrapper .chord-dictionary-midi-11 {
   color: hsl(332, 97%, 33%);
 }
 </style>

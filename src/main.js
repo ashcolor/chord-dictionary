@@ -14,20 +14,18 @@ Vue.use(VueI18n);
 
 Vue.config.productionTip = false;
 
-const appId = "chord-dictionary-app";
-const wrapperId = "chord-dictionary-wrapper";
 const el = document.createElement("app");
-el.id = appId;
-const wrapperEl = document.getElementById(wrapperId);
+el.id = "chord-dictionary-app";
+const wrapperEl = document.getElementById("chord-dictionary-wrapper");
 if (wrapperEl) wrapperEl.remove();
 document.body.appendChild(el);
 new Vue({
   render: h => h(App),
   i18n: new VueI18n({
-    locale: 'en',
+    locale: "en",
     messages: langs
   })
-}).$mount("#" + appId);
+}).$mount("#chord-dictionary-app");
 window.addEventListener("beforeunload", function() {
   chrome.runtime.sendMessage(null, "reload");
 });

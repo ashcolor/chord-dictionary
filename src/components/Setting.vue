@@ -109,31 +109,33 @@ export default {
 </script>
 
 <style lang="scss">
-#chord-dictionary-setting {
+#chord-dictionary-wrapper #chord-dictionary-setting {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
   text-align: left;
   display: flex;
   align-items: stretch;
 }
-#chord-dictionary-toggle-button {
+#chord-dictionary-wrapper #chord-dictionary-toggle-button {
   position: fixed;
   bottom: 10px;
   right: 10px;
-  z-index: 11000;
+  z-index: 2147483646;
 }
-#chord-dictionary-sidebar {
+#chord-dictionary-wrapper #chord-dictionary-sidebar {
   position: fixed;
   bottom: 60px;
   right: 12px;
-  z-index: 10000;
+  z-index: 2147483645;
   width: 280px;
 }
-select {
+#chord-dictionary-wrapper select {
   -webkit-appearance: none;
   appearance: none;
 }
-.custom-range {
+</style>
+<style>
+#chord-dictionary-wrapper .custom-range {
   width: 100%;
   height: 1.4rem;
   padding: 0;
@@ -141,13 +143,13 @@ select {
   -webkit-appearance: none;
   appearance: none;
 }
-.custom-range:focus {
+#chord-dictionary-wrapper .custom-range:focus {
   outline: none;
 }
-.custom-range:focus::-webkit-slider-thumb {
+#chord-dictionary-wrapper .custom-range:focus::-webkit-slider-thumb {
   box-shadow: 0 0 0 1px #fff,0 0 0 .2rem rgba(0,123,255,.25);
 }
-.custom-range::-webkit-slider-thumb {
+#chord-dictionary-wrapper .custom-range::-webkit-slider-thumb {
   width: 1rem;
   height: 1rem;
   margin-top: -.25rem;
@@ -160,12 +162,21 @@ select {
   appearance: none;
 }
 @media (prefers-reduced-motion:reduce) {
-  .custom-range::-webkit-slider-thumb {
+  #chord-dictionary-wrapper .custom-range::-webkit-slider-thumb {
     -webkit-transition: none;
     transition: none;
   }
 }
-.custom-range::-webkit-slider-thumb:active {
+#chord-dictionary-wrapper .custom-range::-webkit-slider-thumb:active {
   background-color: #b3d7ff;
+}
+@media (max-height: 660px) {
+  #chord-dictionary-wrapper #chord-dictionary-setting nav {
+    width: 560px;
+    display: flex;
+  }
+  #chord-dictionary-wrapper #chord-dictionary-setting .card {
+    flex: auto;
+  }
 }
 </style>
