@@ -62,7 +62,6 @@
 
 <script>
 import { INSTS, KEYS, OFFSETS } from "../config/const";
-import VueI18n from "vue-i18n";
 
 import langs from "../config/i18n";
 
@@ -94,7 +93,7 @@ export default {
     settings: {
       handler: function(newValue, oldValue) {
         chrome.storage.local.set({ settings: newValue });
-        this._i18n.locale = this.settings.language;
+        this._i18n.locale = newValue.language;
       },
       deep: true
     }
@@ -104,7 +103,9 @@ export default {
       this.isShow = !this.isShow;
     }
   },
-  mounted() {}
+  mounted() {
+    this._i18n.locale = this.settings.language;
+  }
 };
 </script>
 

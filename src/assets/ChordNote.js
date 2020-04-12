@@ -723,6 +723,7 @@ function parseContent(input, withinPos) {
 			i--;
 		}
 	}
+	return {};
 }
 if (!String.prototype.includes) String.prototype.includes = function(search, start) {
 	return this.indexOf(search, start) != -1;

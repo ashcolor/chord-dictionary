@@ -1,7 +1,7 @@
 <template>
   <div v-show="isActive">
     <b-card-group
-      v-if="chord"
+      v-if="chord.string"
       id="chord-dictionary-pop-up"
       :style="position"
       deck
@@ -24,13 +24,13 @@
             v-html="chord.originalElement && chord.originalElement.innerHTML"
             class="mb-0"
           />
-          <score :chord="chord" class="mt-0" />
+          <score :chord="chord" class="mt-0" @updated="updated" />
         </b-card-body>
       </b-card>
     </b-card-group>
     <player :isActive="isActive" :chord="chord" :settings="settings" />
     <div
-      v-show="chord"
+      v-show="chord.string"
       id="chord-dictionary-highlight"
       :style="highlightPos"
     />
@@ -60,7 +60,7 @@ export default {
   data() {
     return {
       isActive: true,
-      chord: null,
+      chord: {},
       settings: {
         isShow: null,
         language: null,
@@ -79,12 +79,14 @@ export default {
       position: {},
       range: null,
       textNode: null,
-      highlightPos: {}
+      highlightPos: {},
+      pageX: 0,
+      pageY: 0
     };
   },
   watch: {
     chord: function(val) {
-      if (!val) return false;
+      if (!val.string) return;
       this.range.setStart(this.textNode, val.position);
       this.range.setEnd(this.textNode, val.position + val.string.length);
       var rangeRect = this.range.getBoundingClientRect();
@@ -95,6 +97,7 @@ export default {
         width: rangeRect.width + "px",
         height: rangeRect.height + "px"
       };
+      this.updated();
     }
   },
   mounted() {
@@ -125,17 +128,13 @@ export default {
         if (this.settings.isShow === null) this.settings.isShow = true;
       }.bind(this)
     );
-    window.addEventListener(
-      "mousemove",
-      function(e) {
-        this.position.top = e.pageY + 16 + "px";
-        this.position.left = e.pageX + 16 + "px";
-        this.setPointedChord(e);
-      }.bind(this)
-    );
+    window.addEventListener("mousemove", this.setPointedChord);
   },
   methods: {
     setPointedChord: function(e) {
+      this.pageX = Math.min(e.pageX, document.documentElement.clientWidth);
+      this.pageY = Math.min(e.pageY, document.documentElement.clientHeight);
+      this.updated();
       if (document.caretPositionFromPoint) {
         this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
         if (!this.range) return;
@@ -146,15 +145,17 @@ export default {
         this.textNode = this.range.startContainer;
       } else return;
       if (!this.textNode || this.textNode.nodeType !== 3 || this.$el.contains(this.textNode)) return;
-      ChordNote.parseContent.intervalNote = ChordNote.Note(
-        this.settings.key,
-        this.settings.offset
-      );
-      ChordNote.parseContent.transposeTo = ChordNote.Note(
-        this.settings.isTranspose && this.settings.transposeKey,
-        this.settings.isTranspose && this.settings.transposeOffset
-      );
       this.chord = ChordNote.parseContent(this.textNode.nodeValue, this.range.startOffset);
+    },
+    updated: function() {
+      if (!this.chord.string) return;
+      var div = document.getElementById("chord-dictionary-pop-up");
+      if (!div) return;
+      var dimension = div.getBoundingClientRect();
+      this.position = {
+        top: (dimension.height + this.pageY - window.scrollY + 40 > document.documentElement.clientHeight ? this.pageY - dimension.height - 10 : this.pageY + 20) + "px",
+        left: (dimension.width + this.pageX - window.scrollX + 40 > document.documentElement.clientWidth ? this.pageX - dimension.width - 10 : this.pageX + 20) + "px"
+      };
     }
   }
 };

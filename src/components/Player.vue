@@ -6,7 +6,7 @@ export default {
   name: "Player",
   props: {
     isActive: Boolean,
-    chord: Array,
+    chord: Object,
     settings: Object
   },
   data() {
@@ -16,14 +16,14 @@ export default {
   },
   watch: {
     chord: function(newVal, oldVal) {
-      if (JSON.stringify(newVal) === JSON.stringify(oldVal)) return false;
       if (!this.isActive || !this.settings.isActiveHover) return false;
+      if (newVal.string === oldVal.string) return false;
       this.playChord();
     }
   },
   methods: {
     playChord: function() {
-      if (!this.chord || !this.chord.voicing) return false;
+      if (!this.chord.voicing) return false;
       this.insts[this.settings.inst].volume.value = Tone.gainToDb(
         this.settings.volume / 100
       );

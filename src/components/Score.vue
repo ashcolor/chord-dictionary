@@ -18,7 +18,7 @@ export default {
   },
   watch: {
     chord: function(newVal, oldVal) {
-      if (JSON.stringify(newVal) === JSON.stringify(oldVal)) return false;
+      if (newVal.string === oldVal.string) return false;
       this.dispScore();
     }
   },
@@ -27,8 +27,9 @@ export default {
   },
   methods: {
     dispScore: function() {
-      if (!this.chord || !this.chord.display) return;
+      if (!this.chord.display) return;
       const div = document.getElementById("chord-dictionary-score");
+      if (!div) return;
       div.textContent = null;
 
       const VF = Vex.Flow;
@@ -47,7 +48,7 @@ export default {
       this.chord.original.forEach((note, index) => {
         if (note.offset) {
           const acci = note.offset < 0 ? "bb" : "##", repetition = Math.abs(note.offset) >> 1;
-		  for (var i = 0; i < repetition; i++) notes.addAccidental(
+          for (var i = 0; i < repetition; i++) notes.addAccidental(
             index,
             new VF.Accidental(acci)
           );
@@ -73,6 +74,7 @@ export default {
 
       stave.draw();
       voice.draw(context, stave);
+      this.$emit("updated");
     }
   }
 };
