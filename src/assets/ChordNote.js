@@ -188,7 +188,7 @@ function parseContent(input, withinPos) {
 		
 		if (detect) {
 			
-			var noteObj = Note(note, acci), noteUntil = i;
+			var noteObj = transpose(0, parseContent.transposeTo, Note(note, acci)), noteUntil = i;
 			
 			var bracketLayer = 0;
 			var has5 = false, has6 = false, has7 = false, third = null, seventh = null, type = null;
@@ -517,7 +517,7 @@ function parseContent(input, withinPos) {
 			if (failed) continue;
 			
 			chordNote = chordNote.map(function(item) {
-				return transpose(0, parseContent.transposeTo, transpose(0, isInterval && parseContent.intervalNote, transpose(0, noteObj, item)));
+				return transpose(0, isInterval && parseContent.intervalNote, transpose(0, noteObj, item));
 			});
 			
 			var data = {string: "", name: "", noteString: "", isInterval: isInterval}, slashPos = i, onDetect = false;

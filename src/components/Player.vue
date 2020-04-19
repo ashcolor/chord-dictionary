@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     playChord: function() {
-      if (!this.chord.voicing) return false;
+      if (this.$parent.$el.matches(":hover") || !this.chord.voicing) return false;
       this.insts[this.settings.inst].volume.value = Tone.gainToDb(
         this.settings.volume / 100
       );

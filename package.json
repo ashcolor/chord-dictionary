@@ -26,7 +26,7 @@
     "tone": "^13.8.25",
     "vexflow": "^1.2.90",
     "vue": "^2.6.11",
-    "vue-i18n": "^8.17.2",
+    "vue-i18n": "8.16.0",
     "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {

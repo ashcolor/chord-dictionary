@@ -91,13 +91,15 @@ export default {
       this.range.setEnd(this.textNode, val.position + val.string.length);
       var rangeRect = this.range.getBoundingClientRect();
       var offsetRect = offsetBase.getBoundingClientRect();
-      this.highlightPos = {
-        top: rangeRect.top - offsetRect.top + "px",
-        left: rangeRect.left - offsetRect.left + "px",
-        width: rangeRect.width + "px",
-        height: rangeRect.height + "px"
-      };
-      this.updated();
+      if (this.pageY >= rangeRect.top - offsetRect.top && this.pageY <= rangeRect.top - offsetRect.top + rangeRect.height && this.pageX >= rangeRect.left - offsetRect.left && this.pageX <= rangeRect.left - offsetRect.left + rangeRect.width) {
+        this.highlightPos = {
+          top: rangeRect.top - offsetRect.top + "px",
+          left: rangeRect.left - offsetRect.left + "px",
+          width: rangeRect.width + "px",
+          height: rangeRect.height + "px"
+        };
+        this.updated();
+      } else this.chord = {};
     }
   },
   mounted() {
@@ -128,12 +130,14 @@ export default {
         if (this.settings.isShow === null) this.settings.isShow = true;
       }.bind(this)
     );
-    window.addEventListener("mousemove", this.setPointedChord);
+    window.addEventListener("mousemove", function(e) {
+      if (!this.setPointedChord(e)) this.chord = {};
+    }.bind(this));
   },
   methods: {
     setPointedChord: function(e) {
-      this.pageX = Math.min(e.pageX, document.documentElement.clientWidth);
-      this.pageY = Math.min(e.pageY, document.documentElement.clientHeight);
+      this.pageX = Math.min(e.pageX, document.documentElement.scrollWidth);
+      this.pageY = Math.min(e.pageY, document.documentElement.scrollHeight);
       this.updated();
       if (document.caretPositionFromPoint) {
         this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
@@ -145,7 +149,17 @@ export default {
         this.textNode = this.range.startContainer;
       } else return;
       if (!this.textNode || this.textNode.nodeType !== 3 || this.$el.contains(this.textNode)) return;
+      if (!this.textNode.parentNode.matches(":hover")) return;
+      ChordNote.parseContent.intervalNote = ChordNote.Note(
+        this.settings.key,
+        this.settings.offset
+      );
+      ChordNote.parseContent.transposeTo = ChordNote.Note(
+        this.settings.isTranspose && this.settings.transposeKey,
+        this.settings.isTranspose && this.settings.transposeOffset
+      );
       this.chord = ChordNote.parseContent(this.textNode.nodeValue, this.range.startOffset);
+      return true;
     },
     updated: function() {
       if (!this.chord.string) return;
@@ -153,8 +167,8 @@ export default {
       if (!div) return;
       var dimension = div.getBoundingClientRect();
       this.position = {
-        top: (dimension.height + this.pageY - window.scrollY + 40 > document.documentElement.clientHeight ? this.pageY - dimension.height - 10 : this.pageY + 20) + "px",
-        left: (dimension.width + this.pageX - window.scrollX + 40 > document.documentElement.clientWidth ? this.pageX - dimension.width - 10 : this.pageX + 20) + "px"
+        top: (dimension.height + this.pageY - window.scrollY + 30 > document.documentElement.clientHeight ? this.pageY - dimension.height - 10 : this.pageY + 20) + "px",
+        left: (dimension.width + this.pageX - window.scrollX + 30 > document.documentElement.clientWidth ? this.pageX - dimension.width - 10 : this.pageX + 20) + "px"
       };
     }
   }
