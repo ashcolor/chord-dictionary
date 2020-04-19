@@ -91,13 +91,15 @@ export default {
       this.range.setEnd(this.textNode, val.position + val.string.length);
       var rangeRect = this.range.getBoundingClientRect();
       var offsetRect = offsetBase.getBoundingClientRect();
-      this.highlightPos = {
-        top: rangeRect.top - offsetRect.top + "px",
-        left: rangeRect.left - offsetRect.left + "px",
-        width: rangeRect.width + "px",
-        height: rangeRect.height + "px"
-      };
-      this.updated();
+      if (this.pageY >= rangeRect.top - offsetRect.top && this.pageY <= rangeRect.top - offsetRect.top + rangeRect.height && this.pageX >= rangeRect.left - offsetRect.left && this.pageX <= rangeRect.left - offsetRect.left + rangeRect.width) {
+        this.highlightPos = {
+          top: rangeRect.top - offsetRect.top + "px",
+          left: rangeRect.left - offsetRect.left + "px",
+          width: rangeRect.width + "px",
+          height: rangeRect.height + "px"
+        };
+        this.updated();
+      } else this.chord = {};
     }
   },
   mounted() {
