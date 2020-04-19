@@ -8,53 +8,55 @@ import Vex from "vexflow";
 export default {
   name: "ChordScore",
   props: {
-    chordObject: Object
+    chord: Object
   },
   data() {
     return {
+      width: 0,
       offsetH: 0
     };
   },
   watch: {
-    chordObject: function(val) {
-      this.dispScore(val);
+    chord: function(newVal, oldVal) {
+      if (newVal.string === oldVal.string) return false;
+      this.dispScore();
     }
   },
   mounted() {
-    this.dispScore(this.chordObject);
+    this.dispScore();
   },
   methods: {
-    dispScore: function(chordObject) {
-      if (this.chordObject.display === undefined) return;
+    dispScore: function() {
+      if (!this.chord.display) return;
       const div = document.getElementById("chord-dictionary-score");
+      if (!div) return;
       div.textContent = null;
-
-      const width = 120;
-      const height = 100;
 
       const VF = Vex.Flow;
       const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
       const context = renderer.getContext();
-      context.setFont("Arial", 10, "").setBackgroundFillStyle("#fff");
-      const stave = new VF.Stave(0, 0, width);
+      context.setFont("Bravura", 10, "").setBackgroundFillStyle("transparent");
+      const stave = new VF.Stave(0, 0, 0);
       stave.addClef("treble");
       stave.setContext(context);
 
       const notes = new VF.StaveNote({
-        keys: chordObject.display,
+        keys: this.chord.display,
         duration: "w"
       });
 
-      chordObject.original.forEach((note, index) => {
-        if (note.offset)
-          notes.addAccidental(
+      this.chord.original.forEach((note, index) => {
+        if (note.offset) {
+          const acci = note.offset < 0 ? "bb" : "##", repetition = Math.abs(note.offset) >> 1;
+          for (var i = 0; i < repetition; i++) notes.addAccidental(
             index,
-            new VF.Accidental(
-              note.offset < 0
-                ? "b".repeat(-note.offset)
-                : "#".repeat(note.offset)
-            )
+            new VF.Accidental(acci)
           );
+          if (note.offset & 1) notes.addAccidental(
+            index,
+            new VF.Accidental(note.offset < 0 ? "b" : "#")
+          );
+        }
       });
 
       const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
@@ -63,13 +65,16 @@ export default {
       voice.setStave(stave);
 
       //音符の描画位置が高すぎる場合の調整
-      const y = voice.getBoundingBox().y;
-      this.offsetH = y < 10 ? 10 - y : 0;
-      renderer.resize(width + 20, height + this.offsetH);
+      const box = voice.getBoundingBox();
+      this.width = box.w + 65;
+      this.offsetH = box.y < 20 ? 20 - box.y : 0;
+      renderer.resize(20 + this.width, 110 + this.offsetH);
+      stave.setWidth(this.width);
       stave.setY(this.offsetH);
 
       stave.draw();
       voice.draw(context, stave);
+      this.$emit("updated");
     }
   }
 };

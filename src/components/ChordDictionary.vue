@@ -1,9 +1,9 @@
 <template>
   <div v-show="isActive">
     <b-card-group
-      v-if="chord"
+      v-if="chord.string"
       id="chord-dictionary-pop-up"
-      :style="{ top: position.top + 'px' , left: position.left + 'px' }"
+      :style="position"
       deck
     >
       <b-card no-body>
@@ -24,15 +24,15 @@
             v-html="chord.originalElement && chord.originalElement.innerHTML"
             class="mb-0"
           />
-          <score :chordObject="chord" class="mt-0" />
+          <score :chord="chord" class="mt-0" @updated="updated" />
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :isActive="isActive" :chordVoicing="chord ? chord.voicing : {}" :settings="settings" />
+    <player :isActive="isActive" :chord="chord" :settings="settings" />
     <div
-      v-show="chord"
+      v-show="chord.string"
       id="chord-dictionary-highlight"
-      :style="{ top: highlightPos.top + 'px' , left: highlightPos.left + 'px' , width: highlightPos.width + 'px' , height: highlightPos.height + 'px' }"
+      :style="highlightPos"
     />
     <setting :settings="settings" />
   </div>
@@ -60,12 +60,13 @@ export default {
   data() {
     return {
       isActive: true,
-      chord: null,
+      chord: {},
       settings: {
-        isShow: true,
+        isShow: null,
+        language: null,
         key: 0,
         offset: 0,
-        isTransport: false,
+        isTranspose: false,
         transposeKey: 0,
         transposeOffset: 0,
         volume: 70,
@@ -75,33 +76,28 @@ export default {
         isActiveKey: true,
         isActiveHover: false
       },
-      position: {
-        top: 0,
-        left: 0
-      },
+      position: {},
       range: null,
       textNode: null,
-      highlightPos: {
-        top: 0,
-        left: 0,
-        width: 0,
-        height: 0
-      }
+      highlightPos: {},
+      pageX: 0,
+      pageY: 0
     };
   },
   watch: {
     chord: function(val) {
-      if (!val) return false;
+      if (!val.string) return;
       this.range.setStart(this.textNode, val.position);
       this.range.setEnd(this.textNode, val.position + val.string.length);
       var rangeRect = this.range.getBoundingClientRect();
       var offsetRect = offsetBase.getBoundingClientRect();
       this.highlightPos = {
-        top: rangeRect.top - offsetRect.top,
-        left: rangeRect.left - offsetRect.left,
-        width: rangeRect.width,
-        height: rangeRect.height
+        top: rangeRect.top - offsetRect.top + "px",
+        left: rangeRect.left - offsetRect.left + "px",
+        width: rangeRect.width + "px",
+        height: rangeRect.height + "px"
       };
+      this.updated();
     }
   },
   mounted() {
@@ -116,21 +112,29 @@ export default {
     chrome.storage.local.get(
       "settings",
       function(value) {
-        if (!value) return false;
-        this.settings = Object.assign(this.settings, value.settings);
+        if (value) this.settings = Object.assign(this.settings, value.settings);
+        this.settings.language = this.settings.language || (function(languages) {
+          for (var i = 0; i < languages.length; i++) {
+            if (!languages[i]) continue;
+            if (/^zh-(hk|mo)/i.test(languages[i])) return "hk";
+            if (/^zh-(tw|hant)/i.test(languages[i])) return "tw";
+            if (/^zh/i.test(languages[i])) return "cn";
+            if (/^ja/i.test(languages[i])) return "ja";
+            if (/^ko/i.test(languages[i])) return "ko";
+            if (/^en/i.test(languages[i])) return "en";
+          }
+          return "en";
+        })([].concat(window.navigator.language, window.navigator.userLanguage, window.navigator.browserLanguage, window.navigator.systemLanguage, window.navigator.languages));
+        if (this.settings.isShow === null) this.settings.isShow = true;
       }.bind(this)
     );
-    window.addEventListener(
-      "mousemove",
-      function(e) {
-        this.position.top = e.pageY + 16;
-        this.position.left = e.pageX + 16;
-        this.setPointedChord(e);
-      }.bind(this)
-    );
+    window.addEventListener("mousemove", this.setPointedChord);
   },
   methods: {
     setPointedChord: function(e) {
+      this.pageX = Math.min(e.pageX, document.documentElement.clientWidth);
+      this.pageY = Math.min(e.pageY, document.documentElement.clientHeight);
+      this.updated();
       if (document.caretPositionFromPoint) {
         this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
         if (!this.range) return;
@@ -140,105 +144,89 @@ export default {
         if (!this.range) return;
         this.textNode = this.range.startContainer;
       } else return;
-
-      if (
-        this.textNode.parentNode.classList.value.indexOf(
-          "chord-dictionary-no-event"
-        ) >= 0
-      ) {
-        return;
-      }
-
-      if (!this.textNode || this.textNode.nodeType !== 3) return;
-      if (!this.setChord(this.textNode.nodeValue, this.range.startOffset)) {
-        this.setChord(this.textNode.nodeValue, this.range.startOffset - 1);
-      }
+      if (!this.textNode || this.textNode.nodeType !== 3 || this.$el.contains(this.textNode)) return;
+      this.chord = ChordNote.parseContent(this.textNode.nodeValue, this.range.startOffset);
     },
-    setChord: function(text, offset = 0) {
-      ChordNote.parseContent.intervalNote = ChordNote.Note(
-        this.settings.key,
-        this.settings.offset
-      );
-      if (this.settings.isTransport) {
-        ChordNote.parseContent.transposeTo = ChordNote.Note(
-          this.settings.transposeKey,
-          this.settings.transposeOffset
-        );
-      } else {
-        ChordNote.parseContent.transposeTo = ChordNote.Note(0, 0);
-      }
-      return (this.chord = ChordNote.parseContent(text, offset));
+    updated: function() {
+      if (!this.chord.string) return;
+      var div = document.getElementById("chord-dictionary-pop-up");
+      if (!div) return;
+      var dimension = div.getBoundingClientRect();
+      this.position = {
+        top: (dimension.height + this.pageY - window.scrollY + 40 > document.documentElement.clientHeight ? this.pageY - dimension.height - 10 : this.pageY + 20) + "px",
+        left: (dimension.width + this.pageX - window.scrollX + 40 > document.documentElement.clientWidth ? this.pageX - dimension.width - 10 : this.pageX + 20) + "px"
+      };
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-#chord-dictionary-pop-up {
+#chord-dictionary-wrapper #chord-dictionary-pop-up {
   @import "node_modules/bootstrap/scss/bootstrap";
   @import "node_modules/bootstrap-vue/src/index.scss";
   text-align: left;
   position: absolute !important;
+  z-index: 2147483647;
 }
-#chord-dictionary-highlight {
+#chord-dictionary-wrapper #chord-dictionary-highlight {
   position: absolute;
-  z-index: -1000;
   background-color: yellow;
+  z-index: -2147483648;
 }
 </style>
 <style>
-.chord-dictionary-note {
+#chord-dictionary-wrapper .chord-dictionary-note {
   font-style: bold;
 }
-.chord-dictionary-chord {
+#chord-dictionary-wrapper .chord-dictionary-chord {
   color: #333;
   font-style: italic;
 }
-.chord-dictionary-slash {
+#chord-dictionary-wrapper .chord-dictionary-slash {
   color: #888;
   font-size: 80%;
 }
-.chord-dictionary-bass {
+#chord-dictionary-wrapper .chord-dictionary-bass {
   font-size: 80%;
 }
-.chord-dictionary-part {
+#chord-dictionary-wrapper .chord-dictionary-part {
   margin-right: 10px;
 }
-
-.chord-dictionary-midi-0 {
+#chord-dictionary-wrapper .chord-dictionary-midi-0 {
   color: hsl(0, 88%, 46%);
 }
-.chord-dictionary-midi-1 {
+#chord-dictionary-wrapper .chord-dictionary-midi-1 {
   color: hsl(30, 99%, 33%);
 }
-.chord-dictionary-midi-2 {
+#chord-dictionary-wrapper .chord-dictionary-midi-2 {
   color: hsl(49, 90%, 46%);
 }
-.chord-dictionary-midi-3 {
+#chord-dictionary-wrapper .chord-dictionary-midi-3 {
   color: hsl(60, 98%, 33%);
 }
-.chord-dictionary-midi-4 {
+#chord-dictionary-wrapper .chord-dictionary-midi-4 {
   color: hsl(79, 59%, 46%);
 }
-.chord-dictionary-midi-5 {
+#chord-dictionary-wrapper .chord-dictionary-midi-5 {
   color: hsl(135, 76%, 33%);
 }
-.chord-dictionary-midi-6 {
+#chord-dictionary-wrapper .chord-dictionary-midi-6 {
   color: hsl(172, 68%, 46%);
 }
-.chord-dictionary-midi-7 {
+#chord-dictionary-wrapper .chord-dictionary-midi-7 {
   color: hsl(191, 41%, 33%);
 }
-.chord-dictionary-midi-8 {
+#chord-dictionary-wrapper .chord-dictionary-midi-8 {
   color: hsl(273, 79%, 46%);
 }
-.chord-dictionary-midi-9 {
+#chord-dictionary-wrapper .chord-dictionary-midi-9 {
   color: hsl(291, 46%, 33%);
 }
-.chord-dictionary-midi-10 {
+#chord-dictionary-wrapper .chord-dictionary-midi-10 {
   color: hsl(295, 97%, 46%);
 }
-.chord-dictionary-midi-11 {
+#chord-dictionary-wrapper .chord-dictionary-midi-11 {
   color: hsl(332, 97%, 33%);
 }
 </style>
