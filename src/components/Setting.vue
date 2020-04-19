@@ -91,9 +91,9 @@ export default {
   },
   watch: {
     settings: {
-      handler: function(newValue, oldValue) {
-        chrome.storage.local.set({ settings: newValue });
-        this._i18n.locale = newValue.language;
+      handler: function(val) {
+        chrome.storage.local.set({ settings: val });
+        this._i18n.locale = val.language;
       },
       deep: true
     }
