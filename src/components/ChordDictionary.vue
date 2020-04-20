@@ -128,6 +128,7 @@ export default {
           return "en";
         })([].concat(window.navigator.language, window.navigator.userLanguage, window.navigator.browserLanguage, window.navigator.systemLanguage, window.navigator.languages));
         if (this.settings.isShow === null) this.settings.isShow = true;
+        if (this.settings.volume > 1) this.settings.volume /= 100;
       }.bind(this)
     );
     window.addEventListener("mousemove", function(e) {
