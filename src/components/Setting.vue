@@ -9,19 +9,28 @@
             <template v-slot:prepend><b-input-group-text>{{ $t("language") }}</b-input-group-text></template>
             <b-form-select v-model="settings.language" :options="languages"></b-form-select>
           </b-input-group>
+          <b-input-group class="mb-2">
+            <template v-slot:prepend><b-input-group-text>{{ $t("clef") }}</b-input-group-text></template>
+            <b-form-select v-model="settings.clef" :options="clefs"></b-form-select>
+          </b-input-group>
+          <b-input-group class="mb-2">
+            <template v-slot:prepend><b-input-group-text>{{ $t("note") }}</b-input-group-text></template>
+            <b-form-select v-model="settings.note" :options="notes"></b-form-select>
+          </b-input-group>
           <b-form-checkbox v-model="settings.isShowRoman" onclick="blur()" switch>{{ $t("roman_display") }}</b-form-checkbox>
           <b-input-group class="mb-2">
             <template v-slot:prepend><b-input-group-text>{{ $t("key") }}</b-input-group-text></template>
             <b-form-select v-model="settings.key" :options="KEYS"></b-form-select>
-            <b-form-select v-model="settings.offset" :options="OFFSETS"></b-form-select>
+            <b-form-select v-model="settings.offset" :options="OFFSETS" style="font-family: 'FreeSerif'"></b-form-select>
           </b-input-group>
           <b-form-checkbox v-model="settings.isTranspose" onclick="blur()" switch>{{ $t("transpose") }}</b-form-checkbox>
           <b-input-group v-show="settings.isTranspose">
             <template v-slot:prepend><b-input-group-text>{{ $t("transpose_to") }}</b-input-group-text></template>
             <b-form-select v-model="settings.transposeKey" :options="KEYS"></b-form-select>
-            <b-form-select v-model="settings.transposeOffset" :options="OFFSETS"></b-form-select>
+            <b-form-select v-model="settings.transposeOffset" :options="OFFSETS" style="font-family: 'FreeSerif'"></b-form-select>
           </b-input-group>
           <p v-show="settings.isTranspose" class="small text-muted mb-0">{{ $t("transpose_hint") }}</p>
+          <b-form-checkbox v-model="settings.isColorNote" onclick="blur()" switch>{{ $t("color_note") }}</b-form-checkbox>
         </b-card-body>
       </b-card>
       <b-card no-body>
@@ -29,23 +38,19 @@
         <b-card-body>
           <b-input-group class="mb-2">
             <template v-slot:prepend><b-input-group-text>{{ $t("volume") }}</b-input-group-text></template>
-            <b-form-input v-model="settings.volume" type="range" min="0" max="100"></b-form-input>
+            <b-form-input v-model="settings.volume" type="range" min="0" max="1" step="any"></b-form-input>
           </b-input-group>
           <b-input-group class="mb-2">
             <template v-slot:prepend><b-input-group-text>{{ $t("instrument") }}</b-input-group-text></template>
             <b-form-select v-model="settings.inst" :options="instOptions"></b-form-select>
           </b-input-group>
           <b-form-checkbox v-model="settings.isActiveClick" onclick="blur()" switch>{{ $t("click") }}</b-form-checkbox>
-          <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>{{ $t("shortcut") }}</b-form-checkbox>
-          <p
-            v-show="settings.isActiveKey"
-            class="small text-muted mb-0"
-          >(Win) Ctrl + Space</p>
-          <p
-            v-show="settings.isActiveKey"
-            class="small text-muted mb-0"
-          >(Mac) Cmd + Shift + Space</p>
+          <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>{{ $t("shortcut") }} <span class="small text-muted mb-0">({{ SHORTCUT }}&thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)</span></b-form-checkbox>
           <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>{{ $t("hover") }}</b-form-checkbox>
+          <b-input-group class="mb-2">
+            <template v-slot:prepend><b-input-group-text>{{ $t("duration") }}</b-input-group-text></template>
+            <b-form-input v-model="settings.duration" type="range" min="0.15" max="3" step="any"></b-form-input>
+          </b-input-group>
         </b-card-body>
       </b-card>
     </nav>
@@ -61,7 +66,7 @@
 </template>
 
 <script>
-import { INSTS, KEYS, OFFSETS } from "../config/const";
+import { CLEFS, NOTES, INSTS, KEYS, OFFSETS } from "../config/const";
 
 import langs from "../config/i18n";
 
@@ -85,9 +90,18 @@ export default {
     OFFSETS() {
       return OFFSETS;
     },
+    SHORTCUT() {
+      return window.navigator.platform.includes("Mac") ? "Cmd" : "Ctrl";
+    },
     languages() {
       return Object.keys(langs).map(v => ({ value: v, text: langs[v].name }));
     },
+    clefs() {
+      return Object.keys(CLEFS).map(v => ({ value: v, text: this.$t(v) }));
+    },
+    notes() {
+      return Object.keys(NOTES).map(v => ({ value: v, text: this.$t(v) }));
+    }
   },
   watch: {
     settings: {
@@ -128,7 +142,6 @@ export default {
   bottom: 60px;
   right: 12px;
   z-index: 2147483645;
-  width: 280px;
 }
 #chord-dictionary-wrapper select {
   -webkit-appearance: none;
@@ -171,13 +184,11 @@ export default {
 #chord-dictionary-wrapper .custom-range::-webkit-slider-thumb:active {
   background-color: #b3d7ff;
 }
-@media (max-height: 660px) {
-  #chord-dictionary-wrapper #chord-dictionary-setting nav {
-    width: 560px;
-    display: flex;
-  }
-  #chord-dictionary-wrapper #chord-dictionary-setting .card {
-    flex: auto;
-  }
+#chord-dictionary-wrapper #chord-dictionary-setting nav {
+  width: 600px;
+  display: flex;
+}
+#chord-dictionary-wrapper #chord-dictionary-setting .card {
+  flex: auto;
 }
 </style>

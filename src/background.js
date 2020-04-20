@@ -3,10 +3,11 @@ let activeTabIds = {};
 //アイコンがクリックされたとき
 chrome.browserAction.onClicked.addListener(function (tab) {
   const tabId = tab.id;
-  if (tabId == -1) return;
+  if (tabId === -1) return;
   if (!(tabId in activeTabIds)) {
     chrome.tabs.executeScript(tabId, { file: "main.js" });
     chrome.tabs.insertCSS(tabId, { file: "main.css" });
+    chrome.tabs.insertCSS(tabId, { code: '@font-face { font-family: "FreeSerif"; src: url("' + chrome.extension.getURL("assets/FreeSerif.ttf") + '"), url("' + chrome.extension.getURL("assets/FreeSerif.otf") + '"); unicode-range: U+266D-266F, U+1D12A-1D12B; }' });
     activeTabIds[tabId] = true;
     chrome.browserAction.setBadgeText({ text: "ON" });
   } else {

@@ -24,7 +24,7 @@
             v-html="chord.originalElement && chord.originalElement.innerHTML"
             class="mb-0"
           />
-          <score :chord="chord" class="mt-0" @updated="updated" />
+          <score :chord="chord" :settings="settings" class="mt-0" @updated="updated" />
         </b-card-body>
       </b-card>
     </b-card-group>
@@ -69,8 +69,12 @@ export default {
         isTranspose: false,
         transposeKey: 0,
         transposeOffset: 0,
-        volume: 70,
+        volume: 0.7,
+        duration: 1.5,
+        clef: "treble",
+        note: "quarter",
         inst: "piano",
+        isColorNote: true,
         isShowRoman: false,
         isActiveClick: true,
         isActiveKey: true,
@@ -103,11 +107,6 @@ export default {
     }
   },
   mounted() {
-    ChordNote.Note.useUnicode = true;
-    ChordNote.Note.useDouble = true;
-    ChordNote.Note.romanUseUnicode = true;
-    ChordNote.Note.romanUseLowerCase = false;
-
     chrome.runtime.onMessage.addListener(object => {
       this.isActive = object.isActive;
     });
@@ -123,6 +122,7 @@ export default {
             if (/^zh/i.test(languages[i])) return "cn";
             if (/^ja/i.test(languages[i])) return "ja";
             if (/^ko/i.test(languages[i])) return "ko";
+            if (/^en-(gb|ie|au|nz)/i.test(languages[i])) return "gb";
             if (/^en/i.test(languages[i])) return "en";
           }
           return "en";
@@ -150,14 +150,9 @@ export default {
       } else return;
       if (!this.textNode || this.textNode.nodeType !== 3 || this.$el.contains(this.textNode)) return;
       if (!this.textNode.parentNode.matches(":hover")) return;
-      ChordNote.parseContent.intervalNote = ChordNote.Note(
-        this.settings.key,
-        this.settings.offset
-      );
-      ChordNote.parseContent.transposeTo = ChordNote.Note(
-        this.settings.isTranspose && this.settings.transposeKey,
-        this.settings.isTranspose && this.settings.transposeOffset
-      );
+      ChordNote.parseContent.transposeOn = this.settings.isTranspose;
+      ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
+      ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
       this.chord = ChordNote.parseContent(this.textNode.nodeValue, this.range.startOffset);
       return true;
     },
@@ -203,6 +198,15 @@ export default {
 }
 #chord-dictionary-wrapper .chord-dictionary-bass {
   font-size: 80%;
+}
+#chord-dictionary-wrapper .chord-dictionary-white {
+  font-style: bold;
+}
+#chord-dictionary-wrapper .chord-dictionary-acci {
+  font-family: "FreeSerif";
+  font-size: 115%;
+  position: relative;
+  bottom: 3px;
 }
 #chord-dictionary-wrapper .chord-dictionary-part {
   margin-right: 10px;
