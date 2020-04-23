@@ -31,6 +31,10 @@
           </b-input-group>
           <p v-show="settings.isTranspose" class="small text-muted mb-0">{{ $t("transpose_hint") }}</p>
           <b-form-checkbox v-model="settings.isColorNote" onclick="blur()" switch>{{ $t("color_note") }}</b-form-checkbox>
+          <b-input-group class="mb-2">
+            <template v-slot:prepend><b-input-group-text>{{ $t("delay") }}</b-input-group-text></template>
+            <b-form-input v-model="settings.delay" type="range" min="0" max="1600" step="any"></b-form-input>
+          </b-input-group>
         </b-card-body>
       </b-card>
       <b-card no-body>
@@ -38,7 +42,7 @@
         <b-card-body>
           <b-input-group class="mb-2">
             <template v-slot:prepend><b-input-group-text>{{ $t("volume") }}</b-input-group-text></template>
-            <b-form-input v-model="settings.volume" type="range" min="0" max="1" step="any"></b-form-input>
+            <b-form-input v-model="settings.vol" type="range" min="0" max="1.2" step="any"></b-form-input>
           </b-input-group>
           <b-input-group class="mb-2">
             <template v-slot:prepend><b-input-group-text>{{ $t("instrument") }}</b-input-group-text></template>
@@ -48,8 +52,12 @@
           <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>{{ $t("shortcut") }} <span class="small text-muted mb-0">({{ SHORTCUT }}&thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)</span></b-form-checkbox>
           <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>{{ $t("hover") }}</b-form-checkbox>
           <b-input-group class="mb-2">
+            <template v-slot:prepend><b-input-group-text>{{ $t("arpeggio") }}</b-input-group-text></template>
+            <b-form-input v-model="settings.arpeggio" type="range" min="0" max="0.2" step="any"></b-form-input>
+          </b-input-group>
+          <b-input-group class="mb-2">
             <template v-slot:prepend><b-input-group-text>{{ $t("duration") }}</b-input-group-text></template>
-            <b-form-input v-model="settings.duration" type="range" min="0.15" max="3" step="any"></b-form-input>
+            <b-form-input v-model="settings.duration" type="range" min="0.5" max="3" step="any"></b-form-input>
           </b-input-group>
         </b-card-body>
       </b-card>

@@ -1,7 +1,7 @@
 <template>
   <div v-show="isActive">
     <b-card-group
-      v-if="chord.string"
+      v-if="showChord && chord.string"
       id="chord-dictionary-pop-up"
       :style="position"
       deck
@@ -24,11 +24,11 @@
             v-html="chord.originalElement && chord.originalElement.innerHTML"
             class="mb-0"
           />
-          <score :chord="chord" :settings="settings" class="mt-0" @updated="updated" />
+          <score :chord="chord" :settings="settings" @updated="updated" class="mt-0" />
         </b-card-body>
       </b-card>
     </b-card-group>
-    <player :isActive="isActive" :chord="chord" :settings="settings" />
+    <player :isActive="isActive" :showChord="showChord" :chord="chord" :settings="settings" />
     <div
       v-show="chord.string"
       id="chord-dictionary-highlight"
@@ -69,8 +69,10 @@ export default {
         isTranspose: false,
         transposeKey: 0,
         transposeOffset: 0,
-        volume: 0.7,
+        vol: 0.84,
+        delay: 0,
         duration: 1.5,
+        arpeggio: 0.04,
         clef: "treble",
         note: "quarter",
         inst: "piano",
@@ -84,8 +86,13 @@ export default {
       range: null,
       textNode: null,
       highlightPos: {},
+      highlightRect: null,
       pageX: 0,
-      pageY: 0
+      pageY: 0,
+      clientX: 0,
+      clientY: 0,
+      timeoutId: null,
+      showChord: false
     };
   },
   watch: {
@@ -95,15 +102,26 @@ export default {
       this.range.setEnd(this.textNode, val.position + val.string.length);
       var rangeRect = this.range.getBoundingClientRect();
       var offsetRect = offsetBase.getBoundingClientRect();
-      if (this.pageY >= rangeRect.top - offsetRect.top && this.pageY <= rangeRect.top - offsetRect.top + rangeRect.height && this.pageX >= rangeRect.left - offsetRect.left && this.pageX <= rangeRect.left - offsetRect.left + rangeRect.width) {
+      this.highlightRect = {
+        top: rangeRect.top - offsetRect.top,
+        left: rangeRect.left - offsetRect.left,
+        width: rangeRect.width,
+        height: rangeRect.height,
+      };
+      this.highlightRect.bottom = this.highlightRect.top + this.highlightRect.height;
+      this.highlightRect.right = this.highlightRect.left + this.highlightRect.width;
+      if (this.cursorInRect()) {
         this.highlightPos = {
-          top: rangeRect.top - offsetRect.top + "px",
-          left: rangeRect.left - offsetRect.left + "px",
-          width: rangeRect.width + "px",
-          height: rangeRect.height + "px"
+          top: this.highlightRect.top + "px",
+          left: this.highlightRect.left + "px",
+          width: this.highlightRect.width + "px",
+          height: this.highlightRect.height + "px"
         };
-        this.updated();
-      } else this.chord = {};
+        this.timeoutId = setTimeout(this.displayChord, this.settings.delay);
+      } else {
+        this.chord = {};
+        this.highlightRect = null;
+      }
     }
   },
   mounted() {
@@ -128,24 +146,31 @@ export default {
           return "en";
         })([].concat(window.navigator.language, window.navigator.userLanguage, window.navigator.browserLanguage, window.navigator.systemLanguage, window.navigator.languages));
         if (this.settings.isShow === null) this.settings.isShow = true;
-        if (this.settings.volume > 1) this.settings.volume /= 100;
       }.bind(this)
     );
     window.addEventListener("mousemove", function(e) {
-      if (!this.setPointedChord(e)) this.chord = {};
+      this.pageX = Math.min(e.pageX, document.documentElement.scrollWidth);
+      this.pageY = Math.min(e.pageY, document.documentElement.scrollHeight);
+      this.clientX = e.clientX;
+      this.clientY = e.clientY;
+      if (this.highlightRect && this.cursorInRect()) this.updated();
+      else {
+        if (this.timeoutId !== null) clearTimeout(this.timeoutId);
+        this.showChord = false;
+        this.chord = {};
+        this.highlightRect = null;
+        this.setPointedChord();
+      }
     }.bind(this));
   },
   methods: {
-    setPointedChord: function(e) {
-      this.pageX = Math.min(e.pageX, document.documentElement.scrollWidth);
-      this.pageY = Math.min(e.pageY, document.documentElement.scrollHeight);
-      this.updated();
+    setPointedChord: function() {
       if (document.caretPositionFromPoint) {
-        this.range = document.caretPositionFromPoint(e.clientX, e.clientY);
+        this.range = document.caretPositionFromPoint(this.clientX, this.clientY);
         if (!this.range) return;
         this.textNode = this.range.offsetNode;
       } else if (document.caretRangeFromPoint) {
-        this.range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        this.range = document.caretRangeFromPoint(this.clientX, this.clientY);
         if (!this.range) return;
         this.textNode = this.range.startContainer;
       } else return;
@@ -155,10 +180,9 @@ export default {
       ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
       ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
       this.chord = ChordNote.parseContent(this.textNode.nodeValue, this.range.startOffset);
-      return true;
     },
     updated: function() {
-      if (!this.chord.string) return;
+      if (!this.showChord || !this.chord.string) return;
       var div = document.getElementById("chord-dictionary-pop-up");
       if (!div) return;
       var dimension = div.getBoundingClientRect();
@@ -166,6 +190,14 @@ export default {
         top: (dimension.height + this.pageY - window.scrollY + 30 > document.documentElement.clientHeight ? this.pageY - dimension.height - 10 : this.pageY + 20) + "px",
         left: (dimension.width + this.pageX - window.scrollX + 30 > document.documentElement.clientWidth ? this.pageX - dimension.width - 10 : this.pageX + 20) + "px"
       };
+    },
+    cursorInRect: function() {
+      return this.pageY >= this.highlightRect.top && this.pageY <= this.highlightRect.bottom && this.pageX >= this.highlightRect.left && this.pageX <= this.highlightRect.right;
+    },
+    displayChord: function() {
+      this.showChord = true;
+      this.updated();
+      this.timeoutId = null;
     }
   }
 };

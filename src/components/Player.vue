@@ -6,6 +6,7 @@ export default {
   name: "Player",
   props: {
     isActive: Boolean,
+    showChord: Boolean,
     chord: Object,
     settings: Object
   },
@@ -15,13 +16,13 @@ export default {
     };
   },
   watch: {
-    chord: function(newVal, oldVal) {
-      if (!this.settings.isActiveHover || newVal.string === oldVal.string) return false;
+    showChord: function(newVal, oldVal) {
+      if (!this.settings.isActiveHover) return false;
       this.playChord();
     },
     settings: {
       handler: function(val) {
-        Tone.Master.volume.value = Tone.gainToDb(val.volume);
+        Tone.Master.volume.value = Tone.gainToDb(val.vol);
       },
       deep: true
     }
@@ -33,9 +34,11 @@ export default {
       try {
         this.insts[this.settings.inst].releaseAll();
       } catch (e) {}
-      Tone.Transport.scheduleOnce(function(chord, time) {
-        this.insts[this.settings.inst].triggerAttack(chord, time);
-      }.bind(this, this.chord.voicing.map(midi => Tone.Frequency(midi, "midi"))), 0);
+      this.chord.voicing.forEach(function(midi, index) {
+        Tone.Transport.scheduleOnce(function(time) {
+          this.insts[this.settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
+        }.bind(this), this.settings.arpeggio * index);
+      }.bind(this));
       Tone.Transport.scheduleOnce(function(time) {
         try {
           this.insts[this.settings.inst].releaseAll(time);
@@ -56,7 +59,7 @@ export default {
   },
   mounted() {
     INSTS.forEach(function(v) {
-      this.insts[v.key] = (v.samples ? new Tone.Sampler(v.samples) : new Tone.PolySynth()).toMaster();
+      this.insts[v.key] = (v.samples ? new Tone.Sampler(v.samples) : new Tone.PolySynth(12)).toMaster();
     }.bind(this));
     window.addEventListener("keydown", this.keyDown);
     window.addEventListener("click", this.click);

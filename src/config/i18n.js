@@ -25,6 +25,8 @@ export default {
 		"half": "Half Note",
 		"quarter": "Quarter Note",
 		"color_note": "Color the Notes",
+		"delay": "Delay",
+		"arpeggio": "Arpeggio",
 		"duration": "Duration",
 		"language": "Language"
 	},
@@ -54,6 +56,8 @@ export default {
 		"half": "Minim",
 		"quarter": "Crotchet",
 		"color_note": "Colour the Notes",
+		"delay": "Delay",
+		"arpeggio": "Arpeggio",
 		"duration": "Duration",
 		"language": "Language"
 	},
@@ -83,6 +87,8 @@ export default {
 		"half": "二分音符",
 		"quarter": "四分音符",
 		"color_note": "音符に着色する",
+		"delay": "遅延",
+		"arpeggio": "アルペジオ",
 		"duration": "持続期間",
 		"language": "言語"
 	},
@@ -112,6 +118,8 @@ export default {
 		"half": "이분음표",
 		"quarter": "사분음표",
 		"color_note": "음표에 착색한다",
+		"delay": "지연",
+		"arpeggio": "아르페지오",
 		"duration": "지속기간",
 		"language": "언어"
 	},
@@ -141,6 +149,8 @@ export default {
 		"half": "二分音符",
 		"quarter": "四分音符",
 		"color_note": "為音符著色",
+		"delay": "延遲",
+		"arpeggio": "琶音",
 		"duration": "持續時間",
 		"language": "語言"
 	},
@@ -170,6 +180,8 @@ export default {
 		"half": "二分音符",
 		"quarter": "四分音符",
 		"color_note": "為音符着色",
+		"delay": "延遲",
+		"arpeggio": "琶音",
 		"duration": "持續時間",
 		"language": "語言"
 	},
@@ -199,6 +211,8 @@ export default {
 		"half": "二分音符",
 		"quarter": "四分音符",
 		"color_note": "为音符上色",
+		"delay": "延迟",
+		"arpeggio": "琶音",
 		"duration": "持续时间",
 		"language": "语言"
 	}
