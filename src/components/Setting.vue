@@ -31,9 +31,11 @@
           </b-input-group>
           <p v-show="settings.isTranspose" class="small text-muted mb-0">{{ $t("transpose_hint") }}</p>
           <b-form-checkbox v-model="settings.isColorNote" onclick="blur()" switch>{{ $t("color_note") }}</b-form-checkbox>
-          <b-input-group class="mb-2">
+          <b-form-checkbox v-model="settings.isColorNoteName" onclick="blur()" switch>{{ $t("color_note_name") }}</b-form-checkbox>
+          <b-form-checkbox v-model="settings.isDelay" onclick="blur()" switch>{{ $t("delay_show") }}</b-form-checkbox>
+          <b-input-group class="mb-2" v-show="settings.isDelay">
             <template v-slot:prepend><b-input-group-text>{{ $t("delay") }}</b-input-group-text></template>
-            <b-form-input v-model="settings.delay" type="range" min="0" max="1600" step="any"></b-form-input>
+            <b-form-input v-model="settings.delay" type="range" min="100" max="1600" step="any"></b-form-input>
           </b-input-group>
         </b-card-body>
       </b-card>
@@ -51,9 +53,10 @@
           <b-form-checkbox v-model="settings.isActiveClick" onclick="blur()" switch>{{ $t("click") }}</b-form-checkbox>
           <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>{{ $t("shortcut") }} <span class="small text-muted mb-0">({{ SHORTCUT }}&thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)</span></b-form-checkbox>
           <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>{{ $t("hover") }}</b-form-checkbox>
-          <b-input-group class="mb-2">
-            <template v-slot:prepend><b-input-group-text>{{ $t("arpeggio") }}</b-input-group-text></template>
-            <b-form-input v-model="settings.arpeggio" type="range" min="0" max="0.2" step="any"></b-form-input>
+          <b-form-checkbox v-model="settings.isArpeggio" onclick="blur()" switch>{{ $t("arpeggio") }}</b-form-checkbox>
+          <b-input-group class="mb-2" v-show="settings.isArpeggio">
+            <template v-slot:prepend><b-input-group-text>{{ $t("gap") }}</b-input-group-text></template>
+            <b-form-input v-model="settings.arpeggio" type="range" min="0.01" max="0.2" step="any"></b-form-input>
           </b-input-group>
           <b-input-group class="mb-2">
             <template v-slot:prepend><b-input-group-text>{{ $t("duration") }}</b-input-group-text></template>
@@ -64,6 +67,7 @@
     </nav>
     <b-button
       :pressed.sync="settings.isShow"
+      onclick="blur()"
       id="chord-dictionary-toggle-button"
       size="sm"
       class="mb-2"
@@ -116,17 +120,14 @@ export default {
       handler: function(val) {
         chrome.storage.local.set({ settings: val });
         this._i18n.locale = val.language;
+        this.$parent.$el.lang = this.$t("code");
       },
       deep: true
     }
   },
-  methods: {
-    toggleSetting() {
-      this.isShow = !this.isShow;
-    }
-  },
   mounted() {
     this._i18n.locale = this.settings.language;
+    this.$parent.$el.lang = this.$t("code");
   }
 };
 </script>
@@ -169,17 +170,17 @@ export default {
   outline: none;
 }
 #chord-dictionary-wrapper .custom-range:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 1px #fff,0 0 0 .2rem rgba(0,123,255,.25);
+  box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 #chord-dictionary-wrapper .custom-range::-webkit-slider-thumb {
   width: 1rem;
   height: 1rem;
-  margin-top: -.25rem;
+  margin-top: -0.25rem;
   background-color: #007bff;
   border: 0;
   border-radius: 1rem;
-  -webkit-transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-  transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  -webkit-transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-appearance: none;
   appearance: none;
 }

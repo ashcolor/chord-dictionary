@@ -37,7 +37,7 @@ export default {
       this.chord.voicing.forEach(function(midi, index) {
         Tone.Transport.scheduleOnce(function(time) {
           this.insts[this.settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
-        }.bind(this), this.settings.arpeggio * index);
+        }.bind(this), this.settings.isArpeggio * this.settings.arpeggio * index);
       }.bind(this));
       Tone.Transport.scheduleOnce(function(time) {
         try {

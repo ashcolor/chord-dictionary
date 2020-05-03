@@ -1,7 +1,7 @@
 let activeTabIds = {};
 
 function checkError() {
-	let error = chrome.runtime.lastError;
+  let error = chrome.runtime.lastError;
 }
 
 //アイコンがクリックされたとき
@@ -23,14 +23,11 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 });
 
 //タブが更新されたとき
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
-  if (changeInfo.status === "unloaded") delete activeTabIds[tabId];
-  setStatus();
-});
+chrome.tabs.onUpdated.addListener(setStatus);
 
 //ページがリロードされたとき
-chrome.tabs.onRemoved.addListener(function (tabId) {
-  delete activeTabIds[tabId];
+chrome.runtime.onMessage.addListener(function (message, sender) {
+  if (message == "reload") delete activeTabIds[sender.tab.id];
 });
 
 //アクティブなタブが変更されたとき

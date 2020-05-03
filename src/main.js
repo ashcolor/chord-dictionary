@@ -26,3 +26,6 @@ new Vue({
     messages: langs
   })
 }).$mount("#chord-dictionary-app");
+window.addEventListener("beforeunload", function() {
+  chrome.runtime.sendMessage(null, "reload");
+});

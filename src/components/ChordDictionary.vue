@@ -3,6 +3,7 @@
     <b-card-group
       v-if="showChord && chord.string"
       id="chord-dictionary-pop-up"
+	  v-bind:class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
       :style="position"
       deck
     >
@@ -70,13 +71,16 @@ export default {
         transposeKey: 0,
         transposeOffset: 0,
         vol: 0.84,
-        delay: 0,
+        delay: 600,
         duration: 1.5,
         arpeggio: 0.04,
         clef: "treble",
         note: "quarter",
         inst: "piano",
-        isColorNote: true,
+        isDelay: false,
+        isArpeggio: false,
+        isColorNote: false,
+        isColorNoteName: true,
         isShowRoman: false,
         isActiveClick: true,
         isActiveKey: true,
@@ -117,7 +121,7 @@ export default {
           width: this.highlightRect.width + "px",
           height: this.highlightRect.height + "px"
         };
-        this.timeoutId = setTimeout(this.displayChord, this.settings.delay);
+        this.timeoutId = setTimeout(this.displayChord, this.settings.isDelay * this.settings.delay);
       } else {
         this.chord = {};
         this.highlightRect = null;
@@ -244,40 +248,40 @@ export default {
 #chord-dictionary-wrapper .chord-dictionary-part {
   margin-right: 10px;
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-0 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-0 {
   color: hsl(0, 88%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-1 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-1 {
   color: hsl(30, 99%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-2 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-2 {
   color: hsl(49, 90%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-3 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-3 {
   color: hsl(60, 98%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-4 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-4 {
   color: hsl(79, 59%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-5 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-5 {
   color: hsl(135, 76%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-6 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-6 {
   color: hsl(172, 68%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-7 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-7 {
   color: hsl(191, 41%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-8 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-8 {
   color: hsl(273, 79%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-9 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-9 {
   color: hsl(291, 46%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-10 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-10 {
   color: hsl(295, 97%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-midi-11 {
+#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-11 {
   color: hsl(332, 97%, 33%);
 }
 </style>

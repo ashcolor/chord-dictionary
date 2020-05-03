@@ -152,8 +152,8 @@ function parseContent(input, withinPos) {
 			addNoteMandatory[-1] = true;
 			
 			cont(
-				"p", c => {if (!nextIs("5")) {type = "'"; return true;}},
-				"_", c => {if (!nextIs("5")) {third = "m"; seventhPos = i; return true;}},
+				"p", c => {if (nextIsNot5()) {type = "'"; return true;}},
+				"_", c => {if (nextIsNot5()) {third = "m"; seventhPos = i; return true;}},
 				"2", c => {sus2 = true; cont("4", c => sus4 = true); return true;},
 				"4", c => {sus4 = true; cont("2", c => sus2 = true); return true;},
 				"79et", c => {has7 = true; highestInterval = c; return true;}
@@ -166,6 +166,7 @@ function parseContent(input, withinPos) {
 					"<", c => {
 						var innerBracketLayer = 1;
 						var anyNote = false;
+						var tempI = i;
 						while (cont(
 							"<", c => {innerBracketLayer++; return true;},
 							">", c => {innerBracketLayer--; return true;},
@@ -173,6 +174,7 @@ function parseContent(input, withinPos) {
 							"24569et", c => {if (addNotes(acci, c, acciPos)) return anyNote = true;}
 						) && innerBracketLayer > 0);
 						if (innerBracketLayer > 0 && anyNote) currStatus = "f";
+						if (!anyNote) i = tempI;
 						return anyNote;
 					}
 				);
@@ -190,6 +192,7 @@ function parseContent(input, withinPos) {
 					"<", c => {
 						var innerBracketLayer = 1;
 						var anyNote = false;
+						var tempI = i;
 						while (cont(
 							"<", c => {innerBracketLayer++; return true;},
 							">", c => {innerBracketLayer--; return true;},
@@ -203,6 +206,7 @@ function parseContent(input, withinPos) {
 							}
 						) && innerBracketLayer > 0);
 						if (innerBracketLayer > 0) currStatus = "f";
+						if (!anyNote) i = tempI;
 						return anyNote;
 					}
 				);
@@ -339,7 +343,7 @@ function parseContent(input, withinPos) {
 				},
 				"<", c => {
 					bracketLayer++;
-					return !nextIs(">");
+					return !/^<[w,]*>/.test(idList.slice(i));
 				},
 				">", c => {
 					bracketLayer--;
@@ -582,8 +586,8 @@ function parseContent(input, withinPos) {
 				return parseContent.transposeOn ? transpose(!isInterval && parseContent.intervalNote, parseContent.transposeTo, note) : isInterval ? transpose0(parseContent.intervalNote, note) : note;
 			}
 			
-			function nextIs(id) {
-				return peek() == id || peek() == "w" && idList.charAt(i + 2) == id;
+			function nextIsNot5() {
+				return peek() != "5" && !(peek() == "w" && idList.charAt(i + 2) == "5");
 			}
 			function clear(pos) {
 				idList = idList.slice(0, pos) + "=" + idList.slice(pos + 1);
