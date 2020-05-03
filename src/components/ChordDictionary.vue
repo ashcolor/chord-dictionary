@@ -3,7 +3,7 @@
     <b-card-group
       v-if="showChord && chord.string"
       id="chord-dictionary-pop-up"
-	  v-bind:class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
+      v-bind:class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
       :style="position"
       deck
     >
@@ -30,11 +30,7 @@
       </b-card>
     </b-card-group>
     <player :isActive="isActive" :showChord="showChord" :chord="chord" :settings="settings" />
-    <div
-      v-show="chord.string"
-      id="chord-dictionary-highlight"
-      :style="highlightPos"
-    />
+    <div v-show="chord.string" id="chord-dictionary-highlight" :style="highlightPos" />
     <setting :settings="settings" />
   </div>
 </template>
@@ -80,7 +76,7 @@ export default {
         isDelay: false,
         isArpeggio: false,
         isColorNote: false,
-        isColorNoteName: true,
+        isColorNoteName: false,
         isShowRoman: false,
         isActiveClick: true,
         isActiveKey: true,
@@ -110,10 +106,12 @@ export default {
         top: rangeRect.top - offsetRect.top,
         left: rangeRect.left - offsetRect.left,
         width: rangeRect.width,
-        height: rangeRect.height,
+        height: rangeRect.height
       };
-      this.highlightRect.bottom = this.highlightRect.top + this.highlightRect.height;
-      this.highlightRect.right = this.highlightRect.left + this.highlightRect.width;
+      this.highlightRect.bottom =
+        this.highlightRect.top + this.highlightRect.height;
+      this.highlightRect.right =
+        this.highlightRect.left + this.highlightRect.width;
       if (this.cursorInRect()) {
         this.highlightPos = {
           top: this.highlightRect.top + "px",
@@ -121,7 +119,10 @@ export default {
           width: this.highlightRect.width + "px",
           height: this.highlightRect.height + "px"
         };
-        this.timeoutId = setTimeout(this.displayChord, this.settings.isDelay * this.settings.delay);
+        this.timeoutId = setTimeout(
+          this.displayChord,
+          this.settings.isDelay * this.settings.delay
+        );
       } else {
         this.chord = {};
         this.highlightRect = null;
@@ -136,41 +137,57 @@ export default {
       "settings",
       function(value) {
         if (value) this.settings = Object.assign(this.settings, value.settings);
-        this.settings.language = this.settings.language || (function(languages) {
-          for (var i = 0; i < languages.length; i++) {
-            if (!languages[i]) continue;
-            if (/^zh-(hk|mo)/i.test(languages[i])) return "hk";
-            if (/^zh-(tw|hant)/i.test(languages[i])) return "tw";
-            if (/^zh/i.test(languages[i])) return "cn";
-            if (/^ja/i.test(languages[i])) return "ja";
-            if (/^ko/i.test(languages[i])) return "ko";
-            if (/^en-(gb|ie|au|nz)/i.test(languages[i])) return "gb";
-            if (/^en/i.test(languages[i])) return "en";
-          }
-          return "en";
-        })([].concat(window.navigator.language, window.navigator.userLanguage, window.navigator.browserLanguage, window.navigator.systemLanguage, window.navigator.languages));
+        this.settings.language =
+          this.settings.language ||
+          (function(languages) {
+            for (var i = 0; i < languages.length; i++) {
+              if (!languages[i]) continue;
+              if (/^zh-(hk|mo)/i.test(languages[i])) return "hk";
+              if (/^zh-(tw|hant)/i.test(languages[i])) return "tw";
+              if (/^zh/i.test(languages[i])) return "cn";
+              if (/^ja/i.test(languages[i])) return "ja";
+              if (/^ko/i.test(languages[i])) return "ko";
+              if (/^en-(gb|ie|au|nz)/i.test(languages[i])) return "gb";
+              if (/^en/i.test(languages[i])) return "en";
+            }
+            return "en";
+          })(
+            [].concat(
+              window.navigator.language,
+              window.navigator.userLanguage,
+              window.navigator.browserLanguage,
+              window.navigator.systemLanguage,
+              window.navigator.languages
+            )
+          );
         if (this.settings.isShow === null) this.settings.isShow = true;
       }.bind(this)
     );
-    window.addEventListener("mousemove", function(e) {
-      this.pageX = Math.min(e.pageX, document.documentElement.scrollWidth);
-      this.pageY = Math.min(e.pageY, document.documentElement.scrollHeight);
-      this.clientX = e.clientX;
-      this.clientY = e.clientY;
-      if (this.highlightRect && this.cursorInRect()) this.updated();
-      else {
-        if (this.timeoutId !== null) clearTimeout(this.timeoutId);
-        this.showChord = false;
-        this.chord = {};
-        this.highlightRect = null;
-        this.setPointedChord();
-      }
-    }.bind(this));
+    window.addEventListener(
+      "mousemove",
+      function(e) {
+        this.pageX = Math.min(e.pageX, document.documentElement.scrollWidth);
+        this.pageY = Math.min(e.pageY, document.documentElement.scrollHeight);
+        this.clientX = e.clientX;
+        this.clientY = e.clientY;
+        if (this.highlightRect && this.cursorInRect()) this.updated();
+        else {
+          if (this.timeoutId !== null) clearTimeout(this.timeoutId);
+          this.showChord = false;
+          this.chord = {};
+          this.highlightRect = null;
+          this.setPointedChord();
+        }
+      }.bind(this)
+    );
   },
   methods: {
     setPointedChord: function() {
       if (document.caretPositionFromPoint) {
-        this.range = document.caretPositionFromPoint(this.clientX, this.clientY);
+        this.range = document.caretPositionFromPoint(
+          this.clientX,
+          this.clientY
+        );
         if (!this.range) return;
         this.textNode = this.range.offsetNode;
       } else if (document.caretRangeFromPoint) {
@@ -178,12 +195,26 @@ export default {
         if (!this.range) return;
         this.textNode = this.range.startContainer;
       } else return;
-      if (!this.textNode || this.textNode.nodeType !== 3 || this.$el.contains(this.textNode)) return;
+      if (
+        !this.textNode ||
+        this.textNode.nodeType !== 3 ||
+        this.$el.contains(this.textNode)
+      )
+        return;
       if (!this.textNode.parentNode.matches(":hover")) return;
       ChordNote.parseContent.transposeOn = this.settings.isTranspose;
-      ChordNote.parseContent.intervalNote = ChordNote.Note(this.settings.key, this.settings.offset);
-      ChordNote.parseContent.transposeTo = ChordNote.Note(this.settings.transposeKey, this.settings.transposeOffset);
-      this.chord = ChordNote.parseContent(this.textNode.nodeValue, this.range.startOffset);
+      ChordNote.parseContent.intervalNote = ChordNote.Note(
+        this.settings.key,
+        this.settings.offset
+      );
+      ChordNote.parseContent.transposeTo = ChordNote.Note(
+        this.settings.transposeKey,
+        this.settings.transposeOffset
+      );
+      this.chord = ChordNote.parseContent(
+        this.textNode.nodeValue,
+        this.range.startOffset
+      );
     },
     updated: function() {
       if (!this.showChord || !this.chord.string) return;
@@ -191,12 +222,25 @@ export default {
       if (!div) return;
       var dimension = div.getBoundingClientRect();
       this.position = {
-        top: (dimension.height + this.pageY - window.scrollY + 30 > document.documentElement.clientHeight ? this.pageY - dimension.height - 10 : this.pageY + 20) + "px",
-        left: (dimension.width + this.pageX - window.scrollX + 30 > document.documentElement.clientWidth ? this.pageX - dimension.width - 10 : this.pageX + 20) + "px"
+        top:
+          (dimension.height + this.pageY - window.scrollY + 30 >
+          document.documentElement.clientHeight
+            ? this.pageY - dimension.height - 10
+            : this.pageY + 20) + "px",
+        left:
+          (dimension.width + this.pageX - window.scrollX + 30 >
+          document.documentElement.clientWidth
+            ? this.pageX - dimension.width - 10
+            : this.pageX + 20) + "px"
       };
     },
     cursorInRect: function() {
-      return this.pageY >= this.highlightRect.top && this.pageY <= this.highlightRect.bottom && this.pageX >= this.highlightRect.left && this.pageX <= this.highlightRect.right;
+      return (
+        this.pageY >= this.highlightRect.top &&
+        this.pageY <= this.highlightRect.bottom &&
+        this.pageX >= this.highlightRect.left &&
+        this.pageX <= this.highlightRect.right
+      );
     },
     displayChord: function() {
       this.showChord = true;
@@ -248,40 +292,64 @@ export default {
 #chord-dictionary-wrapper .chord-dictionary-part {
   margin-right: 10px;
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-0 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-0 {
   color: hsl(0, 88%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-1 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-1 {
   color: hsl(30, 99%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-2 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-2 {
   color: hsl(49, 90%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-3 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-3 {
   color: hsl(60, 98%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-4 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-4 {
   color: hsl(79, 59%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-5 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-5 {
   color: hsl(135, 76%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-6 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-6 {
   color: hsl(172, 68%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-7 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-7 {
   color: hsl(191, 41%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-8 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-8 {
   color: hsl(273, 79%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-9 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-9 {
   color: hsl(291, 46%, 33%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-10 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-10 {
   color: hsl(295, 97%, 46%);
 }
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-11 {
+#chord-dictionary-wrapper
+  .chord-dictionary-color-name
+  .chord-dictionary-midi-11 {
   color: hsl(332, 97%, 33%);
 }
 </style>

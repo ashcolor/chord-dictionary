@@ -29,27 +29,50 @@ export default {
   },
   methods: {
     playChord: function() {
-      if (!this.isActive || this.$parent.$el.matches(":hover") || !this.chord.voicing) return false;
+      if (
+        !this.isActive ||
+        this.$parent.$el.matches(":hover") ||
+        !this.chord.voicing
+      )
+        return false;
       Tone.Transport.stop().cancel();
       try {
         this.insts[this.settings.inst].releaseAll();
       } catch (e) {}
-      this.chord.voicing.forEach(function(midi, index) {
-        Tone.Transport.scheduleOnce(function(time) {
-          this.insts[this.settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
-        }.bind(this), this.settings.isArpeggio * this.settings.arpeggio * index);
-      }.bind(this));
-      Tone.Transport.scheduleOnce(function(time) {
-        try {
-          this.insts[this.settings.inst].releaseAll(time);
-        } catch (e) {}
-      }.bind(this), this.settings.duration);
+      this.chord.voicing.forEach(
+        function(midi, index) {
+          Tone.Transport.scheduleOnce(
+            function(time) {
+              this.insts[this.settings.inst].triggerAttack(
+                Tone.Frequency(midi, "midi"),
+                time
+              );
+            }.bind(this),
+            this.settings.isArpeggio * this.settings.arpeggio * index
+          );
+        }.bind(this)
+      );
+      Tone.Transport.scheduleOnce(
+        function(time) {
+          try {
+            this.insts[this.settings.inst].releaseAll(time);
+          } catch (e) {}
+        }.bind(this),
+        this.settings.duration
+      );
       Tone.Transport.start();
     },
     keyDown: function(e) {
       if (!this.settings.isActiveKey) return false;
-      if (window.navigator.platform.includes("Mac") ? !e.metaKey : !e.ctrlKey) return false;
-      if (!e.shiftKey || e.altKey || e.repeat || (e.which || e.keyCode || e.charCode) !== 32) return false;
+      if (window.navigator.platform.includes("Mac") ? !e.metaKey : !e.ctrlKey)
+        return false;
+      if (
+        !e.shiftKey ||
+        e.altKey ||
+        e.repeat ||
+        (e.which || e.keyCode || e.charCode) !== 32
+      )
+        return false;
       this.playChord();
     },
     click: function(e) {
@@ -58,9 +81,14 @@ export default {
     }
   },
   mounted() {
-    INSTS.forEach(function(v) {
-      this.insts[v.key] = (v.samples ? new Tone.Sampler(v.samples) : new Tone.PolySynth(12)).toMaster();
-    }.bind(this));
+    INSTS.forEach(
+      function(v) {
+        this.insts[v.key] = (v.samples
+          ? new Tone.Sampler(v.samples)
+          : new Tone.PolySynth(12)
+        ).toMaster();
+      }.bind(this)
+    );
     window.addEventListener("keydown", this.keyDown);
     window.addEventListener("click", this.click);
   }
