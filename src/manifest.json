@@ -11,10 +11,12 @@
   "web_accessible_resources": [
     "main.js",
     "main.css",
-    "sounds/*.mp3"
+    "sounds/*.mp3",
+    "assets/FreeSerif.ttf",
+    "assets/FreeSerif.otf"
   ],
   "browser_action": {
-    "default_title": "chord-dictionary"
+    "default_title": "Chord Dictionary"
   },
   "background": {
     "scripts": [

@@ -1,24 +1,3 @@
-var accidentals = {
-	"b": -1,
-	"#": 1,
-	"ｂ": -1,
-	"＃": 1,
-	"♭": -1,
-	"♯": 1,
-	"♮": 0,
-	"x": 2,
-	"\uDD2B": -2,
-	"\uDD2A": 2
-};
-var relatives = [
-	[/major|(iod|hypolyd)ian/i],
-	[/dori(an|c)|hypomixolydian/i, /hypodori(an|c)/i],
-	[/phrygian/i, /hypophrygian/i],
-	[/lydian/i, /mixolydian/i],
-	[/mixolydian/i],
-	[/minor|(aeol|hypodor)ian/i],
-	[/(locr|hypophryg)ian/i]
-];
 function Note(key, offset) {
 	if (key instanceof Note) return key;
 	if (!(this instanceof Note)) return new Note(key, offset);
@@ -26,50 +5,21 @@ function Note(key, offset) {
 		this.key = key ? (key % 7 + 7) % 7 : 0;
 		this.offset = +offset || 0;
 	} else {
-		var match = key.match(/([A-Ga-gＡ-Ｇａ-ｇ])((?:[b#ｂ＃♭♯♮x]|\uD834[\uDD2B\uDD2A])*)(.*)/);
-		if (match) {
-			this.key = "CDEFGABcdefgabＣＤＥＦＧＡＢｃｄｅｆｇａｂ".indexOf(match[1]) % 7;
-			this.offset = match[2].replace(/\uD834/g, "").split("").reduce(function(total, item) {
-				return total + accidentals[item];
-			}, 0);
-			if (!match[3] || /[MＭ](?![A-Za-zＡ-Ｚａ-ｚ])/.test(match[3])) return this;
-			if (/[mｍ](?![A-Za-zＡ-Ｚａ-ｚ])/.test(match[3])) return transpose(5, 0, this);
-			var index = relatives.findIndex(function(item) {
-				return !(item[1] && item[1].test(match[3])) && item[0].test(match[3]);
-			});
-			if (index != -1) return transpose(index, 0, this);
-		} else return null;
+		this.key = "CDEFGAB".indexOf(key.charAt(0));
+		this.offset = 0;
+		for (var i = 1; i < key.length; i++) this.offset += key.charAt(i) == "b" ? -1 : 1;
 	}
 }
-Note.prototype.toString = function() {
-	return "CDEFGAB".charAt(this.key) + (
-		this.offset < 0
-			? Note.useUnicode && Note.useDouble && this.offset == -2
-				? "𝄫"
-				: (Note.useUnicode ? "♭" : "b").repeat(-this.offset)
-			: Note.useDouble && this.offset == 2
-				? (Note.useUnicode ? "𝄪" : "x")
-				: (Note.useUnicode ? "♯" : "#").repeat(this.offset)
-	);
+Note.prototype.toAcci = function() {
+	return this.offset < 0
+		? "𝄫".repeat(-this.offset >> 1) + (this.offset & 1 ? "♭" : "")
+		: "𝄪".repeat(this.offset >> 1) + (this.offset & 1 ? "♯" : "");
+};
+Note.prototype.toElement = function() {
+	return [el("chord-dictionary-white", "CDEFGAB".charAt(this.key)), el("chord-dictionary-acci", this.toAcci())];
 };
 Note.prototype.toRoman = function() {
-	return (
-		this.offset < 0
-			? Note.useUnicode && Note.useDouble && this.offset == -2
-				? "𝄫"
-				: (Note.useUnicode ? "♭" : "b").repeat(-this.offset)
-			: Note.useDouble && this.offset == 2
-				? (Note.useUnicode ? "𝄪" : "x")
-				: (Note.useUnicode ? "♯" : "#").repeat(this.offset)
-	) + (
-		Note.romanUseUnicode
-			? Note.romanUseLowerCase
-				? ["ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ"]
-				: ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"]
-			: Note.romanUseLowerCase
-				? ["i", "ii", "iii", "iv", "v", "vi", "vii"]
-				: ["I", "II", "III", "IV", "V", "VI", "VII"]
-	)[this.key];
+	return [el("chord-dictionary-acci", this.toAcci()), el("chord-dictionary-white", "ⅠⅡⅢⅣⅤⅥⅦ".charAt(this.key))];
 };
 var half = [0, 2, 4, 5, 7, 9, 11];
 Note.prototype.toHalf = function() {
@@ -90,6 +40,12 @@ function transpose(original, target, note) {
 	note = Note(note);
 	var out = ((target.key + note.key - original.key) % 7 + 7) % 7;
 	return Note(out, keyOffsets[target.key][out] - keyOffsets[original.key][note.key] + target.offset + note.offset - original.offset);
+}
+function transpose0(target, note) {
+	target = Note(target);
+	note = Note(note);
+	var out = ((target.key + note.key) % 7 + 7) % 7;
+	return Note(out, keyOffsets[target.key][out] + target.offset + note.offset);
 }
 if (!String.prototype.repeat) String.prototype.repeat = function(times) {
 	var str = "" + this;
@@ -117,10 +73,6 @@ function Chord(array, data) {
 	this.original = array;
 	this.firstIndex = array.first;
 	delete array.first;
-	var octave = 4;
-	this.display = array.map(function(item, index) {
-		return "CDEFGAB".charAt(item.key) + "/" + (array[index - 1] && item.key <= array[index - 1].key ? ++octave : octave);
-	});
 	this.voicing = array.map(item => item.toHalf());
 	var prev = 60, index = 0;
 	for (var a = 1; a < this.voicing.length; a++) if (this.voicing[a] < this.voicing[index]) index = a;
@@ -188,7 +140,7 @@ function parseContent(input, withinPos) {
 		
 		if (detect) {
 			
-			var noteObj = transpose(0, parseContent.transposeTo, Note(note, acci)), noteUntil = i;
+			var noteObj = Note(note, acci), noteUntil = i;
 			
 			var bracketLayer = 0;
 			var has5 = false, has6 = false, has7 = false, third = null, seventh = null, type = null;
@@ -200,8 +152,8 @@ function parseContent(input, withinPos) {
 			addNoteMandatory[-1] = true;
 			
 			cont(
-				"p", c => {if (!nextIs("5")) {type = "'"; return true;}},
-				"_", c => {if (!nextIs("5")) {third = "m"; seventhPos = i; return true;}},
+				"p", c => {if (nextIsNot5()) {type = "'"; return true;}},
+				"_", c => {if (nextIsNot5()) {third = "m"; seventhPos = i; return true;}},
 				"2", c => {sus2 = true; cont("4", c => sus4 = true); return true;},
 				"4", c => {sus4 = true; cont("2", c => sus2 = true); return true;},
 				"79et", c => {has7 = true; highestInterval = c; return true;}
@@ -214,6 +166,7 @@ function parseContent(input, withinPos) {
 					"<", c => {
 						var innerBracketLayer = 1;
 						var anyNote = false;
+						var tempI = i;
 						while (cont(
 							"<", c => {innerBracketLayer++; return true;},
 							">", c => {innerBracketLayer--; return true;},
@@ -221,6 +174,7 @@ function parseContent(input, withinPos) {
 							"24569et", c => {if (addNotes(acci, c, acciPos)) return anyNote = true;}
 						) && innerBracketLayer > 0);
 						if (innerBracketLayer > 0 && anyNote) currStatus = "f";
+						if (!anyNote) i = tempI;
 						return anyNote;
 					}
 				);
@@ -238,6 +192,7 @@ function parseContent(input, withinPos) {
 					"<", c => {
 						var innerBracketLayer = 1;
 						var anyNote = false;
+						var tempI = i;
 						while (cont(
 							"<", c => {innerBracketLayer++; return true;},
 							">", c => {innerBracketLayer--; return true;},
@@ -251,6 +206,7 @@ function parseContent(input, withinPos) {
 							}
 						) && innerBracketLayer > 0);
 						if (innerBracketLayer > 0) currStatus = "f";
+						if (!anyNote) i = tempI;
 						return anyNote;
 					}
 				);
@@ -387,7 +343,7 @@ function parseContent(input, withinPos) {
 				},
 				"<", c => {
 					bracketLayer++;
-					return !nextIs(">");
+					return !/^<[w,]*>/.test(idList.slice(i));
 				},
 				">", c => {
 					bracketLayer--;
@@ -517,7 +473,7 @@ function parseContent(input, withinPos) {
 			if (failed) continue;
 			
 			chordNote = chordNote.map(function(item) {
-				return transpose(0, isInterval && parseContent.intervalNote, transpose(0, noteObj, item));
+				return transpose0(noteObj, item);
 			});
 			
 			var data = {string: "", name: "", noteString: "", isInterval: isInterval}, slashPos = i, onDetect = false;
@@ -562,11 +518,8 @@ function parseContent(input, withinPos) {
 						data.onString = "";
 						for (var k = slashPos; k < onCurrPos; k++) data.onString += inputList[k];
 						slashPos--;
-						if (isInterval) data.onNoteKey = transpose(0, onNoteObj, parseContent.intervalNote) + "";
-						else data.onNoteInterval = transpose(parseContent.intervalNote, onNoteObj).toRoman();
 						data.onNoteString = "";
 						for (var z = onCurrPos; z <= onNoteUntil; z++) data.onNoteString += inputList[z];
-						onNoteObj = transpose(0, parseContent.transposeTo, transpose(0, isInterval && parseContent.intervalNote, onNoteObj));
 						var half = onNoteObj.toHalf();
 						var inversion = false;
 						for (var y = 0; y < chordNote.length; y++) {
@@ -608,23 +561,33 @@ function parseContent(input, withinPos) {
 			data.position = inputList.slice(0, currPos).join("").length;
 			if (withinPos >= data.position && withinPos <= data.position + data.string.length) {
 				
-				if (isInterval) data.noteKey = transpose(0, noteObj, parseContent.intervalNote) + "";
-				else data.noteInterval = transpose(parseContent.intervalNote, noteObj).toRoman();
+				chordNote = chordNote.map(transposeIfOn);
 				
-				data.titleElement = [el("chord-dictionary-note chord-dictionary-midi-" + noteObj.toHalf(), data.noteString), el("chord-dictionary-chord", data.name)];
-				if (onDetect) data.titleElement.push(el("chord-dictionary-slash", data.onString), el("chord-dictionary-bass chord-dictionary-midi-" + onNoteObj.toHalf(), data.onNoteString));
+				var noteHalf = transposeIfOn(noteObj).toHalf();
+				if (onDetect) var onNoteHalf = transposeIfOn(onNoteObj).toHalf();
+				var noteElement = isInterval ? transpose0(noteObj, parseContent.intervalNote).toElement() : transpose(parseContent.intervalNote, noteObj).toRoman();
+				if (onDetect) var onNoteElement = isInterval ? transpose0(onNoteObj, parseContent.intervalNote).toElement() : transpose(parseContent.intervalNote, onNoteObj).toRoman();
+				
+				data.titleElement = [el("chord-dictionary-note chord-dictionary-midi-" + noteHalf, isInterval ? noteObj.toRoman() : noteObj.toElement()), el("chord-dictionary-chord", data.name)];
+				if (onDetect) data.titleElement.push(el("chord-dictionary-slash", data.onString), el("chord-dictionary-bass chord-dictionary-midi-" + onNoteHalf, isInterval ? onNoteObj.toRoman() : onNoteObj.toElement()));
 				data.titleElement = el("chord-dictionary-title", data.titleElement);
-				data.subtitleElement = [el("chord-dictionary-note chord-dictionary-midi-" + noteObj.toHalf(), isInterval ? data.noteKey : data.noteInterval), el("chord-dictionary-chord", data.name)];
-				if (onDetect) data.subtitleElement.push(el("chord-dictionary-slash", data.onString), el("chord-dictionary-bass chord-dictionary-midi-" + onNoteObj.toHalf(), data.isInterval ? data.onNoteKey : data.onNoteInterval));
+				
+				data.subtitleElement = [el("chord-dictionary-note chord-dictionary-midi-" + noteHalf, noteElement), el("chord-dictionary-chord", data.name)];
+				if (onDetect) data.subtitleElement.push(el("chord-dictionary-slash", data.onString), el("chord-dictionary-bass chord-dictionary-midi-" + onNoteHalf, onNoteElement));
 				data.subtitleElement = el("chord-dictionary-subtitle", data.subtitleElement);
-				data.originalElement = el("chord-dictionary-original", chordNote.map(item => el("chord-dictionary-part chord-dictionary-midi-" + item.toHalf(), item + "")));
+				
+				data.originalElement = el("chord-dictionary-original", chordNote.map(item => el("chord-dictionary-part chord-dictionary-midi-" + item.toHalf(), item.toElement())));
 				
 				return Chord(chordNote, data);
 				
 			}
 			
-			function nextIs(id) {
-				return peek() == id || peek() == "w" && idList.charAt(i + 2) == id;
+			function transposeIfOn(note) {
+				return parseContent.transposeOn ? transpose(!isInterval && parseContent.intervalNote, parseContent.transposeTo, note) : isInterval ? transpose0(parseContent.intervalNote, note) : note;
+			}
+			
+			function nextIsNot5() {
+				return peek() != "5" && !(peek() == "w" && idList.charAt(i + 2) == "5");
 			}
 			function clear(pos) {
 				idList = idList.slice(0, pos) + "=" + idList.slice(pos + 1);
