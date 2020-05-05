@@ -39,7 +39,7 @@
 import ChordNote from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
-import Setting from "./setting.vue";
+import Setting from "./Setting.vue";
 
 var offsetBase = document.createElement("div");
 offsetBase.style.position = "absolute";
