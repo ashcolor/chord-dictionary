@@ -84,6 +84,7 @@ const config = {
       filename: '[name].css',
     }),
     new CopyWebpackPlugin([
+      { from: '_locales', to: '_locales' },
       { from: 'icons', to: 'icons', ignore: ['icon.xcf'] },
       { from: 'sounds', to: 'sounds' },
       { from: 'popup/popup.html', to: 'popup/popup.html', transform: transformHtml },

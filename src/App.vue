@@ -1,5 +1,5 @@
 <template>
-  <div id="cd-wrapper">
+  <div id="chord-dictionary-wrapper">
     <ChordDictionary />
   </div>
 </template>

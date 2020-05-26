@@ -3,73 +3,98 @@
 </template>
 
 <script>
+import { CLEFS, NOTES, COLORS } from "../config/const";
+
 import Vex from "vexflow";
 
 export default {
   name: "ChordScore",
   props: {
-    chordObject: Object
-  },
-  data() {
-    return {
-      offsetH: 0
-    };
+    chord: Object,
+    settings: Object
   },
   watch: {
-    chordObject: function(val) {
-      this.dispScore(val);
+    chord: function(newVal, oldVal) {
+      if (newVal.string === oldVal.string) return false;
+      this.dispScore();
     }
   },
   mounted() {
-    this.dispScore(this.chordObject);
+    this.dispScore();
   },
   methods: {
-    dispScore: function(chordObject) {
-      if (this.chordObject.display === undefined) return;
+    dispScore: function() {
+      if (!this.chord.original) return;
       const div = document.getElementById("chord-dictionary-score");
-      div.textContent = null;
-
-      const width = 120;
-      const height = 100;
+      if (!div) return;
+      div.textContent = "";
 
       const VF = Vex.Flow;
       const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
       const context = renderer.getContext();
-      context.setFont("Arial", 10, "").setBackgroundFillStyle("#fff");
-      const stave = new VF.Stave(0, 0, width);
-      stave.addClef("treble");
+      const stave = new VF.Stave(0, 0, 0);
+      stave.addClef(this.settings.clef);
       stave.setContext(context);
 
+      var octave =
+        CLEFS[this.settings.clef].octave +
+        (this.chord.original[0].key < CLEFS[this.settings.clef].note);
       const notes = new VF.StaveNote({
-        keys: chordObject.display,
-        duration: "w"
+        clef: this.settings.clef,
+        keys: this.chord.original.map(
+          function(item, index) {
+            return (
+              "CDEFGAB".charAt(item.key) +
+              "/" +
+              (this.chord.original[index - 1] &&
+              item.key <= this.chord.original[index - 1].key
+                ? ++octave
+                : octave)
+            );
+          }.bind(this)
+        ),
+        duration: NOTES[this.settings.note].duration
       });
 
-      chordObject.original.forEach((note, index) => {
-        if (note.offset)
-          notes.addAccidental(
-            index,
-            new VF.Accidental(
-              note.offset < 0
-                ? "b".repeat(-note.offset)
-                : "#".repeat(note.offset)
-            )
-          );
+      this.chord.original.forEach((note, index) => {
+        if (note.offset) {
+          const acci = note.offset < 0 ? "bb" : "##",
+            repetition = Math.abs(note.offset) >> 1;
+          for (var i = 0; i < repetition; i++)
+            notes.addAccidental(index, new VF.Accidental(acci));
+          if (note.offset & 1)
+            notes.addAccidental(
+              index,
+              new VF.Accidental(note.offset < 0 ? "b" : "#")
+            );
+        }
+        if (this.settings.isColorNote)
+          notes.setKeyStyle(index, { fillStyle: COLORS[note.toHalf()] });
       });
 
-      const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
+      const voice = new VF.Voice({
+        num_beats: 1,
+        beat_value: NOTES[this.settings.note].num
+      });
       voice.addTickables([notes]);
       new VF.Formatter().joinVoices([voice]).format([voice]);
       voice.setStave(stave);
 
-      //音符の描画位置が高すぎる場合の調整
-      const y = voice.getBoundingBox().y;
-      this.offsetH = y < 10 ? 10 - y : 0;
-      renderer.resize(width + 20, height + this.offsetH);
-      stave.setY(this.offsetH);
+      //音符の描画位置の調整
+      const box = voice.getBoundingBox();
+      renderer.resize(
+        box.w + 80,
+        Math.max(
+          Math.abs(box.y) + box.h + 15 + (this.settings.note != "whole") * 15,
+          110
+        )
+      );
+      stave.setWidth(box.w + 65);
+      stave.setY(Math.max(20 - box.y, 0));
 
       stave.draw();
       voice.draw(context, stave);
+      this.$emit("updated");
     }
   }
 };
