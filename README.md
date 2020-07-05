@@ -1,6 +1,6 @@
 # Chord Dictionary
 
-##ダウンロード
+## ダウンロード
 
 [Chrome ウェブストア](https://chrome.google.com/webstore/detail/chord-dictionary/lnefagbhokamcaedbeopnhdabkcemkcf)
 
