@@ -4,3 +4,6 @@
 /.test/
 /dist/
 /dist-zip/
+
+.idea
+.vscode
