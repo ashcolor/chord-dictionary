@@ -7,22 +7,22 @@
 ## Project setup
 
 ```
-npm install
+yarn
 ```
 
 ## Watch for modifications then run npm run build
 
 ```
-npm run watch
+yarn watch
 ```
 
 ## 動作確認
 
-chrome://extensions/を開く
+[Chrome 拡張機能](chrome://extensions/)を開く
 
 「パッケージ化されていない拡張機能を読み込む」をクリック
 
-\/dist を選択
+`\dist`を選択
 
 任意のサイト上で右上の拡張機能のアイコンをクリックする
 
