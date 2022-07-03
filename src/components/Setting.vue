@@ -1,8 +1,12 @@
 <script setup>
+import { onMounted, watch, getCurrentInstance, computed } from "vue";
+import CustomSelect from "./common/CustomSelect.vue";
+import CustomToggle from "./common/CustomToggle.vue";
+import CustomInputGroup from "./common/CustomInputGroup.vue";
+import CustomRange from "./common/CustomRange.vue";
 import langs from "../config/i18n";
 import { CLEFS, NOTES, OFFSETS, INSTS, KEYS } from "../config/const";
-import CustomSelect from "./common/CustomSelect.vue";
-import { onMounted, watch, getCurrentInstance, computed } from "vue";
+import CustomToggleButton from "./common/CustomToggleButton.vue";
 
 const instance = getCurrentInstance();
 
@@ -30,161 +34,131 @@ onMounted(() => {
 
 <template>
     <div id="chord-dictionary-setting">
-        <!-- Sidebar -->
         <nav v-show="settings.isShow" id="chord-dictionary-sidebar">
             <b-card no-body>
                 <b-card-header>{{ $t("display_settings") }}</b-card-header>
                 <b-card-body>
-                    <CustomSelect
-                        v-model="settings.language"
-                        :label="$t('language')"
-                        :options="
-                            Object.keys(langs).map((v) => ({ value: v, text: langs[v].name }))
-                        "
-                    ></CustomSelect>
+                    <CustomInputGroup :label="$t('language')">
+                        <CustomSelect
+                            v-model="settings.language"
+                            :options="
+                                Object.keys(langs).map((v) => ({ value: v, text: langs[v].name }))
+                            "
+                        ></CustomSelect>
+                    </CustomInputGroup>
                     <hr />
-                    <CustomSelect
-                        v-model="settings.clef"
-                        :label="$t('clef')"
-                        :options="Object.keys(CLEFS).map((v) => ({ value: v, text: $t(v) }))"
-                    ></CustomSelect>
-                    <CustomSelect
-                        v-model="settings.note"
-                        :label="$t('note')"
-                        :options="Object.keys(NOTES).map((v) => ({ value: v, text: $t(v) }))"
-                    ></CustomSelect>
+                    <CustomInputGroup :label="$t('clef')">
+                        <CustomSelect
+                            v-model="settings.clef"
+                            :options="Object.keys(CLEFS).map((v) => ({ value: v, text: $t(v) }))"
+                        ></CustomSelect>
+                    </CustomInputGroup>
+                    <CustomInputGroup :label="$t('note')">
+                        <CustomSelect
+                            v-model="settings.note"
+                            :options="Object.keys(NOTES).map((v) => ({ value: v, text: $t(v) }))"
+                        ></CustomSelect
+                    ></CustomInputGroup>
                     <hr />
-                    <b-form-checkbox v-model="settings.isShowRoman" onclick="blur()" switch>{{
-                        $t("roman_display")
-                    }}</b-form-checkbox>
-                    <b-input-group class="mb-2">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("key") }}</b-input-group-text>
-                        </template>
-                        <b-form-select v-model="settings.key" :options="KEYS"></b-form-select>
-                        <b-form-select
+                    <CustomToggle
+                        v-model="settings.isShowRoman"
+                        :label="$t('roman_display')"
+                    ></CustomToggle>
+                    <CustomInputGroup :label="$t('key')">
+                        <CustomSelect v-model="settings.key" :options="KEYS"></CustomSelect>
+                        <CustomSelect
                             v-model="settings.offset"
                             :options="OFFSETS"
                             style="font-family: 'FreeSerif'"
-                        ></b-form-select>
-                    </b-input-group>
-                    <b-form-checkbox v-model="settings.isTranspose" onclick="blur()" switch>{{
-                        $t("transpose")
-                    }}</b-form-checkbox>
-                    <b-input-group v-show="settings.isTranspose">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("transpose_to") }}</b-input-group-text>
-                        </template>
-                        <b-form-select
+                        ></CustomSelect>
+                    </CustomInputGroup>
+                    <CustomToggle
+                        v-model="settings.isTranspose"
+                        :label="$t('transpose')"
+                    ></CustomToggle>
+                    <CustomInputGroup v-show="settings.isTranspose" :label="$t('transpose_to')">
+                        <CustomSelect
                             v-model="settings.transposeKey"
                             :options="KEYS"
-                        ></b-form-select>
-                        <b-form-select
+                        ></CustomSelect>
+                        <CustomSelect
                             v-model="settings.transposeOffset"
                             :options="OFFSETS"
                             style="font-family: 'FreeSerif'"
-                        ></b-form-select>
-                    </b-input-group>
+                        ></CustomSelect>
+                    </CustomInputGroup>
                     <p v-show="settings.isTranspose" class="small text-muted mb-0">
                         {{ $t("transpose_hint") }}
                     </p>
                     <hr />
-                    <b-form-checkbox v-model="settings.isColorNote" onclick="blur()" switch>{{
-                        $t("color_note")
-                    }}</b-form-checkbox>
-                    <b-form-checkbox v-model="settings.isColorNoteName" onclick="blur()" switch>{{
-                        $t("color_note_name")
-                    }}</b-form-checkbox>
-                    <b-form-checkbox v-model="settings.isDelay" onclick="blur()" switch>{{
-                        $t("delay_show")
-                    }}</b-form-checkbox>
-                    <b-input-group class="mb-2" v-show="settings.isDelay">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("delay") }}</b-input-group-text>
-                        </template>
-                        <b-form-input
-                            v-model="settings.delay"
-                            type="range"
-                            min="100"
-                            max="1600"
-                            step="any"
-                        ></b-form-input>
-                    </b-input-group>
+                    <CustomToggle
+                        v-model="settings.isColorNote"
+                        :label="$t('color_note')"
+                    ></CustomToggle>
+                    <CustomToggle
+                        v-model="settings.isColorNoteName"
+                        :label="$t('color_note_name')"
+                    ></CustomToggle>
+                    <CustomToggle
+                        v-model="settings.isDelay"
+                        :label="$t('delay_show')"
+                    ></CustomToggle>
+                    <CustomInputGroup v-show="settings.isDelay" :label="$t('delay')">
+                        <CustomRange v-model="settings.delay" :min="100" :max="1600"></CustomRange>
+                    </CustomInputGroup>
                 </b-card-body>
             </b-card>
             <b-card no-body>
                 <b-card-header>{{ $t("player_settings") }}</b-card-header>
                 <b-card-body>
-                    <b-input-group class="mb-2">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("volume") }}</b-input-group-text>
-                        </template>
-                        <b-form-input
-                            v-model="settings.vol"
-                            type="range"
-                            min="0"
-                            max="1.2"
-                            step="any"
-                        ></b-form-input>
-                    </b-input-group>
-                    <b-input-group class="mb-2">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("duration") }}</b-input-group-text>
-                        </template>
-                        <b-form-input
-                            v-model="settings.duration"
-                            type="range"
-                            min="0.5"
-                            max="3"
-                            step="any"
-                        ></b-form-input>
-                    </b-input-group>
-                    <CustomSelect
-                        v-model="settings.inst"
-                        :label="$t('instrument')"
-                        :options="INSTS.map((v) => ({ value: v.key, text: $t(v.key) }))"
-                    ></CustomSelect>
-                    <b-form-checkbox v-model="settings.isArpeggio" onclick="blur()" switch>{{
-                        $t("arpeggio")
-                    }}</b-form-checkbox>
-                    <b-input-group class="mb-2" v-show="settings.isArpeggio">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("gap") }}</b-input-group-text>
-                        </template>
-                        <b-form-input
+                    <CustomInputGroup :label="$t('volume')">
+                        <CustomRange v-model="settings.vol" :min="0" :max="1.2"></CustomRange>
+                    </CustomInputGroup>
+                    <CustomInputGroup :label="$t('duration')">
+                        <CustomRange v-model="settings.duration" :min="0.5" :max="3"></CustomRange>
+                    </CustomInputGroup>
+                    <CustomInputGroup :label="$t('instrument')">
+                        <CustomSelect
+                            v-model="settings.inst"
+                            :options="INSTS.map((v) => ({ value: v.key, text: $t(v.key) }))"
+                        ></CustomSelect
+                    ></CustomInputGroup>
+                    <CustomToggle
+                        v-model="settings.isArpeggio"
+                        :label="$t('arpeggio')"
+                    ></CustomToggle>
+                    <CustomInputGroup v-show="settings.isArpeggio" :label="$t('gap')">
+                        <CustomRange
                             v-model="settings.arpeggio"
-                            type="range"
-                            min="0.01"
-                            max="0.2"
-                            step="any"
-                        ></b-form-input>
-                    </b-input-group>
+                            :min="0.01"
+                            :max="0.2"
+                        ></CustomRange>
+                    </CustomInputGroup>
                     <hr />
-                    <b-form-checkbox v-model="settings.isActiveClick" onclick="blur()" switch>{{
-                        $t("click")
-                    }}</b-form-checkbox>
-                    <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>{{
-                        $t("shortcut")
-                    }}</b-form-checkbox>
+                    <CustomToggle
+                        v-model="settings.isActiveClick"
+                        :label="$t('click')"
+                    ></CustomToggle>
+                    <CustomToggle
+                        v-model="settings.isActiveKey"
+                        :label="$t('shortcut')"
+                    ></CustomToggle>
                     <span class="small text-muted mb-0">
                         ({{ isMac ? "Cmd" : "Ctrl" }}
                         &thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)
                     </span>
-                    <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>{{
-                        $t("hover")
-                    }}</b-form-checkbox>
+                    <CustomToggle
+                        v-model="settings.isActiveHover"
+                        :label="$t('hover')"
+                    ></CustomToggle>
                 </b-card-body>
             </b-card>
         </nav>
-        <b-button
-            :pressed.sync="settings.isShow"
-            onclick="blur()"
+        <CustomToggleButton
+            v-model="settings.isShow"
             id="chord-dictionary-toggle-button"
-            size="sm"
-            class="mb-2"
-        >
-            <b-icon icon="gear-fill"></b-icon>
-        </b-button>
+            :icon="'ant-design:setting-filled'"
+        />
     </div>
 </template>
 

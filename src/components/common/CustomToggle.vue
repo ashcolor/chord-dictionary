@@ -1,7 +1,7 @@
 <script setup>
 const props = defineProps({
-    options: Array,
-    value: String,
+    label: String,
+    value: String | Boolean,
 });
 
 const emit = defineEmits(["input"]);
@@ -12,5 +12,7 @@ const onChange = () => {
 </script>
 
 <template>
-    <b-form-select v-model="value" :options="options" @change="onChange"></b-form-select>
+    <b-form-checkbox v-model="value" onclick="blur()" switch @change="onChange()">
+        {{ label }}
+    </b-form-checkbox>
 </template>
