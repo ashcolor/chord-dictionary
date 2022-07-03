@@ -14,6 +14,9 @@ const i18n = new VueI18n({
     locale: "en",
     messages: langs,
 });
+Vue.prototype._i18n = function () {
+    return i18n;
+};
 Vue.prototype.$t = function (...args) {
     return i18n.t(...args);
 };
