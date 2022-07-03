@@ -1,3 +1,33 @@
+<script setup>
+import langs from "../config/i18n";
+import { CLEFS, NOTES, OFFSETS, INSTS, KEYS } from "../config/const";
+import CustomSelect from "./common/CustomSelect.vue";
+import { onMounted, watch, getCurrentInstance, computed } from "vue";
+
+const instance = getCurrentInstance();
+
+const props = defineProps({
+    settings: Object,
+});
+
+const isMac = computed(() => (window.navigator.platform.includes("Mac") ? "Cmd" : "Ctrl"));
+
+watch(
+    props.settings,
+    (newSettings) => {
+        chrome.storage.local.set({ settings: newSettings });
+        instance.proxy._i18n.locale = newSettings.language;
+        instance.proxy.$parent.$el.lang = instance.proxy.$t("code");
+    },
+    { deep: true }
+);
+
+onMounted(() => {
+    instance.proxy._i18n.locale = props.settings.language;
+    instance.proxy.$parent.$el.lang = instance.proxy.$t("code");
+});
+</script>
+
 <template>
     <div id="chord-dictionary-setting">
         <!-- Sidebar -->
@@ -5,15 +35,24 @@
             <b-card no-body>
                 <b-card-header>{{ $t("display_settings") }}</b-card-header>
                 <b-card-body>
-                    <LanguageSelect v-model="settings.language"></LanguageSelect>
+                    <CustomSelect
+                        v-model="settings.language"
+                        :label="$t('language')"
+                        :options="
+                            Object.keys(langs).map((v) => ({ value: v, text: langs[v].name }))
+                        "
+                    ></CustomSelect>
                     <hr />
-                    <ClefSelect v-model="settings.clef"></ClefSelect>
-                    <b-input-group class="mb-2">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("note") }}</b-input-group-text>
-                        </template>
-                        <b-form-select v-model="settings.note" :options="notes"></b-form-select>
-                    </b-input-group>
+                    <CustomSelect
+                        v-model="settings.clef"
+                        :label="$t('clef')"
+                        :options="Object.keys(CLEFS).map((v) => ({ value: v, text: $t(v) }))"
+                    ></CustomSelect>
+                    <CustomSelect
+                        v-model="settings.note"
+                        :label="$t('note')"
+                        :options="Object.keys(NOTES).map((v) => ({ value: v, text: $t(v) }))"
+                    ></CustomSelect>
                     <hr />
                     <b-form-checkbox v-model="settings.isShowRoman" onclick="blur()" switch>{{
                         $t("roman_display")
@@ -100,15 +139,11 @@
                             step="any"
                         ></b-form-input>
                     </b-input-group>
-                    <b-input-group class="mb-2">
-                        <template v-slot:prepend>
-                            <b-input-group-text>{{ $t("instrument") }}</b-input-group-text>
-                        </template>
-                        <b-form-select
-                            v-model="settings.inst"
-                            :options="instOptions"
-                        ></b-form-select>
-                    </b-input-group>
+                    <CustomSelect
+                        v-model="settings.inst"
+                        :label="$t('instrument')"
+                        :options="INSTS.map((v) => ({ value: v.key, text: $t(v.key) }))"
+                    ></CustomSelect>
                     <b-form-checkbox v-model="settings.isArpeggio" onclick="blur()" switch>{{
                         $t("arpeggio")
                     }}</b-form-checkbox>
@@ -131,9 +166,10 @@
                     <b-form-checkbox v-model="settings.isActiveKey" onclick="blur()" switch>{{
                         $t("shortcut")
                     }}</b-form-checkbox>
-                    <span class="small text-muted mb-0"
-                        >({{ SHORTCUT }}&thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)</span
-                    >
+                    <span class="small text-muted mb-0">
+                        ({{ isMac ? "Cmd" : "Ctrl" }}
+                        &thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)
+                    </span>
                     <b-form-checkbox v-model="settings.isActiveHover" onclick="blur()" switch>{{
                         $t("hover")
                     }}</b-form-checkbox>
@@ -151,56 +187,6 @@
         </b-button>
     </div>
 </template>
-
-<script>
-import { NOTES, INSTS, KEYS, OFFSETS } from "../config/const";
-import LanguageSelect from "./LanguageSelect.vue";
-import ClefSelect from "./ClefSelect.vue";
-
-export default {
-    name: "setting",
-    props: {
-        settings: Object,
-    },
-    data() {
-        return {
-            isShow: true,
-        };
-    },
-    computed: {
-        instOptions() {
-            return INSTS.map((v) => ({ value: v.key, text: this.$t(v.key) }));
-        },
-        KEYS() {
-            return KEYS;
-        },
-        OFFSETS() {
-            return OFFSETS;
-        },
-        SHORTCUT() {
-            return window.navigator.platform.includes("Mac") ? "Cmd" : "Ctrl";
-        },
-        notes() {
-            return Object.keys(NOTES).map((v) => ({ value: v, text: this.$t(v) }));
-        },
-    },
-    watch: {
-        settings: {
-            handler: function (val) {
-                chrome.storage.local.set({ settings: val });
-                this._i18n.locale = val.language;
-                this.$parent.$el.lang = this.$t("code");
-            },
-            deep: true,
-        },
-    },
-    mounted() {
-        this._i18n.locale = this.settings.language;
-        this.$parent.$el.lang = this.$t("code");
-    },
-    components: { LanguageSelect, ClefSelect },
-};
-</script>
 
 <style lang="scss">
 #chord-dictionary-wrapper #chord-dictionary-setting {
