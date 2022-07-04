@@ -1,13 +1,7 @@
 import Vue from "vue";
-import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import VueI18n from "vue-i18n";
 import langs from "../src/config/i18n";
-
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
-
-Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
+import "../src/assets/style/tailwind.css";
 
 Vue.use(VueI18n);
 const i18n = new VueI18n({
