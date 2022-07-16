@@ -16,6 +16,12 @@ yarn
 yarn watch
 ```
 
+## Start storybook
+
+```
+yarn storybook
+```
+
 ## 動作確認
 
 [Chrome 拡張機能](chrome://extensions/)を開く
@@ -29,10 +35,6 @@ yarn watch
 ## Build Zip for Chrome Extension
 
 ```
-npm run build-zip
+# after build
+yarn build-zip
 ```
-
-## Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
-See [Template](https://github.com/Kocal/vue-web-extension).
