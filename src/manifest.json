@@ -1,24 +1,30 @@
 {
-  "name": "Chord Dictionary",
-  "description": "__MSG_description__",
-  "default_locale": "en",
-  "version": "1.3.3",
-  "manifest_version": 3,
-  "icons": {
-    "48": "icons/icon_48.png",
-    "128": "icons/icon_128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["main.js", "main.css", "sounds/*.mp3", "assets/FreeSerif.ttf", "assets/FreeSerif.otf"],
-      "matches": ["http://*/*", "https://*/*"]
-    }
-  ],
-  "action": {
-    "default_title": "Chord Dictionary"
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "permissions": ["tabs", "activeTab", "storage", "scripting"]
+    "name": "Chord Dictionary",
+    "description": "__MSG_description__",
+    "default_locale": "en",
+    "version": "1.3.4",
+    "manifest_version": 3,
+    "icons": {
+        "48": "icons/icon_48.png",
+        "128": "icons/icon_128.png"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "main.js",
+                "main.css",
+                "sounds/*.mp3",
+                "assets/FreeSerif.ttf",
+                "assets/FreeSerif.otf"
+            ],
+            "matches": ["http://*/*", "https://*/*"]
+        }
+    ],
+    "action": {
+        "default_title": "Chord Dictionary"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": ["tabs", "activeTab", "storage", "scripting"]
 }
