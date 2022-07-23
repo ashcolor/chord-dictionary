@@ -1,86 +1,64 @@
 <script setup>
+import { onMounted, watch, reactive, getCurrentInstance } from "vue";
 import Tone from "tone";
 import { INSTS } from "../config/const.js";
-</script>
 
-<script>
-export default {
-    props: {
-        isActive: Boolean,
-        showChord: Boolean,
-        chord: Object,
-        settings: Object,
-    },
-    data() {
-        return {
-            insts: {},
-        };
-    },
-    watch: {
-        showChord: function (newVal, oldVal) {
-            if (!this.settings.isActiveHover) return false;
-            this.playChord();
-        },
-        settings: {
-            handler: function (val) {
-                Tone.Master.volume.value = Tone.gainToDb(val.vol);
-            },
-            deep: true,
-        },
-    },
-    methods: {
-        playChord: function () {
-            if (!this.isActive || this.$parent.$el.matches(":hover") || !this.chord.voicing)
-                return false;
-            Tone.Transport.stop().cancel();
-            try {
-                this.insts[this.settings.inst].releaseAll();
-            } catch (e) {}
-            this.chord.voicing.forEach(
-                function (midi, index) {
-                    Tone.Transport.scheduleOnce(
-                        function (time) {
-                            this.insts[this.settings.inst].triggerAttack(
-                                Tone.Frequency(midi, "midi"),
-                                time
-                            );
-                        }.bind(this),
-                        this.settings.isArpeggio * this.settings.arpeggio * index
-                    );
-                }.bind(this)
-            );
-            Tone.Transport.scheduleOnce(
-                function (time) {
-                    try {
-                        this.insts[this.settings.inst].releaseAll(time);
-                    } catch (e) {}
-                }.bind(this),
-                this.settings.duration
-            );
-            Tone.Transport.start();
-        },
-        keyDown: function (e) {
-            if (!this.settings.isActiveKey) return false;
-            if (window.navigator.platform.includes("Mac") ? !e.metaKey : !e.ctrlKey) return false;
-            if (!e.shiftKey || e.altKey || e.repeat || (e.which || e.keyCode || e.charCode) !== 32)
-                return false;
-            this.playChord();
-        },
-        click: function (e) {
-            if (!this.settings.isActiveClick) return false;
-            this.playChord();
-        },
-    },
-    mounted() {
-        INSTS.forEach(
-            function (v) {
-                this.insts[v.key] = (
-                    v.samples ? new Tone.Sampler(v.samples) : new Tone.PolySynth(12)
-                ).toMaster();
-            }.bind(this)
-        );
-        window.addEventListener("keydown", this.keyDown);
-        window.addEventListener("click", this.click);
-    },
+const instance = getCurrentInstance();
+
+const props = defineProps({
+    isActive: Boolean,
+    showChord: Boolean,
+    chord: Object,
+    settings: Object,
+});
+
+const insts = reactive({});
+
+onMounted(() => {
+    INSTS.forEach((v) => {
+        insts[v.key] = (
+            v.samples ? new Tone.Sampler(v.samples) : new Tone.PolySynth(12)
+        ).toMaster();
+    });
+    window.addEventListener("keydown", keyDown);
+    window.addEventListener("click", click);
+});
+
+watch(props.showChord, () => {
+    if (!props.settings.isActiveHover) return;
+    playChord();
+});
+watch(props.settings, (val) => {
+    Tone.Master.volume.value = Tone.gainToDb(val.vol);
+});
+
+const playChord = () => {
+    if (!props.isActive || instance.proxy.$parent.$el.matches(":hover") || !props.chord.voicing)
+        return;
+    Tone.Transport.stop().cancel();
+    try {
+        insts[props.settings.inst].releaseAll();
+    } catch (e) {}
+    props.chord.voicing.forEach((midi, index) => {
+        Tone.Transport.scheduleOnce((time) => {
+            insts[props.settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
+        }, props.settings.isArpeggio * props.settings.arpeggio * index);
+    });
+    Tone.Transport.scheduleOnce((time) => {
+        try {
+            insts[props.settings.inst].releaseAll(time);
+        } catch (e) {}
+    }, props.settings.duration);
+    Tone.Transport.start();
+};
+const keyDown = () => {
+    if (!props.settings.isActiveKey) return;
+    if (window.navigator.platform.includes("Mac") ? !e.metaKey : !e.ctrlKey) return;
+    if (!e.shiftKey || e.altKey || e.repeat || (e.which || e.keyCode || e.charCode) !== 32) return;
+    playChord();
+};
+const click = () => {
+    if (!props.settings.isActiveClick) return;
+    playChord();
 };
 </script>

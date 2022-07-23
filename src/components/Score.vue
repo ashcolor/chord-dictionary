@@ -15,7 +15,7 @@ onMounted(() => {
 });
 
 watch(props.chord, (newVal, oldVal) => {
-    if (newVal.string === oldVal.string) return false;
+    if (newVal.string === oldVal.string) return;
     dispScore();
 });
 
