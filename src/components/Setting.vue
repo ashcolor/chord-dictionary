@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, watch, getCurrentInstance, computed } from "vue";
+import { watch, computed, getCurrentInstance } from "vue";
+import langs from "../config/i18n";
+import { CLEFS, NOTES, OFFSETS, INSTS, KEYS } from "../config/const";
 import CustomSelect from "./common/CustomSelect.vue";
 import CustomToggle from "./common/CustomToggle.vue";
 import CustomInputGroup from "./common/CustomInputGroup.vue";
 import CustomRange from "./common/CustomRange.vue";
-import langs from "../config/i18n";
-import { CLEFS, NOTES, OFFSETS, INSTS, KEYS } from "../config/const";
 import CustomToggleButton from "./common/CustomToggleButton.vue";
 
 const instance = getCurrentInstance();

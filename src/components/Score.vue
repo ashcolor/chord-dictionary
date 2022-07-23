@@ -1,7 +1,7 @@
 <script setup>
-import { CLEFS, NOTES, COLORS } from "../config/const";
-import Vex from "vexflow";
 import { onMounted, watch } from "vue";
+import Vex from "vexflow";
+import { CLEFS, NOTES, COLORS } from "../config/const";
 
 const props = defineProps({
     chord: Object,

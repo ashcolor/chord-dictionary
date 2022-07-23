@@ -1,9 +1,9 @@
 <script setup>
+import { onMounted, watch, ref, reactive, getCurrentInstance } from "vue";
 import ChordNote from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
 import Setting from "./Setting.vue";
-import { onMounted, watch, ref, reactive, getCurrentInstance } from "vue";
 
 const instance = getCurrentInstance();
 
