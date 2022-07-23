@@ -14,7 +14,6 @@ const props = defineProps({
     settings: Object,
 });
 
-console.log(window.navigator.platform);
 const isMac = computed(() => window.navigator.platform.includes("Mac"));
 
 watch(
