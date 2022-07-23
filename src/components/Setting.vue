@@ -1,7 +1,8 @@
 <script setup>
-import { watch, computed, getCurrentInstance } from "vue";
+import { onMounted, watch, computed, getCurrentInstance } from "vue";
 import langs from "../config/i18n";
 import { CLEFS, NOTES, OFFSETS, INSTS, KEYS } from "../config/const";
+import { util } from "../utils/util";
 import CustomSelect from "./common/CustomSelect.vue";
 import CustomToggle from "./common/CustomToggle.vue";
 import CustomInputGroup from "./common/CustomInputGroup.vue";
@@ -13,8 +14,6 @@ const instance = getCurrentInstance();
 const props = defineProps({
     settings: Object,
 });
-
-const isMac = computed(() => window.navigator.platform.includes("Mac"));
 
 watch(
     props.settings,
@@ -144,8 +143,9 @@ onMounted(() => {
                         :label="$t('shortcut')"
                     ></CustomToggle>
                     <span class="small text-muted mb-0">
-                        ({{ isMac ? "Cmd" : "Ctrl" }}
-                        &thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)
+                        ({{
+                            util.isMac() ? "Cmd" : "Ctrl"
+                        }}&thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)
                     </span>
                     <CustomToggle
                         v-model="settings.isActiveHover"

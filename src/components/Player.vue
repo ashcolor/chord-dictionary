@@ -2,6 +2,7 @@
 import { onMounted, watch, reactive, getCurrentInstance } from "vue";
 import Tone from "tone";
 import { INSTS } from "../config/const.js";
+import { util } from "../utils/util";
 
 const instance = getCurrentInstance();
 
@@ -51,13 +52,19 @@ const playChord = () => {
     }, props.settings.duration);
     Tone.Transport.start();
 };
-const keyDown = () => {
+const keyDown = (event) => {
     if (!props.settings.isActiveKey) return;
-    if (window.navigator.platform.includes("Mac") ? !e.metaKey : !e.ctrlKey) return;
-    if (!e.shiftKey || e.altKey || e.repeat || (e.which || e.keyCode || e.charCode) !== 32) return;
+    if (util.isMac() ? !event.metaKey : !event.ctrlKey) return;
+    if (
+        !event.shiftKey ||
+        event.altKey ||
+        event.repeat ||
+        (event.which || event.keyCode || event.charCode) !== 32
+    )
+        return;
     playChord();
 };
-const click = () => {
+const click = (event) => {
     if (!props.settings.isActiveClick) return;
     playChord();
 };
