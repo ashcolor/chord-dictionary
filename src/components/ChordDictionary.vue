@@ -53,7 +53,7 @@ const clientY = ref(0);
 const timeoutId = ref(null);
 const showChord = ref(false);
 
-var offsetBase = document.createElement("div");
+const offsetBase = document.createElement("div");
 offsetBase.style.position = "absolute";
 offsetBase.style.top = 0;
 offsetBase.style.left = 0;
@@ -63,8 +63,8 @@ watch(chord, (val) => {
     if (!val.string) return;
     range.value.setStart(textNode.value, val.position);
     range.value.setEnd(textNode.value, val.position + val.string.length);
-    var rangeRect = range.value.getBoundingClientRect();
-    var offsetRect = offsetBase.getBoundingClientRect();
+    const rangeRect = range.value.getBoundingClientRect();
+    const offsetRect = offsetBase.getBoundingClientRect();
     highlightRect.isActive = true;
     highlightRect.top = rangeRect.top - offsetRect.top;
     highlightRect.left = rangeRect.left - offsetRect.left;
@@ -93,7 +93,7 @@ onMounted(() => {
         settings.language =
             settings.language ||
             ((languages) => {
-                for (var i = 0; i < languages.length; i++) {
+                for (let i = 0; i < languages.length; i++) {
                     if (!languages[i]) continue;
                     if (/^zh-(hk|mo)/i.test(languages[i])) return "hk";
                     if (/^zh-(tw|hant)/i.test(languages[i])) return "tw";
@@ -158,9 +158,9 @@ const setPointedChord = () => {
 };
 const updated = () => {
     if (!showChord.value || !chord.value.string) return;
-    var div = document.getElementById("chord-dictionary-pop-up");
+    const div = document.getElementById("chord-dictionary-pop-up");
     if (!div) return;
-    var dimension = div.getBoundingClientRect();
+    const dimension = div.getBoundingClientRect();
     position.top =
         (dimension.height + pageY.value - window.scrollY + 30 >
         document.documentElement.clientHeight

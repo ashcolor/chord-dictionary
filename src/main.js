@@ -6,7 +6,6 @@ import langs from "./config/i18n";
 
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
-
 Vue.use(VueI18n);
 
 Vue.config.productionTip = false;
@@ -23,6 +22,6 @@ new Vue({
         messages: langs,
     }),
 }).$mount("#chord-dictionary-app");
-window.addEventListener("beforeunload", function () {
+window.addEventListener("beforeunload", () => {
     chrome.runtime.sendMessage(null, "reload");
 });
