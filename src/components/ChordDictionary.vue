@@ -33,8 +33,10 @@ const settings = reactive({
     isActiveKey: true,
     isActiveHover: false,
 });
-const positionTop = ref(0);
-const positionLeft = ref(0);
+const position = reactive({
+    top: 0,
+    left: 0,
+});
 const range = ref(null);
 const textNode = ref(null);
 const highlightPos = reactive({});
@@ -162,12 +164,12 @@ const updated = () => {
     const div = document.getElementById("chord-dictionary-pop-up");
     if (!div) return;
     const dimension = div.getBoundingClientRect();
-    positionTop.value =
+    position.top =
         (dimension.height + pageY.value - window.scrollY + 30 >
         document.documentElement.clientHeight
             ? pageY.value - dimension.height - 10
             : pageY.value + 20) + "px";
-    positionLeft.value =
+    position.left =
         (dimension.width + pageX.value - window.scrollX + 30 > document.documentElement.clientWidth
             ? pageX.value - dimension.width - 10
             : pageX.value + 20) + "px";
@@ -193,7 +195,7 @@ const displayChord = () => {
             v-if="showChord && chord.string"
             id="chord-dictionary-pop-up"
             v-bind:class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
-            :style="{ top: positionTop, left: positionLeft }"
+            :style="position"
             deck
         >
             <b-card no-body>
