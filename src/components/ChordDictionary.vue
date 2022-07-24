@@ -1,9 +1,10 @@
 <script setup>
-import { onMounted, watch, ref, reactive, getCurrentInstance } from "vue";
+import { onMounted, watch, ref, reactive, getCurrentInstance, computed } from "vue";
 import ChordNote from "../assets/ChordNote.js";
 import Score from "./Score.vue";
 import Player from "./Player.vue";
 import Setting from "./Setting.vue";
+import HighlightDiv from "./common/HighlightDiv.vue";
 
 const instance = getCurrentInstance();
 
@@ -33,13 +34,8 @@ const settings = reactive({
     isActiveKey: true,
     isActiveHover: false,
 });
-const position = reactive({
-    top: 0,
-    left: 0,
-});
 const range = ref(null);
 const textNode = ref(null);
-const highlightPos = reactive({});
 const highlightRect = reactive({
     isActive: false,
     top: null,
@@ -55,6 +51,25 @@ const clientX = ref(0);
 const clientY = ref(0);
 const timeoutId = ref(null);
 const showChord = ref(false);
+const popUpRef = ref(null);
+
+const popupPosition = computed(() => {
+    if (!showChord.value || !chord.value.string) return;
+    if (!popUpRef.value) return;
+    const dimension = popUpRef.value.getBoundingClientRect();
+    return {
+        top:
+            (dimension.height + pageY.value - window.scrollY + 30 >
+            document.documentElement.clientHeight
+                ? pageY.value - dimension.height - 10
+                : pageY.value + 20) + "px",
+        left:
+            (dimension.width + pageX.value - window.scrollX + 30 >
+            document.documentElement.clientWidth
+                ? pageX.value - dimension.width - 10
+                : pageX.value + 20) + "px",
+    };
+});
 
 const offsetBase = document.createElement("div");
 offsetBase.style.position = "absolute";
@@ -76,10 +91,6 @@ watch(chord, (val) => {
     highlightRect.bottom = highlightRect.top + highlightRect.height;
     highlightRect.right = highlightRect.left + highlightRect.width;
     if (cursorInRect()) {
-        highlightPos.top = highlightRect.top + "px";
-        highlightPos.left = highlightRect.left + "px";
-        highlightPos.width = highlightRect.width + "px";
-        highlightPos.height = highlightRect.height + "px";
         timeoutId.value = setTimeout(displayChord, settings.isDelay * settings.delay);
     } else {
         chord.value = {};
@@ -123,8 +134,8 @@ onMounted(() => {
         pageY.value = Math.min(e.pageY, document.documentElement.scrollHeight);
         clientX.value = e.clientX;
         clientY.value = e.clientY;
-        if (highlightRect.isActive && cursorInRect()) updated();
-        else {
+        if (highlightRect.isActive && cursorInRect()) {
+        } else {
             if (timeoutId.value !== null) clearTimeout(timeoutId.value);
             showChord.value = false;
             chord.value = {};
@@ -159,21 +170,7 @@ const setPointedChord = () => {
     );
     chord.value = ChordNote.parseContent(textNode.value.nodeValue, range.value.startOffset);
 };
-const updated = () => {
-    if (!showChord.value || !chord.value.string) return;
-    const div = document.getElementById("chord-dictionary-pop-up");
-    if (!div) return;
-    const dimension = div.getBoundingClientRect();
-    position.top =
-        (dimension.height + pageY.value - window.scrollY + 30 >
-        document.documentElement.clientHeight
-            ? pageY.value - dimension.height - 10
-            : pageY.value + 20) + "px";
-    position.left =
-        (dimension.width + pageX.value - window.scrollX + 30 > document.documentElement.clientWidth
-            ? pageX.value - dimension.width - 10
-            : pageX.value + 20) + "px";
-};
+
 const cursorInRect = () => {
     return (
         pageY.value >= highlightRect.top &&
@@ -184,7 +181,6 @@ const cursorInRect = () => {
 };
 const displayChord = () => {
     showChord.value = true;
-    updated();
     timeoutId.value = null;
 };
 </script>
@@ -194,11 +190,11 @@ const displayChord = () => {
         <b-card-group
             v-if="showChord && chord.string"
             id="chord-dictionary-pop-up"
-            v-bind:class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
-            :style="position"
+            :style="popupPosition"
+            ref="popUpRef"
             deck
         >
-            <b-card no-body>
+            <b-card :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }" no-body>
                 <b-card-header>
                     <b-card-title
                         title-tag="h6"
@@ -221,7 +217,7 @@ const displayChord = () => {
             </b-card>
         </b-card-group>
         <player :isActive="isActive" :showChord="showChord" :chord="chord" :settings="settings" />
-        <div v-show="chord.string" id="chord-dictionary-highlight" :style="highlightPos" />
+        <HighlightDiv v-if="chord.string" :highlightRect="highlightRect" />
         <setting :settings="settings" />
     </div>
 </template>
@@ -233,11 +229,6 @@ const displayChord = () => {
     text-align: left;
     position: absolute !important;
     z-index: 2147483647;
-}
-#chord-dictionary-wrapper #chord-dictionary-highlight {
-    position: absolute;
-    background-color: yellow;
-    z-index: -2147483648;
 }
 </style>
 <style>
