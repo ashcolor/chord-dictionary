@@ -49,7 +49,6 @@ const pageX = ref(0);
 const pageY = ref(0);
 const clientX = ref(0);
 const clientY = ref(0);
-const timeoutId = ref(null);
 const showChord = ref(false);
 const popUpRef = ref(null);
 
@@ -69,6 +68,10 @@ const popupPosition = computed(() => {
                 ? pageX.value - dimension.width - 10
                 : pageX.value + 20) + "px",
     };
+});
+
+const transitionDelay = computed(() => {
+    return settings.isDelay ? `${settings.delay / 1000}s` : "0s";
 });
 
 const offsetBase = document.createElement("div");
@@ -91,7 +94,7 @@ watch(chord, (val) => {
     highlightRect.bottom = highlightRect.top + highlightRect.height;
     highlightRect.right = highlightRect.left + highlightRect.width;
     if (cursorInRect()) {
-        timeoutId.value = setTimeout(displayChord, settings.isDelay * settings.delay);
+        displayChord();
     } else {
         chord.value = {};
         highlightRect.isActive = false;
@@ -136,7 +139,6 @@ onMounted(() => {
         clientY.value = e.clientY;
         if (highlightRect.isActive && cursorInRect()) {
         } else {
-            if (timeoutId.value !== null) clearTimeout(timeoutId.value);
             showChord.value = false;
             chord.value = {};
             highlightRect.isActive = false;
@@ -181,41 +183,50 @@ const cursorInRect = () => {
 };
 const displayChord = () => {
     showChord.value = true;
-    timeoutId.value = null;
 };
 </script>
 
 <template>
     <div v-show="isActive">
-        <b-card-group
-            v-if="showChord && chord.string"
-            id="chord-dictionary-pop-up"
-            :style="popupPosition"
-            ref="popUpRef"
-            deck
-        >
-            <b-card :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }" no-body>
-                <b-card-header>
-                    <b-card-title
-                        title-tag="h6"
-                        v-html="chord.titleElement && chord.titleElement.innerHTML"
-                        class="mb-0"
-                    />
-                    <b-card-sub-title
-                        v-show="chord.isInterval || settings.isShowRoman"
-                        v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
-                        class="mt-2 mb-0"
-                    />
-                </b-card-header>
-                <b-card-body>
-                    <b-card-text
-                        v-html="chord.originalElement && chord.originalElement.innerHTML"
-                        class="mb-0"
-                    />
-                    <score :chord="chord" :settings="settings" @updated="updated" class="mt-0" />
-                </b-card-body>
-            </b-card>
-        </b-card-group>
+        <transition name="pop-up">
+            <b-card-group
+                v-if="showChord && chord.string"
+                id="chord-dictionary-pop-up"
+                :style="popupPosition"
+                ref="popUpRef"
+                deck
+            >
+                <b-card
+                    :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
+                    no-body
+                >
+                    <b-card-header>
+                        <b-card-title
+                            title-tag="h6"
+                            v-html="chord.titleElement && chord.titleElement.innerHTML"
+                            class="mb-0"
+                        />
+                        <b-card-sub-title
+                            v-show="chord.isInterval || settings.isShowRoman"
+                            v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
+                            class="mt-2 mb-0"
+                        />
+                    </b-card-header>
+                    <b-card-body>
+                        <b-card-text
+                            v-html="chord.originalElement && chord.originalElement.innerHTML"
+                            class="mb-0"
+                        />
+                        <score
+                            :chord="chord"
+                            :settings="settings"
+                            @updated="updated"
+                            class="mt-0"
+                        />
+                    </b-card-body>
+                </b-card>
+            </b-card-group>
+        </transition>
         <player :isActive="isActive" :showChord="showChord" :chord="chord" :settings="settings" />
         <HighlightDiv v-if="chord.string" :highlightRect="highlightRect" />
         <setting :settings="settings" />
@@ -293,5 +304,16 @@ const displayChord = () => {
 }
 #chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-11 {
     color: hsl(332, 97%, 33%);
+}
+.pop-up-enter-active {
+    transition: opacity 0.2s ease;
+    transition-delay: v-bind(transitionDelay);
+}
+.pop-up-leave-active {
+    transition: opacity 0.2s ease;
+}
+.pop-up-enter,
+.pop-up-leave-to {
+    opacity: 0;
 }
 </style>
