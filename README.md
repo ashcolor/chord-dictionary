@@ -1,40 +1,39 @@
-# Chord Dictionary
+[Vite]
+[Vue 3]
+[Vue i18n](https://vue-i18n.intlify.dev/)
 
-## ダウンロード
+[BootstrapVue](https://bootstrap-vue.org/)
 
-[Chrome ウェブストア](https://chrome.google.com/webstore/detail/chord-dictionary/lnefagbhokamcaedbeopnhdabkcemkcf)
+# Vue 3 + TypeScript + Vite
 
-## Project setup
+This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-```
-yarn
-```
+## Recommended IDE Setup
 
-## Watch for modifications then run npm run build
+- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
-```
-yarn watch
-```
+## Type Support For `.vue` Imports in TS
 
-## Start storybook
+Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
 
-```
-yarn storybook
-```
+1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
+2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
 
-## 動作確認
+You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
 
-[Chrome 拡張機能](chrome://extensions/)を開く
+ターミナルで Vite を起動していない場合は、今すぐ起動してください。
 
-「パッケージ化されていない拡張機能を読み込む」をクリック
+npm run dev
 
-`\dist`を選択
+をインストールする
+ビルドが完了したら、Chrome または Edge を開いて に移動します chrome://extensions。開発者モードスイッチを必ずオンにしてください。
 
-任意のサイト上で右上の拡張機能のアイコンをクリックする
+クロム 角
+Chrome 開発者モードのスイッチ エッジ開発者モードスイッチ
+右上隅にあります 左側のサイドバーにあります
+dist フォルダーを拡張機能ダッシュボードにドラッグしてインストールします。拡張機能のアイコンが上部のバーに表示されます。アイコンは拡張機能名の最初の文字になります。
 
-## Build Zip for Chrome Extension
+Chrome 拡張機能アイコンのコンテキスト メニュー
 
-```
-# after build
-yarn build-zip
-```
+Vite
+拡張機能アイコンを見つけたら、それを右クリックし、「ポップアップ ウィンドウを検査」を選択します。これにより、ポップアップとポップアップ開発ツール ウィンドウが開きます。変更を加えている間ポップアップを開いたままにするために、ポップアップを検査する必要があります。

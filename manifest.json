@@ -1,0 +1,7 @@
+{
+  "name": "Chord Dictionary",
+  "description": "__MSG_description__",
+  "version": "1.3.4",
+  "manifest_version": 3,
+  "action": { "default_popup": "index.html" }
+}
