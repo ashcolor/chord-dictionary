@@ -2,6 +2,7 @@
 [Vue 3]
 [Vue i18n](https://vue-i18n.intlify.dev/)
 
+[Vuetify](https://vuetifyjs.com/)
 [BootstrapVue](https://bootstrap-vue.org/)
 
 # Vue 3 + TypeScript + Vite
@@ -10,7 +11,7 @@ This template should help get you started developing with Vue 3 and TypeScript i
 
 ## Recommended IDE Setup
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+-   [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
 ## Type Support For `.vue` Imports in TS
 
