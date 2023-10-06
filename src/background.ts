@@ -1,7 +1,7 @@
 import mainJs from "./main?script";
 import mainCss from "./main?css";
 
-let activeTabIds = {};
+const activeTabIds = {};
 let error;
 
 const checkError = () => {

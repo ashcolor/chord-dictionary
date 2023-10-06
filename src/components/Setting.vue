@@ -178,7 +178,7 @@ const overlay = ref(true);
                 </template>
             </v-card>
         </nav>
-        <v-btn-toggle v-model="settings.isShow" id="chord-dictionary-toggle-button" color="primary">
+        <v-btn-toggle id="chord-dictionary-toggle-button" v-model="settings.isShow" color="primary">
             <v-btn icon="mdi-format-align-left">
                 <Icon icon="mdi:cog"></Icon>
             </v-btn>

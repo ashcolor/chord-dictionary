@@ -7,7 +7,7 @@ function Note(key, offset) {
     } else {
         this.key = "CDEFGAB".indexOf(key.charAt(0));
         this.offset = 0;
-        for (var i = 1; i < key.length; i++) this.offset += key.charAt(i) == "b" ? -1 : 1;
+        for (let i = 1; i < key.length; i++) this.offset += key.charAt(i) == "b" ? -1 : 1;
     }
 }
 Note.prototype.toAcci = function () {
@@ -27,11 +27,11 @@ Note.prototype.toRoman = function () {
         el("chord-dictionary-white", "ⅠⅡⅢⅣⅤⅥⅦ".charAt(this.key)),
     ];
 };
-var half = [0, 2, 4, 5, 7, 9, 11];
+const half = [0, 2, 4, 5, 7, 9, 11];
 Note.prototype.toHalf = function () {
     return (((half[this.key] + this.offset) % 12) + 12) % 12;
 };
-var keyOffsets = [
+const keyOffsets = [
     [0, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 1, 0, 0, 0],
     [1, 1, 0, 1, 1, 0, 0],
@@ -44,7 +44,7 @@ function transpose(original, target, note) {
     original = Note(original);
     target = Note(target);
     note = Note(note);
-    var out = (((target.key + note.key - original.key) % 7) + 7) % 7;
+    const out = (((target.key + note.key - original.key) % 7) + 7) % 7;
     return Note(
         out,
         keyOffsets[target.key][out] -
@@ -57,14 +57,14 @@ function transpose(original, target, note) {
 function transpose0(target, note) {
     target = Note(target);
     note = Note(note);
-    var out = (((target.key + note.key) % 7) + 7) % 7;
+    const out = (((target.key + note.key) % 7) + 7) % 7;
     return Note(out, keyOffsets[target.key][out] + target.offset + note.offset);
 }
 if (!String.prototype.repeat)
     String.prototype.repeat = function (times) {
-        var str = "" + this;
+        let str = "" + this;
         times = ~~times;
-        var result = "";
+        let result = "";
         while (true) {
             if (times & 1) result += str;
             times >>>= 1;
@@ -74,7 +74,7 @@ if (!String.prototype.repeat)
     };
 
 function el(classes, content) {
-    var span = document.createElement("span");
+    const span = document.createElement("span");
     span.className = classes;
     if (content instanceof Array) content.forEach((node) => span.appendChild(node));
     else span.textContent = content;
@@ -83,31 +83,31 @@ function el(classes, content) {
 
 function Chord(array, data) {
     if (!(this instanceof Chord)) return new Chord(array, data);
-    for (var prop in data) if (data.hasOwnProperty(prop)) this[prop] = data[prop];
+    for (const prop in data) if (data.hasOwnProperty(prop)) this[prop] = data[prop];
     this.original = array;
     this.firstIndex = array.first;
     delete array.first;
     this.voicing = array.map((item) => item.toHalf());
-    var prev = 60,
+    let prev = 60,
         index = 0;
-    for (var a = 1; a < this.voicing.length; a++)
+    for (let a = 1; a < this.voicing.length; a++)
         if (this.voicing[a] < this.voicing[index]) index = a;
     this.voicing = this.voicing.concat(this.voicing).slice(index, this.voicing.length + index);
     this.voicing = this.voicing.map((item) => (prev += (((item - prev) % 12) + 12) % 12));
     this.voicing.unshift(array[0].toHalf() + 36);
 }
 
-var regex =
+const regex =
     /([+＋⁺₊﹢])|([‑‑⁻₋﹣−˗ー－-])|([／/＼\\])|([AaＡａ][DdＤｄ]{2})|([OoＯｏ0０][MmＭｍ][IiＩｉ][TtＴｔ]|[NnＮｎ][OoＯｏ0０])|([DdＤｄ][OoＯｏ0０][MmＭｍ](?![IiＩｉ][TtＴｔ])(?:[IiＩｉ](?:[NnＮｎ](?:[AaＡａ](?:[NnＮｎ][TtＴｔ]?)?)?)?)?)|([AaＡａ][UuＵｕ][GgＧｇ](?:[MmＭｍ][EeＥｅ](?:[NnＮｎ](?:[TtＴｔ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)|([OoＯｏ0０][NnＮｎ])|([DdＤｄ][IiＩｉ][MmＭｍ](?:[IiＩｉ](?:[NnＮｎ](?:[IiＩｉ](?:[SsＳｓ](?:[HhＨｈ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)?|[°ºᵒ˚⁰∘゜ﾟ○◦◯⚪⭕￮⭘OoＯｏ0０])|([HhＨｈ](?:[AaＡａ](?:[LlＬｌ][FfＦｆ]?)?)?[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*[DdＤｄ][IiＩｉ][MmＭｍ](?:[IiＩｉ](?:[NnＮｎ](?:[IiＩｉ](?:[SsＳｓ](?:[HhＨｈ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)?|[øØ∅⌀])|([SsＳｓ][UuＵｕ][SsＳｓ](?:[PpＰｐ](?:[EeＥｅ](?:[NnＮｎ](?:[DdＤｄ](?:[EeＥｅ][DdＤｄ]?)?)?)?)?)?)|([MmＭｍ][aａ](?![UuＵｕ][GgＧｇ]|[DdＤｄ]{2})(?:[JjＪｊ](?:[OoＯｏ0０][RrＲｒ]?)?)?|[MＭΔ△∆▵])|([MmＭｍ][IiＩｉ](?:[NnＮｎ](?:[OoＯｏ0０][RrＲｒ]?)?)?|[mｍ])|([（【\(])|([）】\)])|([。．，、・,.])|([RrＲｒ][OoＯｏ0０]{2}[TtＴｔ])|((?:[EeＥｅ][LlＬｌ][EeＥｅ][VvＶｖ][EeＥｅ][NnＮｎ]|[1１]{2})(?:[TtＴｔ][HhＨｈ])?)|((?:[TtＴｔ][HhＨｈ][IiＩｉ][RrＲｒ][TtＴｔ][EeＥｅ]{2}[NnＮｎ]|[1１][3３])(?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][IiＩｉ][RrＲｒ][SsＳｓ][TtＴｔ]|[OoＯｏ0０][NnＮｎ][EeＥｅ]|[1１](?:[SsＳｓ][TtＴｔ])?)|([SsＳｓ][EeＥｅ][CcＣｃ][OoＯｏ0０][NnＮｎ][DdＤｄ]|[TtＴｔ][WwＷｗ][OoＯｏ0０]|[2２](?:[NnＮｎ][DdＤｄ])?)|([TtＴｔ][HhＨｈ](?:[IiＩｉ][RrＲｒ][DdＤｄ]|[RrＲｒ][EeＥｅ]{2})|[3３](?:[RrＲｒ][DdＤｄ])?)|((?:[FfＦｆ][OoＯｏ0０][UuＵｕ][RrＲｒ]|4|４)(?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][IiＩｉ](?:[FfＦｆ][TtＴｔ][HhＨｈ]|[VvＶｖ][EeＥｅ])|[5５](?:[TtＴｔ][HhＨｈ])?)|((?:[SsＳｓ][IiＩｉ][XxＸｘ×]|6|６)(?:[TtＴｔ][HhＨｈ])?)|((?:[SsＳｓ][EeＥｅ][VvＶｖ][EeＥｅ][NnＮｎ]|7|７)(?:[TtＴｔ][HhＨｈ])?)|([NnＮｎ][IiＩｉ][NnＮｎ](?:[TtＴｔ][HhＨｈ]|[EeＥｅ])|[9９](?:[TtＴｔ][HhＨｈ])?)|([FfＦｆ][LlＬｌ](?:[AaＡａ][TtＴｔ]?)?|♭)|([bｂ])|([SsＳｓ](?:[HhＨｈ](?:[AaＡａ](?:[RrＲｒ][PpＰｐ]?)?)?)?|[#＃♯])|([DdＤｄ](?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[FfＦｆ][LlＬｌ](?:[AaＡａ][TtＴｔ]?)?|♭)|𝄫)|([DdＤｄ](?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[SsＳｓ](?:[HhＨｈ](?:[AaＡａ](?:[RrＲｒ][PpＰｐ]?)?)?)?|[#＃♯])|𝄪|[XxＸｘ×])|([DdＤｄ]?(?:[OoＯｏ0０][UuＵｕ][BbＢｂ][LlＬｌ][EeＥｅ]|[BbＢｂ][LlＬｌ])[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　]*(?:[NnＮｎ][AaＡａ](?:[TtＴｔ](?:[UuＵｕ](?:[RrＲｒ](?:[AaＡａ][LlＬｌ]?)?)?)?)?|♮))|([AaＡａ])|([BＢ])|([CcＣｃ])|([DdＤｄ])|([EeＥｅ])|([FfＦｆ])|([GgＧｇ])|([VvＶｖ][IiＩｉ](?![IiＩｉ])|[Ⅵⅵ])|([VvＶｖ][IiＩｉ]{2}|[Ⅶⅶ])|([IiＩｉ](?![IiＩｉVvＶｖ])|[Ⅰⅰ])|([IiＩｉ]{2}(?![IiＩｉ])|[Ⅱⅱ])|([IiＩｉ]{3}|[Ⅲⅲ])|([IiＩｉ][VvＶｖ]|[Ⅳⅳ])|([VvＶｖ](?![IiＩｉ])|[Ⅴⅴ])|([ 	 ﻿ -   　]+)|([NnＮｎ](?:[OoＯｏ0０][NnＮｎ]?)?[-‑‑⁻₋﹣−˗ー－ 	 ﻿ -   　。．，、・,.]*[CcＣｃ](?:[HhＨｈ](?:[OoＯｏ0０](?:[RrＲｒ][DdＤｄ]?)?)?)?[。．，、・,.]*|[^])/g;
 // var types = ["plus", "minus", "slash", "add", "omit", "dom", "aug", "on", "dim", "halfdim", "sus", "major", "minor", "opb", "clb", "comma", "root", "11", "13", "1", "2", "3", "4", "5", "6", "7", "9", "flat", "b", "sharp", "dblflat", "dblsharp", "neutral", "A", "B", "C", "D", "E", "F", "G", "VI", "VII", "I", "II", "III", "IV", "V", "whitespace", "others"];
-var ids = " p_%axd'&ohsMm<>,ret12345679fb#vX!ABCDEFGJKLNPQSw=";
-var acciList = { f: -1, b: -1, "#": 1, v: -2, X: 2, "!": 0, w: 0 };
-var accis = { f: "b", b: "b", "#": "#", p: "#", _: "b", "!": "", "": "" };
-var omits = { r: "C", e: "F", t: "A", 1: "C", 3: "E", 5: "G", 7: "B", 9: "D" };
+const ids = " p_%axd'&ohsMm<>,ret12345679fb#vX!ABCDEFGJKLNPQSw=";
+const acciList = { f: -1, b: -1, "#": 1, v: -2, X: 2, "!": 0, w: 0 };
+const accis = { f: "b", b: "b", "#": "#", p: "#", _: "b", "!": "", "": "" };
+const omits = { r: "C", e: "F", t: "A", 1: "C", 3: "E", 5: "G", 7: "B", 9: "D" };
 function parseContent(input, withinPos) {
-    var inputList = [];
-    var idList = "";
-    var i;
+    const inputList = [];
+    let idList = "";
+    let i;
     input.replace(regex, function (match) {
         inputList.push(match);
         for (i = 1; i < arguments.length; i++) {
@@ -225,15 +225,15 @@ function parseContent(input, withinPos) {
             );
 
             function requireNum(acci) {
-                var acciPos = i;
+                const acciPos = i;
                 return cont(
                     "24569et",
                     (c) => addNotes(acci, c),
                     "<",
                     (c) => {
-                        var innerBracketLayer = 1;
-                        var anyNote = false;
-                        var tempI = i;
+                        let innerBracketLayer = 1;
+                        let anyNote = false;
+                        const tempI = i;
                         while (
                             cont(
                                 "<",
@@ -270,14 +270,14 @@ function parseContent(input, withinPos) {
                     (c) => addNotes("", c),
                     "fb#!p_",
                     (acci) => {
-                        var acciPos = i;
+                        const acciPos = i;
                         return cont("2469et", (c) => addNotes(acci, c, acciPos));
                     },
                     "<",
                     (c) => {
-                        var innerBracketLayer = 1;
-                        var anyNote = false;
-                        var tempI = i;
+                        let innerBracketLayer = 1;
+                        let anyNote = false;
+                        const tempI = i;
                         while (
                             cont(
                                 "<",
@@ -300,7 +300,7 @@ function parseContent(input, withinPos) {
                                 },
                                 "fb#!p_",
                                 (acci) => {
-                                    var acciPos = i;
+                                    const acciPos = i;
                                     return cont("2469et", (c) => addNotes(acci, c, acciPos));
                                 }
                             ) &&
@@ -369,7 +369,7 @@ function parseContent(input, withinPos) {
                     "a",
                     (c) => {
                         mandatory = true;
-                        var addResult = requireAdd();
+                        const addResult = requireAdd();
                         mandatory = false;
                         return addResult;
                     },
@@ -410,8 +410,8 @@ function parseContent(input, withinPos) {
                             },
                             "<",
                             (c) => {
-                                var innerBracketLayer = 1;
-                                var anyNote = false;
+                                let innerBracketLayer = 1;
+                                let anyNote = false;
                                 while (
                                     cont(
                                         "<",
@@ -509,8 +509,8 @@ function parseContent(input, withinPos) {
             );
 
             if (type == "h" || type == "d") has7 = true;
-            var noThird = has5 || sus2 || sus4;
-            var maxNum = has7 - noThird + 1;
+            const noThird = has5 || sus2 || sus4;
+            const maxNum = has7 - noThird + 1;
             if ((maxNum < 2 && (seventh || (type && thirdAfterType))) || (maxNum < 1 && third)) {
                 clearAndReset(seventhPos);
                 continue;
@@ -615,8 +615,8 @@ function parseContent(input, withinPos) {
             }
             if (addNote.includes("A#")) chordNote.push("A#");
 
-            var failed = false;
-            for (var m = 0; m < omitNote.length; m++) {
+            let failed = false;
+            for (let m = 0; m < omitNote.length; m++) {
                 if (omitNote[m] == "E") {
                     if (chordNote.includes("E") && chordNote.length > 1)
                         chordNote.splice(chordNote.indexOf("E"), 1);
@@ -657,7 +657,7 @@ function parseContent(input, withinPos) {
                 return transpose0(noteObj, item);
             });
 
-            var data = { string: "", name: "", noteString: "", isInterval: isInterval },
+            let data = { string: "", name: "", noteString: "", isInterval: isInterval },
                 slashPos = i,
                 onDetect = false;
             while (slashPos && "w<,".includes(idList.charAt(slashPos - 1))) slashPos--;
@@ -701,14 +701,14 @@ function parseContent(input, withinPos) {
                         var onNoteObj = Note(onNote, onAcci),
                             onNoteUntil = i;
                         data.onString = "";
-                        for (var k = slashPos; k < onCurrPos; k++) data.onString += inputList[k];
+                        for (let k = slashPos; k < onCurrPos; k++) data.onString += inputList[k];
                         slashPos--;
                         data.onNoteString = "";
-                        for (var z = onCurrPos; z <= onNoteUntil; z++)
+                        for (let z = onCurrPos; z <= onNoteUntil; z++)
                             data.onNoteString += inputList[z];
-                        var half = onNoteObj.toHalf();
-                        var inversion = false;
-                        for (var y = 0; y < chordNote.length; y++) {
+                        const half = onNoteObj.toHalf();
+                        let inversion = false;
+                        for (let y = 0; y < chordNote.length; y++) {
                             if (chordNote[y].toHalf() == half) {
                                 chordNote = chordNote
                                     .concat(chordNote)
@@ -740,7 +740,7 @@ function parseContent(input, withinPos) {
 
             if (!onDetect) slashPos = i;
 
-            for (var x = currPos; x <= i; x++) {
+            for (let x = currPos; x <= i; x++) {
                 if (x <= noteUntil) data.noteString += inputList[x];
                 else if (x <= slashPos) data.name += inputList[x];
                 data.string += inputList[x];
@@ -750,9 +750,9 @@ function parseContent(input, withinPos) {
             if (withinPos >= data.position && withinPos <= data.position + data.string.length) {
                 chordNote = chordNote.map(transposeIfOn);
 
-                var noteHalf = transposeIfOn(noteObj).toHalf();
+                const noteHalf = transposeIfOn(noteObj).toHalf();
                 if (onDetect) var onNoteHalf = transposeIfOn(onNoteObj).toHalf();
-                var noteElement = isInterval
+                const noteElement = isInterval
                     ? transpose0(noteObj, parseContent.intervalNote).toElement()
                     : transpose(parseContent.intervalNote, noteObj).toRoman();
                 if (onDetect)
@@ -827,7 +827,7 @@ function parseContent(input, withinPos) {
                 i = currPos - 1;
             }
             function clearAnyAndReset(id) {
-                var j = i;
+                let j = i;
                 while (!id.includes(idList.charAt(j))) j--;
                 clearAndReset(j);
             }
@@ -884,7 +884,7 @@ function parseContent(input, withinPos) {
             }
         }
         function cont() {
-            var c = peek(),
+            let c = peek(),
                 rev = false;
             if (c == "w") {
                 plus();
@@ -896,7 +896,7 @@ function parseContent(input, withinPos) {
                 return false;
             }
             plus();
-            for (var k = 0; k < arguments.length; k += 2) {
+            for (let k = 0; k < arguments.length; k += 2) {
                 if (arguments[k].includes(c)) {
                     if (arguments[k + 1](c)) return true;
                     else break;
@@ -933,5 +933,5 @@ if (!Array.prototype.includes)
     Array.prototype.includes = function (search, start) {
         return this.indexOf(search, start) != -1;
     };
-var ChordNote = { Note: Note, Chord: Chord, transpose: transpose, parseContent: parseContent };
+const ChordNote = { Note: Note, Chord: Chord, transpose: transpose, parseContent: parseContent };
 export default ChordNote;

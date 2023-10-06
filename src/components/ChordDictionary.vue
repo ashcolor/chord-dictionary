@@ -197,8 +197,8 @@ const displayChord = () => {
             <div
                 v-if="showChord && chord.string"
                 id="chord-dictionary-pop-up"
-                :style="popupPosition"
                 ref="popUpRef"
+                :style="popupPosition"
                 deck
             >
                 <v-card
@@ -208,7 +208,7 @@ const displayChord = () => {
                     <template #title>
                         <div v-html="chord.titleElement && chord.titleElement.innerHTML"></div>
                     </template>
-                    <template #subtitle v-show="chord.isInterval || settings.isShowRoman">
+                    <template v-show="chord.isInterval || settings.isShowRoman" #subtitle>
                         <div
                             v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
                         ></div>
@@ -220,15 +220,15 @@ const displayChord = () => {
                         <Score
                             :chord="chord"
                             :settings="settings"
-                            @updated="updated"
                             class="mt-0"
+                            @updated="updated"
                         />
                     </template>
                 </v-card>
             </div>
         </transition>
-        <player :isActive="isActive" :showChord="showChord" :chord="chord" :settings="settings" />
-        <HighlightDiv v-if="chord.string" :highlightRect="highlightRect" />
+        <player :is-active="isActive" :show-chord="showChord" :chord="chord" :settings="settings" />
+        <HighlightDiv v-if="chord.string" :highlight-rect="highlightRect" />
         <setting :settings="settings" />
     </div>
 </template>
