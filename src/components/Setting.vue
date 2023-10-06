@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { onMounted, watch, computed, getCurrentInstance } from "vue";
-import langs from "../config/i18n";
+import { onMounted, watch, computed, getCurrentInstance, ref } from "vue";
 import { CLEFS, NOTES, OFFSETS, INSTS, KEYS } from "../config/const";
 import { util } from "../utils/util";
 import CustomSelect from "./common/CustomSelect.vue";
-import CustomToggle from "./common/CustomToggle.vue";
 import CustomInputGroup from "./common/CustomInputGroup.vue";
-import CustomRange from "./common/CustomRange.vue";
-import CustomToggleButton from "./common/CustomToggleButton.vue";
 import { useI18n } from "vue-i18n";
+import { Icon } from "@iconify/vue";
 
-const { t, availableLocales, locale } = useI18n({ useScope: "global" });
+const { t, availableLocales, locale, messages } = useI18n({ useScope: "global" });
 
 console.log(locale.value);
 console.log(availableLocales);
+
 locale.value = "en";
 
 // const instance = getCurrentInstance();
@@ -42,21 +40,24 @@ onMounted(() => {
     //TODO
     // instance.proxy.$parent.$el.lang = instance.proxy.t("code");
 });
+const overlay = ref(true);
 </script>
 
 <template>
     <div id="chord-dictionary-setting">
         <nav v-show="settings.isShow" id="chord-dictionary-sidebar">
-            <v-card no-body>
-                <v-card-header>{{ t("display_settings") }}</v-card-header>
-                <v-card-body>
+            <v-card>
+                <template #title>
+                    {{ t("display_settings") }}
+                </template>
+                <template #text>
                     <CustomInputGroup :label="t('language')">
                         <CustomSelect
                             v-model="settings.language"
                             :options="
-                                Object.keys(availableLocales).map((l, index) => ({
-                                    value: index,
-                                    text: l.name,
+                                Object.keys(messages).map((key) => ({
+                                    value: key,
+                                    label: messages[key].name,
                                 }))
                             "
                         ></CustomSelect>
@@ -65,20 +66,21 @@ onMounted(() => {
                     <CustomInputGroup :label="t('clef')">
                         <CustomSelect
                             v-model="settings.clef"
-                            :options="Object.keys(CLEFS).map((v) => ({ value: v, text: t(v) }))"
+                            :options="Object.keys(CLEFS).map((v) => ({ value: v, label: t(v) }))"
                         ></CustomSelect>
                     </CustomInputGroup>
                     <CustomInputGroup :label="t('note')">
                         <CustomSelect
                             v-model="settings.note"
-                            :options="Object.keys(NOTES).map((v) => ({ value: v, text: t(v) }))"
+                            :options="Object.keys(NOTES).map((v) => ({ value: v, label: t(v) }))"
                         ></CustomSelect
                     ></CustomInputGroup>
                     <hr />
-                    <CustomToggle
+                    <v-switch
                         v-model="settings.isShowRoman"
                         :label="t('roman_display')"
-                    ></CustomToggle>
+                        color="primary"
+                    ></v-switch>
                     <CustomInputGroup :label="t('key')">
                         <CustomSelect v-model="settings.key" :options="KEYS"></CustomSelect>
                         <CustomSelect
@@ -87,10 +89,11 @@ onMounted(() => {
                             style="font-family: 'FreeSerif'"
                         ></CustomSelect>
                     </CustomInputGroup>
-                    <CustomToggle
+                    <v-switch
                         v-model="settings.isTranspose"
                         :label="t('transpose')"
-                    ></CustomToggle>
+                        color="primary"
+                    ></v-switch>
                     <CustomInputGroup v-show="settings.isTranspose" :label="t('transpose_to')">
                         <CustomSelect
                             v-model="settings.transposeKey"
@@ -106,75 +109,80 @@ onMounted(() => {
                         {{ t("transpose_hint") }}
                     </p>
                     <hr />
-                    <CustomToggle
+                    <v-switch
                         v-model="settings.isColorNote"
                         :label="t('color_note')"
-                    ></CustomToggle>
-                    <CustomToggle
+                        color="primary"
+                    ></v-switch>
+                    <v-switch
                         v-model="settings.isColorNoteName"
                         :label="t('color_note_name')"
-                    ></CustomToggle>
-                    <CustomToggle
+                        color="primary"
+                    ></v-switch>
+                    <v-switch
                         v-model="settings.isDelay"
                         :label="t('delay_show')"
-                    ></CustomToggle>
+                        color="primary"
+                    ></v-switch>
                     <CustomInputGroup v-show="settings.isDelay" :label="t('delay')">
-                        <CustomRange v-model="settings.delay" :min="100" :max="1600"></CustomRange>
+                        <v-slider v-model="settings.delay" :min="100" :max="1600"></v-slider>
                     </CustomInputGroup>
-                </v-card-body>
+                </template>
             </v-card>
-            <v-card no-body>
-                <v-card-header>{{ t("player_settings") }}</v-card-header>
-                <v-card-body>
+            <v-card>
+                <template #title>
+                    {{ t("player_settings") }}
+                </template>
+                <template #text>
                     <CustomInputGroup :label="t('volume')">
-                        <CustomRange v-model="settings.vol" :min="0" :max="1.2"></CustomRange>
+                        <v-slider v-model="settings.vol" :min="0" :max="1.2"></v-slider>
                     </CustomInputGroup>
                     <CustomInputGroup :label="t('duration')">
-                        <CustomRange v-model="settings.duration" :min="0.5" :max="3"></CustomRange>
+                        <v-slider v-model="settings.duration" :min="0.5" :max="3"></v-slider>
                     </CustomInputGroup>
                     <CustomInputGroup :label="t('instrument')">
                         <CustomSelect
                             v-model="settings.inst"
-                            :options="INSTS.map((v) => ({ value: v.key, text: t(v.key) }))"
+                            :options="INSTS.map((v) => ({ value: v.key, label: t(v.key) }))"
                         ></CustomSelect
                     ></CustomInputGroup>
-                    <CustomToggle
+                    <v-switch
                         v-model="settings.isArpeggio"
                         :label="t('arpeggio')"
-                    ></CustomToggle>
+                        color="primary"
+                    ></v-switch>
                     <CustomInputGroup v-show="settings.isArpeggio" :label="t('gap')">
-                        <CustomRange
-                            v-model="settings.arpeggio"
-                            :min="0.01"
-                            :max="0.2"
-                        ></CustomRange>
+                        <v-slider v-model="settings.arpeggio" :min="0.01" :max="0.2"></v-slider>
                     </CustomInputGroup>
                     <hr />
-                    <CustomToggle
+                    <v-switch
                         v-model="settings.isActiveClick"
                         :label="t('click')"
-                    ></CustomToggle>
-                    <CustomToggle
+                        color="primary"
+                    ></v-switch>
+                    <v-switch
                         v-model="settings.isActiveKey"
                         :label="t('shortcut')"
-                    ></CustomToggle>
+                        color="primary"
+                    ></v-switch>
                     <span class="small text-muted mb-0">
                         ({{
                             util.isMac() ? "Cmd" : "Ctrl"
                         }}&thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)
                     </span>
-                    <CustomToggle
+                    <v-switch
                         v-model="settings.isActiveHover"
                         :label="t('hover')"
-                    ></CustomToggle>
-                </v-card-body>
+                        color="primary"
+                    ></v-switch>
+                </template>
             </v-card>
         </nav>
-        <CustomToggleButton
-            v-model="settings.isShow"
-            id="chord-dictionary-toggle-button"
-            :icon="'ant-design:setting-filled'"
-        />
+        <v-btn-toggle v-model="settings.isShow" id="chord-dictionary-toggle-button" color="primary">
+            <v-btn icon="mdi-format-align-left">
+                <Icon icon="mdi:cog"></Icon>
+            </v-btn>
+        </v-btn-toggle>
     </div>
 </template>
 
@@ -245,5 +253,9 @@ onMounted(() => {
 }
 #chord-dictionary-wrapper .custom-range::-webkit-slider-thumb:active {
     background-color: #b3d7ff;
+}
+
+body {
+    position: relative;
 }
 </style>

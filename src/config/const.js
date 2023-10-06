@@ -63,17 +63,17 @@ const INSTS = [
     },
 ];
 const KEYS = [
-    { value: 0, text: "C" },
-    { value: 1, text: "D" },
-    { value: 2, text: "E" },
-    { value: 3, text: "F" },
-    { value: 4, text: "G" },
-    { value: 5, text: "A" },
-    { value: 6, text: "B" },
+    { value: 0, label: "C" },
+    { value: 1, label: "D" },
+    { value: 2, label: "E" },
+    { value: 3, label: "F" },
+    { value: 4, label: "G" },
+    { value: 5, label: "A" },
+    { value: 6, label: "B" },
 ];
 const OFFSETS = [
-    { value: -1, text: "♭" },
-    { value: 0, text: "♮" },
-    { value: 1, text: "♯" },
+    { value: -1, label: "♭" },
+    { value: 0, label: "♮" },
+    { value: 1, label: "♯" },
 ];
 export { CLEFS, NOTES, COLORS, INSTS, KEYS, OFFSETS };

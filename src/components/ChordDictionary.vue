@@ -206,19 +206,17 @@ const displayChord = () => {
                     no-body
                 >
                     <template #title>
-                        <p>test</p>
-                        {{ chord.titleElement && chord.titleElement.innerHTML }}
+                        <div v-html="chord.titleElement && chord.titleElement.innerHTML"></div>
                     </template>
-                    <template
-                        #subtitle
-                        v-show="chord.isInterval || settings.isShowRoman"
-                        v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
-                    >
+                    <template #subtitle v-show="chord.isInterval || settings.isShowRoman">
+                        <div
+                            v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
+                        ></div>
                     </template>
-                    <template
-                        #text
-                        v-html="chord.originalElement && chord.originalElement.innerHTML"
-                    >
+                    <template #text>
+                        <div
+                            v-html="chord.originalElement && chord.originalElement.innerHTML"
+                        ></div>
                         <Score
                             :chord="chord"
                             :settings="settings"

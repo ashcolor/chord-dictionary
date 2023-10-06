@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import { createI18n } from "vue-i18n";
 import App from "./App.vue";
-import messages from "./config/i18n";
+import { MESSAGES } from "./config/i18n";
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
@@ -16,7 +16,7 @@ document.body.appendChild(el);
 
 const i18n = createI18n({
     locale: "en",
-    messages,
+    messages: MESSAGES,
     legacy: false,
 });
 
