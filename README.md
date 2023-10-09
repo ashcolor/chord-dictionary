@@ -1,40 +1,54 @@
-[Vite]
-[Vue 3]
-[Vue i18n](https://vue-i18n.intlify.dev/)
+# Chord Dictionary
 
-[Vuetify](https://vuetifyjs.com/)
-[BootstrapVue](https://bootstrap-vue.org/)
+## ダウンロード
 
-# Vue 3 + TypeScript + Vite
+[Chrome ウェブストア](https://chrome.google.com/webstore/detail/chord-dictionary/lnefagbhokamcaedbeopnhdabkcemkcf)
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 開発者向け情報
 
-## Recommended IDE Setup
+### 使用ライブラリ
 
--   [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+-   [Vite](https://ja.vitejs.dev/)
+-   [Vue 3](https://ja.vuejs.org/)
+-   [VueUse](https://vueuse.org/)
+-   [Vue i18n](https://vue-i18n.intlify.dev/)
+-   [pinia](https://pinia.vuejs.org/introduction.html)
+-   [Vuetify](https://vuetifyjs.com/)
+-   [Storybook](https://storybook.js.org/)
 
-## Type Support For `.vue` Imports in TS
+### インストール
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+```:bash
+yarn
+```
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+### ローカルサーバの起動
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+```:bash
+yarn dev
+```
 
-ターミナルで Vite を起動していない場合は、今すぐ起動してください。
+### Storybook 起動
 
-npm run dev
+```:bash
+yarn storybook
+```
 
-をインストールする
-ビルドが完了したら、Chrome または Edge を開いて に移動します chrome://extensions。開発者モードスイッチを必ずオンにしてください。
+### Chrome 拡張機能としての動作確認
 
-クロム 角
-Chrome 開発者モードのスイッチ エッジ開発者モードスイッチ
-右上隅にあります 左側のサイドバーにあります
-dist フォルダーを拡張機能ダッシュボードにドラッグしてインストールします。拡張機能のアイコンが上部のバーに表示されます。アイコンは拡張機能名の最初の文字になります。
+1. Chrome で`chrome://extensions/`を開く
 
-Chrome 拡張機能アイコンのコンテキスト メニュー
+2. 右上の`デベロッパー モード`がオンになっていることを確認
 
-Vite
-拡張機能アイコンを見つけたら、それを右クリックし、「ポップアップ ウィンドウを検査」を選択します。これにより、ポップアップとポップアップ開発ツール ウィンドウが開きます。変更を加えている間ポップアップを開いたままにするために、ポップアップを検査する必要があります。
+3. 「パッケージ化されていない拡張機能を読み込む」をクリック
+
+4. `dist`ディレクトリをブラウザ画面にドラッグ&ドロップ
+
+5. 任意のサイト上で右上の拡張機能のアイコンをクリック
+
+## アップロード用の zip の作成
+
+```:bash
+yarn build
+yarn build-zip
+```
