@@ -26,7 +26,7 @@ const NOTES = {
         duration: "q",
     },
 };
-const COLORS = [
+const SCORE_NOTE_COLORS = [
     "hsl(0, 88%, 46%)",
     "hsl(30, 99%, 33%)",
     "hsl(49, 90%, 46%)",
@@ -40,22 +40,36 @@ const COLORS = [
     "hsl(295, 97%, 46%)",
     "hsl(332, 97%, 33%)",
 ];
-const INSTS = [
+const INSTRUMENTS = [
     {
         key: "piano",
         samples: {
-            C2: chrome.runtime ? chrome.runtime.getURL("sounds/piano-c2.mp3") : "",
-            C3: chrome.runtime ? chrome.runtime.getURL("sounds/piano-c3.mp3") : "",
-            C4: chrome.runtime ? chrome.runtime.getURL("sounds/piano-c4.mp3") : "",
-            C5: chrome.runtime ? chrome.runtime.getURL("sounds/piano-c5.mp3") : "",
+            C2: chrome.runtime
+                ? chrome.runtime.getURL("assets/sounds/piano-c2.mp3")
+                : "assets/sounds/piano-c2.mp3",
+            C3: chrome.runtime
+                ? chrome.runtime.getURL("assets/sounds/piano-c3.mp3")
+                : "assets/sounds/piano-c3.mp3",
+            C4: chrome.runtime
+                ? chrome.runtime.getURL("assets/sounds/piano-c4.mp3")
+                : "assets/sounds/piano-c4.mp3",
+            C5: chrome.runtime
+                ? chrome.runtime.getURL("assets/sounds/piano-c5.mp3")
+                : "assets/sounds/piano-c5.mp3",
         },
     },
     {
         key: "guitar",
         samples: {
-            E3: chrome.runtime ? chrome.runtime.getURL("sounds/guitar-e2.mp3") : "",
-            C4: chrome.runtime ? chrome.runtime.getURL("sounds/guitar-c3.mp3") : "",
-            C5: chrome.runtime ? chrome.runtime.getURL("sounds/guitar-c4.mp3") : "",
+            E3: chrome.runtime
+                ? chrome.runtime.getURL("assets/sounds/guitar-e2.mp3")
+                : "assets/sounds/guitar-e2.mp3",
+            C4: chrome.runtime
+                ? chrome.runtime.getURL("assets/sounds/guitar-c3.mp3")
+                : "assets/sounds/guitar-c3.mp3",
+            C5: chrome.runtime
+                ? chrome.runtime.getURL("assets/sounds/guitar-c4.mp3")
+                : "assets/sounds/guitar-c4.mp3",
         },
     },
     {
@@ -76,4 +90,4 @@ const OFFSETS = [
     { value: 0, label: "♮" },
     { value: 1, label: "♯" },
 ];
-export { CLEFS, NOTES, COLORS, INSTS, KEYS, OFFSETS };
+export { CLEFS, NOTES, SCORE_NOTE_COLORS, INSTRUMENTS, KEYS, OFFSETS };

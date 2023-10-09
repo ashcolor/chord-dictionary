@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
+import { useSettingsStore } from "../store/useSettings";
 import Vex from "vexflow";
-import { CLEFS, NOTES, COLORS } from "../config/const";
+import { CLEFS, NOTES, SCORE_NOTE_COLORS } from "../config/const";
+
+const settingStore = useSettingsStore();
+const { settings } = settingStore;
 
 const props = defineProps({
     chord: Object,
-    settings: Object,
 });
-
-const emit = defineEmits(["input"]);
 
 onMounted(() => {
     dispScore();
@@ -29,14 +30,13 @@ const dispScore = () => {
     const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
     const context = renderer.getContext();
     const stave = new VF.Stave(0, 0, 0);
-    stave.addClef(props.settings.clef);
+    stave.addClef(settings.clef);
     stave.setContext(context);
 
     let octave =
-        CLEFS[props.settings.clef].octave +
-        (props.chord.original[0].key < CLEFS[props.settings.clef].note);
+        CLEFS[settings.clef].octave + (props.chord.original[0].key < CLEFS[settings.clef].note);
     const notes = new VF.StaveNote({
-        clef: props.settings.clef,
+        clef: settings.clef,
         keys: props.chord.original.map(
             (item, index) =>
                 "CDEFGAB".charAt(item.key) +
@@ -45,7 +45,7 @@ const dispScore = () => {
                     ? ++octave
                     : octave)
         ),
-        duration: NOTES[props.settings.note].duration,
+        duration: NOTES[settings.note].duration,
     });
 
     props.chord.original.forEach((note, index) => {
@@ -59,13 +59,12 @@ const dispScore = () => {
                 notes.addModifier(new VF.Accidental(note.offset < 0 ? "b" : "#"), index);
             }
         }
-        if (props.settings.isColorNote)
-            notes.setKeyStyle(index, { fillStyle: COLORS[note.toHalf()] });
+        if (settings.isColorNote) notes.setKeyStyle(index, { fillStyle: SCORE_NOTE_COLORS[note.toHalf()] });
     });
 
     const voice = new VF.Voice({
         num_beats: 1,
-        beat_value: NOTES[props.settings.note].num,
+        beat_value: NOTES[settings.note].num,
     });
     voice.addTickables([notes]);
     new VF.Formatter().joinVoices([voice]).format([voice]);
@@ -75,14 +74,13 @@ const dispScore = () => {
     const box = voice.getBoundingBox();
     renderer.resize(
         box.w + 80,
-        Math.max(Math.abs(box.y) + box.h + 15 + (props.settings.note != "whole") * 15, 110)
+        Math.max(Math.abs(box.y) + box.h + 15 + (settings.note != "whole") * 15, 110)
     );
     stave.setWidth(box.w + 65);
     stave.setY(Math.max(20 - box.y, 0));
 
     stave.draw();
     voice.draw(context, stave);
-    emit("updated");
 };
 </script>
 

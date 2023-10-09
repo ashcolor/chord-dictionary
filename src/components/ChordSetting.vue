@@ -1,46 +1,37 @@
 <script setup lang="ts">
-import { onMounted, watch, computed, getCurrentInstance, ref } from "vue";
-import { CLEFS, NOTES, OFFSETS, INSTS, KEYS } from "../config/const";
+import { onMounted, watch, getCurrentInstance } from "vue";
+import { useSettingsStore } from "../store/useSettings";
+import { CLEFS, NOTES, OFFSETS, INSTRUMENTS, KEYS } from "../config/const";
 import { util } from "../utils/util";
 import CustomSelect from "./common/CustomSelect.vue";
 import CustomInputGroup from "./common/CustomInputGroup.vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "@iconify/vue";
 
-const { t, availableLocales, locale, messages } = useI18n({ useScope: "global" });
+const { t, locale, messages } = useI18n({ useScope: "global" });
 
-console.log(locale.value);
-console.log(availableLocales);
+const settingStore = useSettingsStore();
+const { settings } = settingStore;
 
-locale.value = "en";
-
-// const instance = getCurrentInstance();
-
-const props = defineProps({
-    settings: Object,
-});
+const instance = getCurrentInstance();
 
 watch(
-    props.settings,
+    settings,
     (newSettings) => {
-        // TODO
         if (chrome?.storage) {
             chrome.storage.local.set({ settings: newSettings });
         }
 
         locale.value = newSettings.language;
-        // TODO
-        // instance.proxy.$parent.$el.lang = instance.proxy.t("code");
+        instance.parent.vnode.el.lang = t("code");
     },
     { deep: true }
 );
 
 onMounted(() => {
-    locale.value = props.settings.language;
-    //TODO
-    // instance.proxy.$parent.$el.lang = instance.proxy.t("code");
+    locale.value = settings.language;
+    instance.parent.vnode.el.lang = t("code");
 });
-const overlay = ref(true);
 </script>
 
 <template>
@@ -143,7 +134,7 @@ const overlay = ref(true);
                     <CustomInputGroup :label="t('instrument')">
                         <CustomSelect
                             v-model="settings.inst"
-                            :options="INSTS.map((v) => ({ value: v.key, label: t(v.key) }))"
+                            :options="INSTRUMENTS.map((v) => ({ value: v.key, label: t(v.key) }))"
                         ></CustomSelect
                     ></CustomInputGroup>
                     <v-switch

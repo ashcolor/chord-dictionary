@@ -1,110 +1,109 @@
 <script setup lang="ts">
-import { onMounted, watch, ref, reactive, getCurrentInstance, computed } from "vue";
+import { onMounted, ref, getCurrentInstance, computed } from "vue";
+import { useMouse, useElementBounding } from "@vueuse/core";
+import { useMouseInRange } from "../composables/useMouseInRange";
+import { useCuretRange } from "../composables/useCuretRange";
+import { useSettingsStore } from "../store/useSettings";
 import ChordNote from "../../assets/ChordNote.js";
-import Score from "./Score.vue";
-import Player from "./Player.vue";
-import Setting from "./Setting.vue";
-import HighlightDiv from "./common/HighlightDiv.vue";
+import ChordCard from "./ChordCard.vue";
+import ChordPlayer from "./ChordPlayer.vue";
+import ChordSetting from "./ChordSetting.vue";
+import HighlightOverlay from "./common/HighlightOverlay.vue";
+import TransitionController from "./common/TransitionController.vue";
+
+const settingStore = useSettingsStore();
+const { settings } = settingStore;
+
+const { x: pageX, y: pageY } = useMouse({ type: "page" });
+
+const isAppActive = ref(true);
+
+const popUpRef = ref(null);
+const { width: popupWidth, height: popupHeight } = useElementBounding(popUpRef);
 
 const instance = getCurrentInstance();
 
-const isActive = ref(true);
-const chord = ref({});
-const settings = reactive({
-    isShow: true,
-    language: "en",
-    key: 0,
-    offset: 0,
-    isTranspose: false,
-    transposeKey: 0,
-    transposeOffset: 0,
-    vol: 0.84,
-    delay: 600,
-    duration: 1.5,
-    arpeggio: 0.04,
-    clef: "treble",
-    note: "quarter",
-    inst: "piano",
-    isDelay: false,
-    isArpeggio: false,
-    isColorNote: false,
-    isColorNoteName: false,
-    isShowRoman: false,
-    isActiveClick: true,
-    isActiveKey: true,
-    isActiveHover: false,
-});
-const range = ref(null);
-const textNode = ref(null);
-const highlightRect = reactive({
-    isActive: false,
-    top: null,
-    left: null,
-    width: null,
-    height: null,
-    bottom: null,
-    right: null,
-});
-const pageX = ref(0);
-const pageY = ref(0);
-const clientX = ref(0);
-const clientY = ref(0);
-const showChord = ref(false);
-const popUpRef = ref(null);
-
 const popupPosition = computed(() => {
-    if (!showChord.value || !chord.value.string) return;
+    if (!chord.value.string) return;
     if (!popUpRef.value) return;
-    const dimension = popUpRef.value.getBoundingClientRect();
-    return {
-        top:
-            (dimension.height + pageY.value - window.scrollY + 30 >
-            document.documentElement.clientHeight
-                ? pageY.value - dimension.height - 10
-                : pageY.value + 20) + "px",
-        left:
-            (dimension.width + pageX.value - window.scrollX + 30 >
-            document.documentElement.clientWidth
-                ? pageX.value - dimension.width - 10
-                : pageX.value + 20) + "px",
-    };
+
+    const MARGIN_Y = 30;
+    const MARGIN_X = 30;
+
+    const isPopupYWithinViewPortWithMargin =
+        pageY.value + popupHeight.value + MARGIN_Y <
+        window.scrollY + document.documentElement.clientHeight;
+
+    const CURSOR_TO_POPUP_DISTANCE_Y = 15;
+
+    const top =
+        (isPopupYWithinViewPortWithMargin
+            ? pageY.value + CURSOR_TO_POPUP_DISTANCE_Y
+            : pageY.value - popupHeight.value - CURSOR_TO_POPUP_DISTANCE_Y) + "px";
+
+    const isPopupXWithinViewPortWithMargin =
+        pageX.value + popupWidth.value + MARGIN_X <
+        window.scrollX + document.documentElement.clientWidth;
+
+    const CURSOR_TO_POPUP_DISTANCE_X = 15;
+
+    const left =
+        (isPopupXWithinViewPortWithMargin
+            ? pageX.value + CURSOR_TO_POPUP_DISTANCE_X
+            : pageX.value - popupWidth.value - CURSOR_TO_POPUP_DISTANCE_X) + "px";
+
+    return { top, left };
 });
 
-const transitionDelay = computed(() => {
-    return settings.isDelay ? `${settings.delay / 1000}s` : "0s";
+const { caretRange, caretRangeTextNode } = useCuretRange();
+const { caretRange: curetRangeCopy } = useCuretRange();
+
+const chord = computed(() => {
+    if (!caretRangeTextNode.value) return {};
+
+    if (
+        !caretRangeTextNode.value ||
+        caretRangeTextNode.value.nodeType !== 3 ||
+        instance?.parent?.vnode.el?.contains(caretRangeTextNode.value)
+    )
+        return {};
+
+    if (!caretRangeTextNode.value.parentNode.matches(":hover")) return {};
+
+    ChordNote.parseContent.transposeOn = settings.isTranspose;
+    ChordNote.parseContent.intervalNote = ChordNote.Note(settings.key, settings.offset);
+    ChordNote.parseContent.transposeTo = ChordNote.Note(
+        settings.transposeKey,
+        settings.transposeOffset
+    );
+    return ChordNote.parseContent(caretRangeTextNode.value.nodeValue, caretRange.value.startOffset);
 });
 
-const offsetBase = document.createElement("div");
-offsetBase.style.position = "absolute";
-offsetBase.style.top = 0;
-offsetBase.style.left = 0;
-document.body.appendChild(offsetBase);
+const highlightChordRange = computed(() => {
+    if (!chord.value.string) return null;
+    if (!curetRangeCopy.value) return null;
 
-watch(chord, (val) => {
-    if (!val.string) return;
-    range.value.setStart(textNode.value, val.position);
-    range.value.setEnd(textNode.value, val.position + val.string.length);
-    const rangeRect = range.value.getBoundingClientRect();
-    const offsetRect = offsetBase.getBoundingClientRect();
-    highlightRect.isActive = true;
-    highlightRect.top = rangeRect.top - offsetRect.top;
-    highlightRect.left = rangeRect.left - offsetRect.left;
-    highlightRect.width = rangeRect.width;
-    highlightRect.height = rangeRect.height;
-    highlightRect.bottom = highlightRect.top + highlightRect.height;
-    highlightRect.right = highlightRect.left + highlightRect.width;
-    if (cursorInRect()) {
-        displayChord();
-    } else {
-        chord.value = {};
-        highlightRect.isActive = false;
-    }
+    curetRangeCopy.value.setStart(caretRangeTextNode.value, chord.value.position);
+    curetRangeCopy.value.setEnd(
+        caretRangeTextNode.value,
+        chord.value.position + chord.value.string.length
+    );
+
+    return curetRangeCopy.value;
 });
+
+const {
+    rangePositionX: highlightRangePositionX,
+    rangePositionY: highlightRangePositionY,
+    rangeWidth: highlightRangeWidth,
+    rangeHeight: highlightRangeHeight,
+    isOutside: isHighlightRangeOutside,
+} = useMouseInRange(highlightChordRange);
 
 onMounted(() => {
     if (chrome?.runtime) {
         chrome.runtime.onMessage.addListener((object) => {
-            isActive.value = object.isActive;
+            isAppActive.value = object.isActive;
         });
     }
     if (chrome?.storage) {
@@ -136,182 +135,37 @@ onMounted(() => {
             if (settings.isShow === null) settings.isShow = true;
         });
     }
-
-    window.addEventListener("mousemove", (e) => {
-        pageX.value = Math.min(e.pageX, document.documentElement.scrollWidth);
-        pageY.value = Math.min(e.pageY, document.documentElement.scrollHeight);
-        clientX.value = e.clientX;
-        clientY.value = e.clientY;
-        if (highlightRect.isActive && cursorInRect()) {
-        } else {
-            showChord.value = false;
-            chord.value = {};
-            highlightRect.isActive = false;
-            setPointedChord();
-        }
-    });
 });
-
-const setPointedChord = () => {
-    if (document.caretPositionFromPoint) {
-        range.value = document.caretPositionFromPoint(clientX.value, clientY.value);
-        if (!range.value) return;
-        textNode.value = range.value.offsetNode;
-    } else if (document.caretRangeFromPoint) {
-        range.value = document.caretRangeFromPoint(clientX.value, clientY.value);
-        if (!range.value) return;
-        textNode.value = range.value.startContainer;
-    } else return;
-    if (
-        !textNode.value ||
-        textNode.value.nodeType !== 3 ||
-        instance.proxy.$el.contains(textNode.value)
-    )
-        return;
-    if (!textNode.value.parentNode.matches(":hover")) return;
-    ChordNote.parseContent.transposeOn = settings.isTranspose;
-    ChordNote.parseContent.intervalNote = ChordNote.Note(settings.key, settings.offset);
-    ChordNote.parseContent.transposeTo = ChordNote.Note(
-        settings.transposeKey,
-        settings.transposeOffset
-    );
-    chord.value = ChordNote.parseContent(textNode.value.nodeValue, range.value.startOffset);
-};
-
-const cursorInRect = () => {
-    return (
-        pageY.value >= highlightRect.top &&
-        pageY.value <= highlightRect.bottom &&
-        pageX.value >= highlightRect.left &&
-        pageX.value <= highlightRect.right
-    );
-};
-const displayChord = () => {
-    showChord.value = true;
-};
 </script>
 
 <template>
-    <div v-show="isActive">
-        <transition name="pop-up">
+    <div v-show="isAppActive">
+        <TransitionController :is-active="settings.isDelay" :delay="settings.delay / 1000">
             <div
-                v-if="showChord && chord.string"
+                v-if="chord.string && !isHighlightRangeOutside"
                 id="chord-dictionary-pop-up"
                 ref="popUpRef"
                 :style="popupPosition"
-                deck
             >
-                <v-card
-                    :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
-                    no-body
-                >
-                    <template #title>
-                        <div v-html="chord.titleElement && chord.titleElement.innerHTML"></div>
-                    </template>
-                    <template v-show="chord.isInterval || settings.isShowRoman" #subtitle>
-                        <div
-                            v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"
-                        ></div>
-                    </template>
-                    <template #text>
-                        <div
-                            v-html="chord.originalElement && chord.originalElement.innerHTML"
-                        ></div>
-                        <Score
-                            :chord="chord"
-                            :settings="settings"
-                            class="mt-0"
-                            @updated="updated"
-                        />
-                    </template>
-                </v-card>
+                <ChordCard :chord="chord"></ChordCard>
             </div>
-        </transition>
-        <player :is-active="isActive" :show-chord="showChord" :chord="chord" :settings="settings" />
-        <HighlightDiv v-if="chord.string" :highlight-rect="highlightRect" />
-        <setting :settings="settings" />
+        </TransitionController>
+        <ChordPlayer :is-active="isAppActive" :chord="chord"></ChordPlayer>
+        <HighlightOverlay
+            v-if="chord.string && !isHighlightRangeOutside"
+            :top="highlightRangePositionY"
+            :left="highlightRangePositionX"
+            :width="highlightRangeWidth"
+            :height="highlightRangeHeight"
+        ></HighlightOverlay>
+        <ChordSetting></ChordSetting>
     </div>
 </template>
 
 <style scoped>
-#chord-dictionary-wrapper #chord-dictionary-pop-up {
+#chord-dictionary-pop-up {
     text-align: left;
     position: absolute !important;
     z-index: 2147483647;
-}
-</style>
-<style>
-#chord-dictionary-wrapper .chord-dictionary-note {
-    font-style: bold;
-}
-#chord-dictionary-wrapper .chord-dictionary-chord {
-    color: #333;
-    font-style: italic;
-}
-#chord-dictionary-wrapper .chord-dictionary-slash {
-    color: #888;
-    font-size: 80%;
-}
-#chord-dictionary-wrapper .chord-dictionary-bass {
-    font-size: 80%;
-}
-#chord-dictionary-wrapper .chord-dictionary-white {
-    font-style: bold;
-}
-#chord-dictionary-wrapper .chord-dictionary-acci {
-    font-family: "FreeSerif";
-    font-size: 115%;
-    position: relative;
-    bottom: 3px;
-}
-#chord-dictionary-wrapper .chord-dictionary-part {
-    margin-right: 10px;
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-0 {
-    color: hsl(0, 88%, 46%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-1 {
-    color: hsl(30, 99%, 33%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-2 {
-    color: hsl(49, 90%, 46%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-3 {
-    color: hsl(60, 98%, 33%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-4 {
-    color: hsl(79, 59%, 46%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-5 {
-    color: hsl(135, 76%, 33%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-6 {
-    color: hsl(172, 68%, 46%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-7 {
-    color: hsl(191, 41%, 33%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-8 {
-    color: hsl(273, 79%, 46%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-9 {
-    color: hsl(291, 46%, 33%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-10 {
-    color: hsl(295, 97%, 46%);
-}
-#chord-dictionary-wrapper .chord-dictionary-color-name .chord-dictionary-midi-11 {
-    color: hsl(332, 97%, 33%);
-}
-.pop-up-enter-active {
-    transition: opacity 0.2s ease;
-    transition-delay: v-bind(transitionDelay);
-}
-.pop-up-leave-active {
-    transition: opacity 0.2s ease;
-}
-.pop-up-enter,
-.pop-up-leave-to {
-    opacity: 0;
 }
 </style>
