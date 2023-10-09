@@ -1,5 +1,4 @@
 import mainJs from "./main?script";
-import mainCss from "./main?css";
 
 const activeTabIds = {};
 let error;
@@ -23,14 +22,6 @@ chrome.action.onClicked.addListener((tab) => {
             target: { tabId: tabId },
             files: [mainJs],
         });
-        // chrome.scripting.insertCSS(
-        //     {
-        //         target: { tabId: tabId },
-        //         files: [mainCss],
-        //         run_at: "document_idle",
-        //     },
-        //     checkError
-        // );
         chrome.scripting.insertCSS(
             {
                 target: { tabId: tabId },
