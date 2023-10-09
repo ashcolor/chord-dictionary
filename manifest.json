@@ -12,7 +12,7 @@
         {
             "resources": [
                 "src/main.js",
-                "sounds/*.mp3",
+                "assets/sounds/*.mp3",
                 "assets/FreeSerif.ttf",
                 "assets/FreeSerif.otf"
             ],
