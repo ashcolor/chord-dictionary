@@ -1,5 +1,11 @@
 # Chord Dictionary
 
+コードの構成音をその場で確認できる Chrome 拡張機能
+
+アイコンをクリックして起動、ページ上に表示されているコードにカーソルを合わせるとコードの構成音を表示します。
+
+また、クリックやキー操作でコードを再生して音を確認することができます。
+
 ## ダウンロード
 
 [Chrome ウェブストア](https://chrome.google.com/webstore/detail/chord-dictionary/lnefagbhokamcaedbeopnhdabkcemkcf)
