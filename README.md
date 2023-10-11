@@ -22,6 +22,11 @@
 -   [Vuetify](https://vuetifyjs.com/)
 -   [Storybook](https://storybook.js.org/)
 
+#### 音楽系ライブラリ
+
+-   [Vex Flow](https://github.com/vexflow/vexflow)
+-   [Tone.js](https://tonejs.github.io/)
+
 ### インストール
 
 ```:bash
