@@ -11,7 +11,7 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "src/main.js",
+                "src/main.ts",
                 "assets/sounds/*.mp3",
                 "assets/FreeSerif.ttf",
                 "assets/FreeSerif.otf"
