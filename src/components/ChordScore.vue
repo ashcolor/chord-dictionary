@@ -1,65 +1,94 @@
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useSettingsStore } from "../store/useSettings";
 import Vex from "vexflow";
 import { CLEFS, NOTES, SCORE_NOTE_COLORS } from "../config/const";
+import { Note } from "../utils/note";
 
 const settingStore = useSettingsStore();
 const { settings } = settingStore;
 
-const props = defineProps({
-    chord: Object,
+interface Original {
+    key: number;
+    offset: number;
+}
+
+interface Props {
+    chordName: string;
+    chordOriginal: Array<Original>;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    chordName: "",
+    chordOriginal: () => [],
 });
+
+const renderElement = ref<HTMLDivElement | null>(null);
+
+watch(
+    () => props.chordName,
+    (newVal, oldVal) => {
+        if (newVal === oldVal) return;
+        renderScore();
+    }
+);
 
 onMounted(() => {
-    dispScore();
+    renderScore();
 });
 
-watch(props.chord, (newVal, oldVal) => {
-    if (newVal.string === oldVal.string) return;
-    dispScore();
-});
+const renderScore = () => {
+    if (!props.chordOriginal) return;
 
-const dispScore = () => {
-    if (!props.chord.original) return;
-    const div = document.getElementById("chord-dictionary-score");
-    if (!div) return;
-    div.textContent = "";
+    if (!renderElement.value) return;
 
+    renderElement.value.textContent = "";
+
+    // 初期設定
     const VF = Vex.Flow;
-    const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+    const renderer = new VF.Renderer(renderElement.value, VF.Renderer.Backends.SVG);
     const context = renderer.getContext();
     const stave = new VF.Stave(0, 0, 0);
-    stave.addClef(settings.clef);
+
+    const clef = settings.clef;
+
+    stave.addClef(clef);
     stave.setContext(context);
 
+    // 音符
     let octave =
-        CLEFS[settings.clef].octave + (props.chord.original[0].key < CLEFS[settings.clef].note);
-    const notes = new VF.StaveNote({
-        clef: settings.clef,
-        keys: props.chord.original.map(
-            (item, index) =>
-                "CDEFGAB".charAt(item.key) +
-                "/" +
-                (props.chord.original[index - 1] && item.key <= props.chord.original[index - 1].key
-                    ? ++octave
-                    : octave)
-        ),
-        duration: NOTES[settings.note].duration,
-    });
+        CLEFS[settings.clef].octave +
+        (props.chordOriginal[0].key < CLEFS[settings.clef].note ? 1 : 0);
 
-    props.chord.original.forEach((note, index) => {
+    const keys = props.chordOriginal.map(
+        (item, index) =>
+            "CDEFGAB".charAt(item.key) +
+            "/" +
+            (props.chordOriginal[index - 1] && item.key <= props.chordOriginal[index - 1].key
+                ? ++octave
+                : octave)
+    );
+
+    const duration = NOTES[settings.note].duration;
+
+    const notes = new VF.StaveNote({ clef, keys, duration });
+
+    // 臨時記号
+    props.chordOriginal.forEach((note, index) => {
         if (note.offset) {
-            const acci = note.offset < 0 ? "bb" : "##",
+            const accidental = note.offset < 0 ? "bb" : "##",
                 repetition = Math.abs(note.offset) >> 1;
             for (let i = 0; i < repetition; i++) {
-                notes.addModifier(new VF.Accidental(acci), index);
+                notes.addModifier(new VF.Accidental(accidental), index);
             }
             if (note.offset & 1) {
                 notes.addModifier(new VF.Accidental(note.offset < 0 ? "b" : "#"), index);
             }
         }
-        if (settings.isColorNote) notes.setKeyStyle(index, { fillStyle: SCORE_NOTE_COLORS[note.toHalf()] });
+        if (settings.isColorNote) {
+            const half = Note.toHalf(note.key, note.offset);
+            notes.setKeyStyle(index, { fillStyle: SCORE_NOTE_COLORS[half] });
+        }
     });
 
     const voice = new VF.Voice({
@@ -72,9 +101,12 @@ const dispScore = () => {
 
     //音符の描画位置の調整
     const box = voice.getBoundingBox();
+
+    if (!box) return;
+
     renderer.resize(
         box.w + 80,
-        Math.max(Math.abs(box.y) + box.h + 15 + (settings.note != "whole") * 15, 110)
+        Math.max(Math.abs(box.y) + box.h + 15 + (settings.note !== "whole" ? 1 : 0) * 15, 110)
     );
     stave.setWidth(box.w + 65);
     stave.setY(Math.max(20 - box.y, 0));
@@ -85,5 +117,5 @@ const dispScore = () => {
 </script>
 
 <template>
-    <div id="chord-dictionary-score"></div>
+    <div ref="renderElement"></div>
 </template>

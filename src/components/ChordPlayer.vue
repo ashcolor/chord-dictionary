@@ -3,30 +3,33 @@ import { onMounted, watch, reactive, getCurrentInstance } from "vue";
 import { useSettingsStore } from "../store/useSettings";
 import * as Tone from "tone";
 import { INSTRUMENTS } from "../config/const.js";
-import { util } from "../utils/util";
+import { Util } from "../utils/util";
 
 const settingStore = useSettingsStore();
 const { settings } = settingStore;
 
 const instance = getCurrentInstance();
 
-const props = defineProps({
-    isActive: Boolean,
-    chord: Object,
+interface Props {
+    isActive: boolean;
+    chordName: string;
+    chordVoicing: Array<number>;
+}
+const props = withDefaults(defineProps<Props>(), {
+    isActive: true,
+    chordName: "",
+    chordVoicing: () => [],
 });
 
-const insts = reactive({});
-
-onMounted(() => {
-    INSTRUMENTS.forEach((v) => {
-        insts[v.key] = (v.samples ? new Tone.Sampler(v.samples) : new Tone.PolySynth()).toMaster();
-    });
-    window.addEventListener("keydown", keyDown);
-    window.addEventListener("click", click);
-});
+const instruments = Object.fromEntries(
+    INSTRUMENTS.map((value) => {
+        const instrument = value.samples ? new Tone.Sampler(value.samples) : new Tone.PolySynth();
+        return [value.key, instrument.toMaster()];
+    })
+);
 
 watch(
-    () => props.chord.string,
+    () => props.chordName,
     (newChordString, oldChordString) => {
         if (!settings.isActiveHover) return;
 
@@ -42,30 +45,38 @@ watch(settings, (val) => {
     Tone.Master.volume.value = Tone.gainToDb(val.vol);
 });
 
+onMounted(() => {
+    window.addEventListener("keydown", keyDown);
+    window.addEventListener("click", click);
+});
+
 const playChord = () => {
-    if (!props.isActive || instance.parent.vnode.el.matches(":hover") || !props.chord.voicing)
+    if (!props.isActive || instance?.parent?.vnode?.el?.matches(":hover") || !props.chordVoicing)
         return;
     Tone.Transport.stop().cancel();
     try {
-        insts[settings.inst].releaseAll();
+        instruments[settings.inst].releaseAll();
     } catch (e) {}
 
-    props.chord.voicing.forEach((midi, index) => {
-        Tone.Transport.scheduleOnce((time) => {
-            insts[settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
-        }, settings.isArpeggio * settings.arpeggio * index);
+    console.log(props.chordVoicing);
+
+    props.chordVoicing.forEach((midi, index) => {
+        Tone.Transport.scheduleOnce((time: number) => {
+            instruments[settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
+        }, (settings.isArpeggio ? 1 : 0) * settings.arpeggio * index);
     });
-    Tone.Transport.scheduleOnce((time) => {
+    Tone.Transport.scheduleOnce((time: number) => {
         try {
-            insts[settings.inst].releaseAll(time);
+            instruments[settings.inst].releaseAll(time);
         } catch (e) {}
     }, settings.duration);
 
     Tone.Transport.start();
 };
-const keyDown = (event) => {
+
+const keyDown = (event: KeyboardEvent) => {
     if (!settings.isActiveKey) return;
-    if (util.isMac() ? !event.metaKey : !event.ctrlKey) return;
+    if (Util.isMac() ? !event.metaKey : !event.ctrlKey) return;
     if (
         !event.shiftKey ||
         event.altKey ||
@@ -75,8 +86,12 @@ const keyDown = (event) => {
         return;
     playChord();
 };
-const click = (event) => {
+
+const click = () => {
     if (!settings.isActiveClick) return;
     playChord();
 };
 </script>
+
+<!-- eslint-disable-next-line vue/valid-template-root -->
+<template></template>

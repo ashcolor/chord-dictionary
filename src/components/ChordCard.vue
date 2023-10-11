@@ -5,38 +5,54 @@ import ChordScore from "./ChordScore.vue";
 const settingStore = useSettingsStore();
 const { settings } = settingStore;
 
+interface Original {
+    key: number;
+    offset: number;
+}
+
 interface Props {
-    chord: Object;
     // isColorNoteNameEnable?: boolean;
-    // isInterval: false;
-    // isShowRoman: false;
-    // chordTitleElement?: Element;
-    // chordSubTitleElement?: Element;
-    // originalElement?: Element;
+    // isShowRoman: boolean;
+
+    chordIsInterval: boolean;
+    chordName: string;
+    chordOriginal: Array<Original>;
+    chordTitleElement?: HTMLSpanElement;
+    chordSubtitleElement?: HTMLSpanElement;
+    chordOriginalElement?: HTMLSpanElement;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    chord: () => {},
     // isColorNoteNameEnable: false,
-    // isInterval: false,
     // isShowRoman: false,
-    // chordTitleElement: undefined,
-    // chordSubTitleElement: undefined,
-    // originalElement: undefined,
+
+    chordIsInterval: false,
+    chordName: "",
+    chordOriginal: () => [],
+    chordTitleElement: undefined,
+    chordSubtitleElement: undefined,
+    chordOriginalElement: undefined,
 });
 </script>
 
 <template>
     <v-card :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }" no-body>
         <template #title>
-            <div v-html="chord.titleElement && chord.titleElement.innerHTML"></div>
+            <div v-html="props.chordTitleElement && props.chordTitleElement.innerHTML"></div>
         </template>
-        <template v-show="chord.isInterval || settings.isShowRoman" #subtitle>
-            <div v-html="chord.subtitleElement && chord.subtitleElement.innerHTML"></div>
+        <template #subtitle>
+            <div
+                v-show="props.chordIsInterval || settings.isShowRoman"
+                v-html="props.chordSubtitleElement && props.chordSubtitleElement.innerHTML"
+            ></div>
         </template>
         <template #text>
-            <div v-html="chord.originalElement && chord.originalElement.innerHTML"></div>
-            <ChordScore :chord="chord" class="mt-0"></ChordScore>
+            <div v-html="props.chordOriginalElement && props.chordOriginalElement.innerHTML"></div>
+            <ChordScore
+                :chord-name="chordName"
+                :chord-original="chordOriginal"
+                class="mt-0"
+            ></ChordScore>
         </template>
     </v-card>
 </template>

@@ -1,12 +1,33 @@
-import { onMounted, watch, ref, reactive, computed } from "vue";
+import { reactive } from "vue";
 import { defineStore } from "pinia";
 
-// export type Settings = {
-//     id: number;
-// };
+export type Settings = {
+    isShow: boolean;
+    language: string;
+    key: number;
+    offset: number;
+    isTranspose: boolean;
+    transposeKey: number;
+    transposeOffset: number;
+    vol: number;
+    delay: number;
+    duration: number;
+    arpeggio: number;
+    clef: "treble" | "alto" | "bass";
+    note: "whole" | "half" | "quarter";
+    inst: string;
+    isDelay: boolean;
+    isArpeggio: boolean;
+    isColorNote: boolean;
+    isColorNoteName: boolean;
+    isShowRoman: boolean;
+    isActiveClick: boolean;
+    isActiveKey: boolean;
+    isActiveHover: boolean;
+};
 
 export const useSettingsStore = defineStore("settings", () => {
-    const settings = reactive({
+    const settings = reactive<Settings>({
         isShow: true,
         language: "en",
         key: 0,

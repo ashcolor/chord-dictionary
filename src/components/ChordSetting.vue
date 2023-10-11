@@ -2,7 +2,7 @@
 import { onMounted, watch, getCurrentInstance } from "vue";
 import { useSettingsStore } from "../store/useSettings";
 import { CLEFS, NOTES, OFFSETS, INSTRUMENTS, KEYS } from "../config/const";
-import { util } from "../utils/util";
+import { Util } from "../utils/util";
 import CustomSelect from "./common/CustomSelect.vue";
 import CustomInputGroup from "./common/CustomInputGroup.vue";
 import { useI18n } from "vue-i18n";
@@ -23,14 +23,19 @@ watch(
         }
 
         locale.value = newSettings.language;
-        instance.parent.vnode.el.lang = t("code");
+        if (instance?.parent?.vnode?.el?.lang) {
+            instance.parent.vnode.el.lang = t("code");
+        }
     },
     { deep: true }
 );
 
 onMounted(() => {
     locale.value = settings.language;
-    instance.parent.vnode.el.lang = t("code");
+
+    if (instance?.parent?.vnode?.el?.lang) {
+        instance.parent.vnode.el.lang = t("code");
+    }
 });
 </script>
 
@@ -158,7 +163,7 @@ onMounted(() => {
                     ></v-switch>
                     <span class="small text-muted mb-0">
                         ({{
-                            util.isMac() ? "Cmd" : "Ctrl"
+                            Util.isMac() ? "Cmd" : "Ctrl"
                         }}&thinsp;+&thinsp;Shift&thinsp;+&thinsp;Space)
                     </span>
                     <v-switch

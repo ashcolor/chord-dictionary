@@ -10,6 +10,7 @@ import ChordPlayer from "./ChordPlayer.vue";
 import ChordSetting from "./ChordSetting.vue";
 import HighlightOverlay from "./common/HighlightOverlay.vue";
 import TransitionController from "./common/TransitionController.vue";
+import { Util } from "../utils/util";
 
 const settingStore = useSettingsStore();
 const { settings } = settingStore;
@@ -100,38 +101,21 @@ const {
     isOutside: isHighlightRangeOutside,
 } = useMouseInRange(highlightChordRange);
 
+const isChordActive = computed(() => {
+    return isAppActive.value && chord.value.string && !isHighlightRangeOutside.value;
+});
+
 onMounted(() => {
     if (chrome?.runtime) {
         chrome.runtime.onMessage.addListener((object) => {
             isAppActive.value = object.isActive;
+            return true;
         });
     }
     if (chrome?.storage) {
-        chrome.storage.local.get("settings", (value) => {
-            if (value) Object.assign(settings, value.settings);
-            settings.language =
-                settings.language ||
-                ((languages) => {
-                    for (let i = 0; i < languages.length; i++) {
-                        if (!languages[i]) continue;
-                        if (/^zh-(hk|mo)/i.test(languages[i])) return "hk";
-                        if (/^zh-(tw|hant)/i.test(languages[i])) return "tw";
-                        if (/^zh/i.test(languages[i])) return "cn";
-                        if (/^ja/i.test(languages[i])) return "ja";
-                        if (/^ko/i.test(languages[i])) return "ko";
-                        if (/^en-(gb|ie|au|nz)/i.test(languages[i])) return "gb";
-                        if (/^en/i.test(languages[i])) return "en";
-                    }
-                    return "en";
-                })(
-                    [].concat(
-                        window.navigator.language,
-                        window.navigator.userLanguage,
-                        window.navigator.browserLanguage,
-                        window.navigator.systemLanguage,
-                        window.navigator.languages
-                    )
-                );
+        chrome.storage.local.get("settings", (result) => {
+            if (result) Object.assign(settings, result.settings);
+            settings.language = settings.language || Util.getUserLanguageCode();
             if (settings.isShow === null) settings.isShow = true;
         });
     }
@@ -141,18 +125,26 @@ onMounted(() => {
 <template>
     <div v-show="isAppActive">
         <TransitionController :is-active="settings.isDelay" :delay="settings.delay / 1000">
-            <div
-                v-if="chord.string && !isHighlightRangeOutside"
-                id="chord-dictionary-pop-up"
-                ref="popUpRef"
-                :style="popupPosition"
-            >
-                <ChordCard :chord="chord"></ChordCard>
+            <div v-if="isChordActive" id="pop-up" ref="popUpRef" :style="popupPosition">
+                <ChordCard
+                    :chord="chord"
+                    :chord-name="chord.name"
+                    :chord-original="chord.original"
+                    :chord-title-element="chord.titleElement"
+                    :chord-subtitle-element="chord.subtitleElement"
+                    :chord-original-element="chord.originalElement"
+                    :chord-is-interval="chord.chordIsInterval"
+                ></ChordCard>
             </div>
         </TransitionController>
-        <ChordPlayer :is-active="isAppActive" :chord="chord"></ChordPlayer>
+        <ChordPlayer
+            :is-active="isAppActive"
+            :chord="chord"
+            :chord-name="chord.name"
+            :chord-voicing="chord.voicing"
+        ></ChordPlayer>
         <HighlightOverlay
-            v-if="chord.string && !isHighlightRangeOutside"
+            v-if="isChordActive"
             :top="highlightRangePositionY"
             :left="highlightRangePositionX"
             :width="highlightRangeWidth"
@@ -163,7 +155,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-#chord-dictionary-pop-up {
+#pop-up {
     text-align: left;
     position: absolute !important;
     z-index: 2147483647;
