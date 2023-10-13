@@ -10,6 +10,7 @@ module.exports = {
         "plugin:vue/vue3-recommended",
         "eslint:recommended",
         "@vue/typescript/recommended",
+        "plugin:tailwindcss/recommended",
         "prettier",
     ],
     overrides: [
@@ -26,6 +27,6 @@ module.exports = {
             },
         },
     ],
-    plugins: ["vue", "@typescript-eslint"],
+    plugins: ["vue", "@typescript-eslint", "tailwindcss"],
     rules: {},
 };
