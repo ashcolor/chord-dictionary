@@ -2,11 +2,8 @@ import { createApp } from "vue";
 import { createI18n } from "vue-i18n";
 import App from "./App.vue";
 import { I18N_CONFIG } from "./config/i18n";
-import "vuetify/styles";
-import { createVuetify } from "vuetify";
-import * as components from "vuetify/components";
-import * as directives from "vuetify/directives";
 import { createPinia } from "pinia";
+import "./tailwind.css";
 
 const el = document.createElement("app");
 el.id = "chord-dictionary-app";
@@ -17,17 +14,11 @@ document.body.appendChild(el);
 
 const i18n = createI18n(I18N_CONFIG);
 
-const vuetify = createVuetify({
-    components,
-    directives,
-});
-
 const pinia = createPinia();
 
 const app = createApp(App);
 
 app.use(i18n);
-app.use(vuetify);
 app.use(pinia);
 
 app.mount("#chord-dictionary-app");

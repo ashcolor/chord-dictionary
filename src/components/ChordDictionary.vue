@@ -161,3 +161,9 @@ onMounted(() => {
     z-index: 2147483647;
 }
 </style>
+
+<style>
+body {
+    position: relative;
+}
+</style>

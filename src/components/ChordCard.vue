@@ -36,25 +36,21 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <v-card :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }" no-body>
-        <template #title>
+    <div :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }" class="daisy-card">
+        <div>
             <div v-html="props.chordTitleElement && props.chordTitleElement.innerHTML"></div>
-        </template>
-        <template #subtitle>
+        </div>
+        <div>
             <div
                 v-show="props.chordIsInterval || settings.isShowRoman"
                 v-html="props.chordSubtitleElement && props.chordSubtitleElement.innerHTML"
             ></div>
-        </template>
-        <template #text>
+        </div>
+        <div>
             <div v-html="props.chordOriginalElement && props.chordOriginalElement.innerHTML"></div>
-            <ChordScore
-                :chord-name="chordName"
-                :chord-original="chordOriginal"
-                class="mt-0"
-            ></ChordScore>
-        </template>
-    </v-card>
+            <ChordScore :chord-name="chordName" :chord-original="chordOriginal"></ChordScore>
+        </div>
+    </div>
 </template>
 
 <style scoped>
@@ -115,10 +111,10 @@ const props = withDefaults(defineProps<Props>(), {
 .chord-dictionary-color-name :deep(.chord-dictionary-midi-9) {
     color: hsl(291, 46%, 33%);
 }
-.chord-dictionary-color-name :deep(.chord-dictionary-midi-1)0 {
+.chord-dictionary-color-name :deep(.chord-dictionary-midi-10) {
     color: hsl(295, 97%, 46%);
 }
-.chord-dictionary-color-name :deep(.chord-dictionary-midi-1)1 {
+.chord-dictionary-color-name :deep(.chord-dictionary-midi-11) {
     color: hsl(332, 97%, 33%);
 }
 </style>
