@@ -4,6 +4,16 @@ import { setup } from "@storybook/vue3";
 import { createPinia } from "pinia";
 import "../src/tailwind.css";
 
+export const decorators = [
+    (story, context) => ({
+        template: `
+      <div id="chord-dictionary-app">
+        <story />
+      </div>
+    `,
+    }),
+];
+
 const i18n = createI18n(I18N_CONFIG);
 
 const pinia = createPinia();
