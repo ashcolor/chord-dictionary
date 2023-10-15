@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
     <select
         v-model="modelValue"
         :options="options"
-        class="daisy-select border daisy-select-bordered"
+        class="daisy-select daisy-select-bordered w-fit border"
     >
         <option v-for="option in props.options" :key="option.value" :value="option.value">
             {{ option.label }}

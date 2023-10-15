@@ -42,8 +42,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <div id="chord-dictionary-setting">
-        <nav v-show="settings.isShow" id="chord-dictionary-sidebar" class="m-2">
+    <div id="chord-dictionary-setting" class="flex items-stretch text-left">
+        <nav
+            v-show="settings.isShow"
+            id="chord-dictionary-sidebar"
+            class="fixed bottom-16 right-3 z-[2147483645] m-2 flex border border-solid"
+        >
             <div class="daisy-card border bg-base-100">
                 <div class="daisy-card-body">
                     <div class="daisy-card-title">
@@ -61,7 +65,7 @@ onMounted(() => {
                                 "
                             ></SettingSelect>
                         </SettingInputGroup>
-                        <div class="divider" />
+                        <div class="daisy-divider" />
                         <SettingInputGroup :label="t('clef')">
                             <SettingSelect
                                 v-model="settings.clef"
@@ -78,38 +82,45 @@ onMounted(() => {
                                 "
                             ></SettingSelect
                         ></SettingInputGroup>
-                        <div class="divider" />
+                        <div class="daisy-divider" />
                         <SettingToggle
                             v-model="settings.isShowRoman"
                             :label="t('roman_display')"
                         ></SettingToggle>
                         <SettingInputGroup :label="t('key')">
-                            <SettingSelect v-model="settings.key" :options="KEYS"></SettingSelect>
-                            <SettingSelect
-                                v-model="settings.offset"
-                                :options="OFFSETS"
-                                style="font-family: 'FreeSerif'"
-                            ></SettingSelect>
+                            <div class="flex flex-row">
+                                <SettingSelect
+                                    v-model="settings.key"
+                                    :options="KEYS"
+                                ></SettingSelect>
+                                <SettingSelect
+                                    v-model="settings.offset"
+                                    :options="OFFSETS"
+                                    style="font-family: 'FreeSerif'"
+                                ></SettingSelect>
+                            </div>
                         </SettingInputGroup>
                         <SettingToggle
                             v-model="settings.isTranspose"
                             :label="t('transpose')"
                         ></SettingToggle>
                         <SettingInputGroup v-show="settings.isTranspose" :label="t('transpose_to')">
-                            <SettingSelect
-                                v-model="settings.transposeKey"
-                                :options="KEYS"
-                            ></SettingSelect>
-                            <SettingSelect
-                                v-model="settings.transposeOffset"
-                                :options="OFFSETS"
-                                style="font-family: 'FreeSerif'"
-                            ></SettingSelect>
+                            <div class="flex flex-row">
+                                <SettingSelect
+                                    v-model="settings.transposeKey"
+                                    :options="KEYS"
+                                ></SettingSelect>
+                                <SettingSelect
+                                    v-model="settings.transposeOffset"
+                                    :options="OFFSETS"
+                                    style="font-family: 'FreeSerif'"
+                                ></SettingSelect>
+                            </div>
                         </SettingInputGroup>
                         <p v-show="settings.isTranspose" class="small text-muted mb-0">
                             {{ t("transpose_hint") }}
                         </p>
-                        <div class="divider" />
+                        <div class="daisy-divider" />
                         <SettingToggle
                             v-model="settings.isColorNote"
                             :label="t('color_note')"
@@ -127,6 +138,7 @@ onMounted(() => {
                                 v-model="settings.delay"
                                 :min="100"
                                 :max="1600"
+                                :step="100"
                             ></SettingSlider>
                         </SettingInputGroup>
                     </div>
@@ -143,6 +155,7 @@ onMounted(() => {
                                 v-model="settings.vol"
                                 :min="0"
                                 :max="1.2"
+                                :step="0.1"
                             ></SettingSlider>
                         </SettingInputGroup>
                         <SettingInputGroup :label="t('duration')">
@@ -150,6 +163,7 @@ onMounted(() => {
                                 v-model="settings.duration"
                                 :min="0.5"
                                 :max="3"
+                                :step="0.1"
                             ></SettingSlider>
                         </SettingInputGroup>
                         <SettingInputGroup :label="t('instrument')">
@@ -169,9 +183,10 @@ onMounted(() => {
                                 v-model="settings.arpeggio"
                                 :min="0.01"
                                 :max="0.2"
+                                :step="0.01"
                             ></SettingSlider>
                         </SettingInputGroup>
-                        <div class="divider" />
+                        <div class="daisy-divider" />
                         <SettingToggle
                             v-model="settings.isActiveClick"
                             :label="t('click')"
@@ -193,31 +208,11 @@ onMounted(() => {
                 </div>
             </div>
         </nav>
-        <ActiveToggleButton id="chord-dictionary-toggle-button" v-model="settings.isShow">
+        <ActiveToggleButton
+            id="chord-dictionary-toggle-button"
+            v-model="settings.isShow"
+            class="fixed bottom-3 right-3 z-[2147483646]"
+        >
         </ActiveToggleButton>
     </div>
 </template>
-
-<style scoped>
-#chord-dictionary-setting {
-    text-align: left;
-    display: flex;
-    align-items: stretch;
-}
-#chord-dictionary-toggle-button {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    z-index: 2147483646;
-}
-#chord-dictionary-sidebar {
-    position: fixed;
-    bottom: 60px;
-    right: 12px;
-    z-index: 2147483645;
-}
-
-#chord-dictionary-setting nav {
-    display: flex;
-}
-</style>
