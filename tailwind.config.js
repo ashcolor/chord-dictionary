@@ -13,7 +13,7 @@ export default {
     },
     plugins: [require("@tailwindcss/typography"), require("daisyui")],
     // @https://github.com/crxjs/chrome-extension-tools/issues/671#issuecomment-1712695919
-    safelist: process.env.NODE_ENV === "development" ? [{ pattern: /./ }] : [],
+    safelist:  [{ pattern: /./ }] ,
 
     daisyui: {
         prefix: "daisy-",
