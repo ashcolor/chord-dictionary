@@ -58,8 +58,6 @@ const playChord = () => {
         instruments[settings.inst].releaseAll();
     } catch (e) {}
 
-    console.log(props.chordVoicing);
-
     props.chordVoicing.forEach((midi, index) => {
         Tone.Transport.scheduleOnce((time: number) => {
             instruments[settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);

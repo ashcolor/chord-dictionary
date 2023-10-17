@@ -20,11 +20,21 @@
         }
     ],
     "action": {
-        "default_title": "Chord Dictionary"
+        "default_title": "Chord Dictionary",
+        "default_popup": "src/popup/popup.html"
     },
     "background": {
         "service_worker": "src/background.ts",
         "type": "module"
     },
-    "permissions": ["tabs", "activeTab", "storage", "scripting"]
+    "content_scripts": [
+        {
+        "matches": [
+            "http://*/*",
+            "https://*/*"
+        ],
+        "js": ["src/main.ts"]
+        }
+    ],
+  "permissions": ["tabs", "activeTab", "storage", "scripting"]
 }

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref, getCurrentInstance, computed } from "vue";
+import { watch, onMounted, ref, getCurrentInstance, computed } from "vue";
 import { useMouse, useElementBounding } from "@vueuse/core";
+import { useI18n } from "vue-i18n";
 import { useMouseInRange } from "../composables/useMouseInRange";
 import { useCuretRange } from "../composables/useCuretRange";
 import { useSettingsStore } from "../store/useSettings";
 import ChordNote from "../../assets/ChordNote.js";
 import ChordCard from "./ChordCard.vue";
 import ChordPlayer from "./ChordPlayer.vue";
-import ChordSetting from "./ChordSetting.vue";
 import HighlightOverlay from "./common/HighlightOverlay.vue";
 import TransitionController from "./common/TransitionController.vue";
-import { Util } from "../utils/util";
 
 const settingStore = useSettingsStore();
 const { settings } = settingStore;
@@ -19,10 +18,31 @@ const { x: pageX, y: pageY } = useMouse({ type: "page" });
 
 const isAppActive = ref(true);
 
-const popUpRef = ref(null);
+const popUpRef = ref<HTMLElement | null>(null);
 const { width: popupWidth, height: popupHeight } = useElementBounding(popUpRef);
 
 const instance = getCurrentInstance();
+
+const { t, locale } = useI18n({ useScope: "global" });
+
+watch(
+    settings,
+    (newSettings) => {
+        locale.value = newSettings.language;
+        if (instance?.parent?.vnode?.el?.lang) {
+            instance.parent.vnode.el.lang = t("code");
+        }
+    },
+    { deep: true }
+);
+
+onMounted(() => {
+    locale.value = settings.language;
+
+    if (instance?.parent?.vnode?.el?.lang) {
+        instance.parent.vnode.el.lang = t("code");
+    }
+});
 
 const popupPosition = computed(() => {
     if (!chord.value.string) return;
@@ -93,6 +113,11 @@ const highlightChordRange = computed(() => {
     return curetRangeCopy.value;
 });
 
+const highlightBaseElement = ref<HTMLElement | null>(null);
+const highlightBaseOffsetRect = computed(() => {
+    return highlightBaseElement.value?.getBoundingClientRect();
+});
+
 const {
     rangePositionX: highlightRangePositionX,
     rangePositionY: highlightRangePositionY,
@@ -103,22 +128,6 @@ const {
 
 const isChordActive = computed(() => {
     return isAppActive.value && chord.value.string && !isHighlightRangeOutside.value;
-});
-
-onMounted(() => {
-    if (chrome?.runtime) {
-        chrome.runtime.onMessage.addListener((object) => {
-            isAppActive.value = object.isActive;
-            return true;
-        });
-    }
-    if (chrome?.storage) {
-        chrome.storage.local.get("settings", (result) => {
-            if (result) Object.assign(settings, result.settings);
-            settings.language = settings.language || Util.getUserLanguageCode();
-            if (settings.isShow === null) settings.isShow = true;
-        });
-    }
 });
 </script>
 
@@ -143,14 +152,16 @@ onMounted(() => {
             :chord-name="chord.name"
             :chord-voicing="chord.voicing"
         ></ChordPlayer>
+        <Teleport to="body">
+            <div ref="highlightBaseElement" style="position: absolute; left: 0; top: 0"></div>
+        </Teleport>
         <HighlightOverlay
             v-if="isChordActive"
-            :top="highlightRangePositionY"
-            :left="highlightRangePositionX"
+            :top="highlightRangePositionY - (highlightBaseOffsetRect?.top || 0)"
+            :left="highlightRangePositionX - (highlightBaseOffsetRect?.left || 0)"
             :width="highlightRangeWidth"
             :height="highlightRangeHeight"
         ></HighlightOverlay>
-        <ChordSetting></ChordSetting>
     </div>
 </template>
 

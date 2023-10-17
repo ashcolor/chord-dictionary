@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { reactive, watch } from "vue";
 import { defineStore } from "pinia";
 
 export type Settings = {
@@ -51,6 +51,43 @@ export const useSettingsStore = defineStore("settings", () => {
         isActiveKey: true,
         isActiveHover: false,
     });
+
+    const getSettingsFromLocalStorage = () => {
+        if (chrome?.storage) {
+            chrome.storage.local.get("settings", (result) => {
+                if (result) Object.assign(settings, result.settings);
+                settings.language = settings.language || Util.getUserLanguageCode();
+                if (settings.isShow === null) settings.isShow = true;
+            });
+        }
+    };
+
+    if (chrome?.runtime) {
+        chrome.runtime.onMessage.addListener((_object) => {
+            getSettingsFromLocalStorage();
+            return true;
+        });
+    }
+
+    getSettingsFromLocalStorage();
+
+    watch(
+        settings,
+        (newSettings) => {
+            if (chrome?.storage) {
+                chrome.storage.local.set({ settings: newSettings });
+            }
+            if (chrome?.tabs) {
+                chrome.tabs.query({}, (tabs) => {
+                    tabs.forEach(function (tab) {
+                        chrome.tabs.sendMessage(tab.id, { settings: newSettings });
+                    });
+                });
+            }
+        },
+
+        { deep: true }
+    );
 
     return { settings };
 });
