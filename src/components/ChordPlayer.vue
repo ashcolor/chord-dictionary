@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch, reactive, getCurrentInstance } from "vue";
+import { onMounted, watch, getCurrentInstance } from "vue";
 import { useSettingsStore } from "../store/useSettings";
 import * as Tone from "tone";
 import { INSTRUMENTS } from "../config/const.js";
@@ -56,7 +56,9 @@ const playChord = () => {
     Tone.Transport.stop().cancel();
     try {
         instruments[settings.inst].releaseAll();
-    } catch (e) {}
+    } catch (e) {
+        return;
+    }
 
     props.chordVoicing.forEach((midi, index) => {
         Tone.Transport.scheduleOnce((time: number) => {
@@ -66,7 +68,9 @@ const playChord = () => {
     Tone.Transport.scheduleOnce((time: number) => {
         try {
             instruments[settings.inst].releaseAll(time);
-        } catch (e) {}
+        } catch (e) {
+            return;
+        }
     }, settings.duration);
 
     Tone.Transport.start();

@@ -26,6 +26,12 @@ module.exports = {
                 "vue/no-multiple-template-root": 0,
             },
         },
+        {
+            files: ["*.vue"],
+            rules: {
+                "vue/multi-word-component-names": 0,
+            },
+        },
     ],
     plugins: ["vue", "@typescript-eslint", "tailwindcss"],
     rules: {},

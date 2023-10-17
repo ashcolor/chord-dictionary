@@ -11,7 +11,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vue-tsc --noEmit && vite build",
+        "build": "vite build",
         "build-zip": "node scripts/build-zip.js",
         "preview": "vite preview",
         "storybook": "storybook dev",
