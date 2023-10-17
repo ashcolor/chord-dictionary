@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watch, getCurrentInstance } from "vue";
+import ChordSettingHeader from "../components/feature/setting/Header.vue";
 import ChordSetting from "../components/ChordSetting.vue";
 import { useI18n } from "vue-i18n";
 import { useSettingsStore } from "../store/useSettings";
@@ -27,6 +28,7 @@ watch(
 
 <template>
     <div id="chord-dictionary-app">
+        <ChordSettingHeader></ChordSettingHeader>
         <ChordSetting></ChordSetting>
     </div>
 </template>

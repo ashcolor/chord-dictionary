@@ -18,7 +18,7 @@ const { settings } = settingStore;
     <div id="chord-dictionary-sidebar" class="flex gap-2">
         <div class="daisy-card border bg-base-100">
             <div class="daisy-card-body">
-                <div class="daisy-card-title">
+                <div class="daisy-card-title whitespace-nowrap">
                     {{ t("display_settings") }}
                 </div>
                 <div>
@@ -108,7 +108,7 @@ const { settings } = settingStore;
         <div class="daisy-divider daisy-divider-horizontal"></div>
         <div class="daisy-card border bg-base-100">
             <div class="daisy-card-body">
-                <div class="daisy-card-title">
+                <div class="daisy-card-title whitespace-nowrap">
                     {{ t("player_settings") }}
                 </div>
                 <div>

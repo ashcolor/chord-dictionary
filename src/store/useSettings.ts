@@ -85,7 +85,6 @@ export const useSettingsStore = defineStore("settings", () => {
                 });
             }
         },
-
         { deep: true }
     );
 
