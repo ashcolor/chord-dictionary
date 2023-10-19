@@ -2,7 +2,7 @@ import { reactive, watch } from "vue";
 import { defineStore } from "pinia";
 
 export type Settings = {
-    isShow: boolean;
+    isActive: boolean;
     language: string;
     key: number;
     offset: number;
@@ -28,7 +28,7 @@ export type Settings = {
 
 export const useSettingsStore = defineStore("settings", () => {
     const settings = reactive<Settings>({
-        isShow: true,
+        isActive: true,
         language: "en",
         key: 0,
         offset: 0,
@@ -57,13 +57,12 @@ export const useSettingsStore = defineStore("settings", () => {
             chrome.storage.local.get("settings", (result) => {
                 if (result) Object.assign(settings, result.settings);
                 settings.language = settings.language || Util.getUserLanguageCode();
-                if (settings.isShow === null) settings.isShow = true;
             });
         }
     };
 
     if (chrome?.runtime) {
-        chrome.runtime.onMessage.addListener((_object) => {
+        chrome.runtime.onMessage.addListener(() => {
             getSettingsFromLocalStorage();
             return true;
         });

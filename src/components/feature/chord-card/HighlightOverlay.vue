@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { ref, computed } from "vue";
 
 interface Props {
     top: number;
@@ -15,10 +15,15 @@ const props = withDefaults(defineProps<Props>(), {
     height: 0,
 });
 
+const highlightBaseElement = ref<HTMLElement | null>(null);
+const highlightBaseOffsetRect = computed(() => {
+    return highlightBaseElement.value?.getBoundingClientRect();
+});
+
 const style = computed(() => {
     return {
-        top: `${props.top}px`,
-        left: `${props.left}px`,
+        top: `${props.top - (highlightBaseOffsetRect.value?.top || 0)}px`,
+        left: `${props.left - (highlightBaseOffsetRect.value?.left || 0)}px`,
         width: `${props.width}px`,
         height: `${props.height}px`,
     };
@@ -26,13 +31,8 @@ const style = computed(() => {
 </script>
 
 <template>
-    <div id="chord-dictionary-highlight" :style="style"></div>
+    <Teleport to="body">
+        <div ref="highlightBaseElement" style="position: absolute; left: 0; top: 0"></div>
+    </Teleport>
+    <div class="absolute bg-yellow-200" :style="style" style="z-index: -2147483648"></div>
 </template>
-
-<style scoped>
-#chord-dictionary-highlight {
-    position: absolute;
-    background-color: yellow;
-    z-index: -2147483648;
-}
-</style>

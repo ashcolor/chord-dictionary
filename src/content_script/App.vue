@@ -16,8 +16,6 @@ const { settings } = settingStore;
 
 const { x: pageX, y: pageY } = useMouse({ type: "page" });
 
-const isAppActive = ref(true);
-
 const popUpRef = ref<HTMLElement | null>(null);
 const { width: popupWidth, height: popupHeight } = useElementBounding(popUpRef);
 
@@ -113,11 +111,6 @@ const highlightChordRange = computed(() => {
     return curetRangeCopy.value;
 });
 
-const highlightBaseElement = ref<HTMLElement | null>(null);
-const highlightBaseOffsetRect = computed(() => {
-    return highlightBaseElement.value?.getBoundingClientRect();
-});
-
 const {
     rangePositionX: highlightRangePositionX,
     rangePositionY: highlightRangePositionY,
@@ -127,14 +120,20 @@ const {
 } = useMouseInRange(highlightChordRange);
 
 const isChordActive = computed(() => {
-    return isAppActive.value && chord.value.string && !isHighlightRangeOutside.value;
+    return settings.isActive && chord.value.string && !isHighlightRangeOutside.value;
 });
 </script>
 
 <template>
-    <div v-show="isAppActive">
+    <div v-show="settings.isActive">
         <TransitionController :is-active="settings.isDelay" :delay="settings.delay / 1000">
-            <div v-if="isChordActive" id="pop-up" ref="popUpRef" :style="popupPosition">
+            <div
+                v-if="isChordActive"
+                ref="popUpRef"
+                :style="popupPosition"
+                class="absolute text-left"
+                style="z: 2147483647"
+            >
                 <ChordCard
                     :chord="chord"
                     :chord-name="chord.name"
@@ -147,31 +146,20 @@ const isChordActive = computed(() => {
             </div>
         </TransitionController>
         <ChordPlayer
-            :is-active="isAppActive"
+            :is-active="settings.isActive"
             :chord="chord"
             :chord-name="chord.name"
             :chord-voicing="chord.voicing"
         ></ChordPlayer>
-        <Teleport to="body">
-            <div ref="highlightBaseElement" style="position: absolute; left: 0; top: 0"></div>
-        </Teleport>
         <HighlightOverlay
             v-if="isChordActive"
-            :top="highlightRangePositionY - (highlightBaseOffsetRect?.top || 0)"
-            :left="highlightRangePositionX - (highlightBaseOffsetRect?.left || 0)"
+            :top="highlightRangePositionY"
+            :left="highlightRangePositionX"
             :width="highlightRangeWidth"
             :height="highlightRangeHeight"
         ></HighlightOverlay>
     </div>
 </template>
-
-<style scoped>
-#pop-up {
-    text-align: left;
-    position: absolute !important;
-    z-index: 2147483647;
-}
-</style>
 
 <style>
 body {
