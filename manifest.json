@@ -11,7 +11,7 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "src/main.ts",
+                "src/content_script/main.ts",
                 "assets/sounds/*.mp3",
                 "assets/FreeSerif.ttf",
                 "assets/FreeSerif.otf"
@@ -29,12 +29,9 @@
     },
     "content_scripts": [
         {
-        "matches": [
-            "http://*/*",
-            "https://*/*"
-        ],
-        "js": ["src/main.ts"]
+            "matches": ["http://*/*", "https://*/*"],
+            "js": ["src/content_script/main.ts"]
         }
     ],
-  "permissions": ["tabs", "activeTab", "storage", "scripting"]
+    "permissions": ["tabs", "activeTab", "storage", "scripting"]
 }
