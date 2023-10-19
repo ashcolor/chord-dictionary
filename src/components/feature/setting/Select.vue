@@ -16,7 +16,10 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <select v-model="modelValue" class="daisy-select daisy-select-bordered w-fit border">
+    <select
+        v-model="modelValue"
+        class="daisy-select daisy-select-bordered daisy-select-sm w-fit border"
+    >
         <option v-for="option in props.options" :key="option.value" :value="option.value">
             {{ option.label }}
         </option>
