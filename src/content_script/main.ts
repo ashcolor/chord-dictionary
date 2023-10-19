@@ -7,9 +7,6 @@ import "../tailwind.css";
 
 const el = document.createElement("app");
 el.id = "chord-dictionary-app";
-const wrapperEl = document.getElementById("chord-dictionary-wrapper");
-
-if (wrapperEl) wrapperEl.remove();
 document.body.appendChild(el);
 
 const i18n = createI18n(I18N_CONFIG);

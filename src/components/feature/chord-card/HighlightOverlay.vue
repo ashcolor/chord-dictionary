@@ -30,7 +30,7 @@ const style = computed(() => {
 </template>
 
 <style scoped>
-#chord-dictionary-wrapper #chord-dictionary-highlight {
+#chord-dictionary-highlight {
     position: absolute;
     background-color: yellow;
     z-index: -2147483648;
