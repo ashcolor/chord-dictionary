@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
     <div class="daisy-join daisy-join-vertical border border-solid border-slate-200 shadow-xl">
-        <div class="daisy-join-item flex flex-col gap-2 bg-base-200 px-4 py-2">
+        <div class="daisy-join-item flex flex-col gap-2 bg-slate-100 px-4 py-2">
             <div
                 class="text-xl font-bold"
                 v-html="props.chordTitleElement && props.chordTitleElement.innerHTML"

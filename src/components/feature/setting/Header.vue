@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import ActiveToggleButton from "./ActiveToggleButton.vue";
 </script>
 
 <template>
     <div class="daisy-navbar min-h-0 bg-neutral py-0.5 text-neutral-content">
-        <div class="daisy-navbar-start"></div>
+        <div class="daisy-navbar-start">
+            <ActiveToggleButton></ActiveToggleButton>
+        </div>
         <div class="daisy-navbar-center">
             <a class="daisy-btn daisy-btn-ghost text-xl normal-case">Chord Dictionary</a>
         </div>

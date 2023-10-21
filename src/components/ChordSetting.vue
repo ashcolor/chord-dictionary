@@ -16,24 +16,11 @@ const { settings } = settingStore;
 
 <template>
     <div id="chord-dictionary-sidebar" class="flex flex-col">
-        <div class="daisy-card daisy-card-compact">
-            <div class="daisy-card-body">
-                <div class="daisy-form-control">
-                    <label class="daisy-label cursor-pointer gap-2">
-                        <span class="daisy-label-text whitespace-nowrap text-xl font-bold">
-                            ON/OFF
-                        </span>
-                        <input
-                            v-model="settings.isActive"
-                            type="checkbox"
-                            class="daisy-toggle daisy-toggle-primary daisy-toggle-lg border-solid"
-                        />
-                    </label>
-                </div>
-            </div>
+        <div v-show="!settings.isActive" class="daisy-card daisy-card-compact">
+            <div class="daisy-card-body"></div>
         </div>
         <div class="daisy-divider m-0 h-1"></div>
-        <div class="flex flex-row">
+        <div v-show="settings.isActive" class="flex flex-row">
             <div class="daisy-card">
                 <div class="daisy-card-body">
                     <div class="daisy-card-title whitespace-nowrap">
