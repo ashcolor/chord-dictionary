@@ -135,7 +135,6 @@ const isChordActive = computed(() => {
                 style="z: 2147483647"
             >
                 <ChordCard
-                    :chord="chord"
                     :chord-name="chord.name"
                     :chord-original="chord.original"
                     :chord-title-element="chord.titleElement"
