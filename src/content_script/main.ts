@@ -3,7 +3,7 @@ import { createI18n } from "vue-i18n";
 import App from "./App.vue";
 import { I18N_CONFIG } from "../config/i18n";
 import { createPinia } from "pinia";
-import "../tailwind.css";
+import "./tailwind.css";
 
 const el = document.createElement("app");
 el.id = "chord-dictionary-app";
