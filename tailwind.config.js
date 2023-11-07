@@ -7,14 +7,12 @@ export default {
         preflight: false,
     },
 
-    content: ["./src/**/*.{vue}"],
+    content: ["./src/**/*.vue"],
     theme: {
         extend: {},
     },
     plugins: [require("@tailwindcss/typography"), require("daisyui")],
     // @https://github.com/crxjs/chrome-extension-tools/issues/671#issuecomment-1712695919
-    safelist: [{ pattern: /./ }],
-
     daisyui: {
         prefix: "daisy-",
         themes: [
