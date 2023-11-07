@@ -112,8 +112,8 @@ const highlightChordRange = computed(() => {
 });
 
 const {
-    rangePositionX: highlightRangePositionX,
-    rangePositionY: highlightRangePositionY,
+    rangeTop: highlightRangeTop,
+    rangeLeft: highlightRangeLeft,
     rangeWidth: highlightRangeWidth,
     rangeHeight: highlightRangeHeight,
     isOutside: isHighlightRangeOutside,
@@ -152,8 +152,8 @@ const isChordActive = computed(() => {
         ></ChordPlayer>
         <HighlightOverlay
             v-if="isChordActive"
-            :top="highlightRangePositionY"
-            :left="highlightRangePositionX"
+            :top="highlightRangeTop"
+            :left="highlightRangeLeft"
             :width="highlightRangeWidth"
             :height="highlightRangeHeight"
         ></HighlightOverlay>
@@ -161,7 +161,7 @@ const isChordActive = computed(() => {
 </template>
 
 <style>
-body {
+html {
     position: relative;
 }
 </style>

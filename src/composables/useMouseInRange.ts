@@ -11,6 +11,8 @@ export function useMouseInRange(target: Ref<Range | null> | ComputedRef<Range | 
     const { x, y, sourceType } = useMouse();
 
     const targetRef = ref(target);
+    const rangeTop = ref(0);
+    const rangeLeft = ref(0);
     const rangeX = ref(0);
     const rangeY = ref(0);
     const rangePositionX = ref(0);
@@ -29,6 +31,9 @@ export function useMouseInRange(target: Ref<Range | null> | ComputedRef<Range | 
                 if (!el) return;
 
                 const { left, top, width, height } = el.getBoundingClientRect();
+
+                rangeTop.value = top;
+                rangeLeft.value = left;
 
                 rangePositionX.value = left + window.pageXOffset;
                 rangePositionY.value = top + window.pageYOffset;
@@ -62,6 +67,8 @@ export function useMouseInRange(target: Ref<Range | null> | ComputedRef<Range | 
         x,
         y,
         sourceType,
+        rangeTop,
+        rangeLeft,
         rangeX,
         rangeY,
         rangePositionX,
