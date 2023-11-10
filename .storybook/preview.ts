@@ -2,10 +2,10 @@ import { createI18n } from "vue-i18n";
 import { I18N_CONFIG } from "../src/config/i18n";
 import { setup } from "@storybook/vue3";
 import { createPinia } from "pinia";
-import "../src/tailwind.css";
+import "../src/popup/tailwind.css";
 
 export const decorators = [
-    (story, context) => ({
+    (_story, _context) => ({
         template: `
       <div id="chord-dictionary-app">
         <story />
