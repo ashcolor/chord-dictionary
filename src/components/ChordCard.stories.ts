@@ -85,7 +85,7 @@ export const List: Story = {
         template: `
             <div class="flex flex-col flex-wrap gap-8 w-full">
                 <template v-for="argsArray in args.argsMatrix" >
-                    <div class="flex flex-row no-wrap gap-2 w-full overflow-scroll">
+                    <div class="flex flex-row no-wrap gap-2 w-full overflow-x-scroll">
                         <template v-for="a in argsArray" >
                         <ChordCard v-bind="a" />
                         </template>
