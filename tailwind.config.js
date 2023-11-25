@@ -7,7 +7,7 @@ export default {
         preflight: false,
     },
 
-    content: ["./src/**/*.vue"],
+    content: ["./src/**/*.vue", "./src/**/*.stories.ts"],
     theme: {
         extend: {},
     },
