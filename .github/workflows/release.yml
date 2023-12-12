@@ -1,0 +1,28 @@
+name: Deploy GitHub Pages
+on:
+  push:
+    branches: [actions]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+
+      - name: Install dependencies
+        run: |
+          yarn --frozen-lockfile
+
+      - name: Build
+        run: |
+          yarn build
+
+      - name: Upload zip file
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build

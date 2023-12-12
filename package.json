@@ -12,7 +12,6 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "build-zip": "node scripts/build-zip.js",
         "preview": "vite preview",
         "storybook": "storybook dev --no-open -p 6006",
         "build-storybook": "storybook build",
