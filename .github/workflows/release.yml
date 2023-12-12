@@ -24,7 +24,7 @@ jobs:
           yarn build
 
       - name: Create zip file
-        run: zip -r build.zip ./build
+        run: zip -r dist.zip ./dist
 
       - name: Upload zip file
         uses: softprops/action-gh-release@v1
