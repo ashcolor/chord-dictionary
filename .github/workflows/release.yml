@@ -1,7 +1,8 @@
 name: Deploy GitHub Pages
 on:
   push:
-    branches: [actions]
+    tags:
+      - "v*.*.*"
 
 jobs:
   deploy:
