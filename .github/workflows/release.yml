@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Release
 on:
   push:
     tags:
@@ -22,6 +22,9 @@ jobs:
       - name: Build
         run: |
           yarn build
+
+      - name: Create zip file
+        run: zip build -r build
 
       - name: Upload zip file
         uses: softprops/action-gh-release@v1
