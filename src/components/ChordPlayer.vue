@@ -61,9 +61,12 @@ const playChord = () => {
     }
 
     props.chordVoicing.forEach((midi, index) => {
-        Tone.Transport.scheduleOnce((time: number) => {
-            instruments[settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
-        }, (settings.isArpeggio ? 1 : 0) * settings.arpeggio * index);
+        Tone.Transport.scheduleOnce(
+            (time: number) => {
+                instruments[settings.inst].triggerAttack(Tone.Frequency(midi, "midi"), time);
+            },
+            (settings.isArpeggio ? 1 : 0) * settings.arpeggio * index
+        );
     });
     Tone.Transport.scheduleOnce((time: number) => {
         try {

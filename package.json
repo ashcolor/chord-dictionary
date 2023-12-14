@@ -21,7 +21,7 @@
         "preview": "vite preview",
         "storybook": "storybook dev --no-open -p 6006",
         "build-storybook": "storybook build",
-        "format": "prettier ./src/**/*.{ts,js,vue}",
+        "format": "prettier --write ./src/**/*.{ts,js,vue}",
         "format:check": "prettier --check ./src/**/*.{ts,js,vue}",
         "lint": "eslint --max-warnings=0 --ext .ts,.js,.vue .",
         "lint:fix": "eslint --ext .ts,.js,.vue . --fix",

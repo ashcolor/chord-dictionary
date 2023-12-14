@@ -69,7 +69,7 @@ const { settings } = settingStore;
                                 <SettingSelect
                                     v-model="settings.offset"
                                     :options="OFFSETS"
-                                    style="font-family: 'FreeSerif'"
+                                    style="font-family: &quot;FreeSerif&quot;"
                                 ></SettingSelect>
                             </div>
                         </SettingInputGroup>
@@ -86,7 +86,7 @@ const { settings } = settingStore;
                                 <SettingSelect
                                     v-model="settings.transposeOffset"
                                     :options="OFFSETS"
-                                    style="font-family: 'FreeSerif'"
+                                    style="font-family: &quot;FreeSerif&quot;"
                                 ></SettingSelect>
                             </div>
                         </SettingInputGroup>

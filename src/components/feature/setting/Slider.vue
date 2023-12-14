@@ -4,13 +4,13 @@ const modelValue = defineModel();
 interface Props {
     min: number;
     max: number;
-    step?: number
+    step?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     min: 0,
     max: 100,
-    step: 1
+    step: 1,
 });
 </script>
 
