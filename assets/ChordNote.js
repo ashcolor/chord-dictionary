@@ -1,3 +1,4 @@
+/* eslint-disable */
 function Note(key, offset) {
     if (key instanceof Note) return key;
     if (!(this instanceof Note)) return new Note(key, offset);
@@ -812,8 +813,8 @@ function parseContent(input, withinPos) {
                           note
                       )
                     : isInterval
-                    ? transpose0(parseContent.intervalNote, note)
-                    : note;
+                      ? transpose0(parseContent.intervalNote, note)
+                      : note;
             }
 
             function nextIsNot5() {

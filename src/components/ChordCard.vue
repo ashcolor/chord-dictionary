@@ -1,3 +1,4 @@
+<!-- eslint-disable tailwindcss/no-custom-classname -->
 <script setup lang="ts">
 import { useSettingsStore } from "../store/useSettings";
 import ChordScore from "./ChordScore.vue";
@@ -48,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
                 v-html="props.chordSubtitleElement && props.chordSubtitleElement.innerHTML"
             ></div>
         </div>
+        <!-- eslint-disable tailwindcss/no-custom-classname -->
         <div
             :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
             class="daisy-card daisy-join-item w-fit bg-base-100 p-4"

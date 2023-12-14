@@ -1,5 +1,3 @@
-import mainJs from "./main?script";
-
 // const activeTabIds = {};
 // let error;
 
