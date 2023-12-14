@@ -18,6 +18,10 @@ jobs:
         with:
           node-version-file: ".node-version"
 
+      - name: Install dependencies
+        run: |
+          yarn --frozen-lockfile
+
       - name: Run prettier
         run: yarn format:check
 
