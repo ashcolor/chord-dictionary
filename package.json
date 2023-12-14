@@ -8,7 +8,6 @@
         "url": "git@github.com:ashcolor/chord-dictionary.git"
     },
     "private": true,
-    "type": "module",
     "lint-staged": {
         "*.{ts,js,vue}": [
             "eslint --fix",
