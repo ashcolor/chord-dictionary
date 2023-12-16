@@ -15,3 +15,12 @@ app.use(i18n);
 app.use(pinia);
 
 app.mount("#app");
+
+const fontUrl = chrome.runtime.getURL("assets/FreeSerif.woff2");
+const style = document.createElement("style");
+style.textContent = `
+  @font-face {
+    font-family: 'FreeSerif';
+    src: url('${fontUrl}') format('woff2');
+`;
+document.head.appendChild(style);
