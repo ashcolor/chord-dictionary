@@ -20,18 +20,6 @@
 //             target: { tabId: tabId },
 //             files: [mainJs],
 //         });
-//         chrome.scripting.insertCSS(
-//             {
-//                 target: { tabId: tabId },
-//                 css:
-//                     '@font-face { font-family: "FreeSerif"; src: url("' +
-//                     chrome.runtime.getURL("assets/FreeSerif.ttf") +
-//                     '"), url("' +
-//                     chrome.runtime.getURL("assets/FreeSerif.otf") +
-//                     '"); unicode-range: U+266D-266F, U+1D12A-1D12B; }',
-//             },
-//             checkError
-//         );
 //         activeTabIds[tabId] = true;
 //         chrome.action.setBadgeText({ text: "ON" });
 //     } else {

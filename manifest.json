@@ -13,8 +13,7 @@
             "resources": [
                 "src/content_script/main.ts",
                 "assets/sounds/*.mp3",
-                "assets/FreeSerif.ttf",
-                "assets/FreeSerif.otf"
+                "assets/FreeSerif.woff2"
             ],
             "matches": ["http://*/*", "https://*/*"]
         }
