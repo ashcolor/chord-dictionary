@@ -10,8 +10,8 @@
     "private": true,
     "lint-staged": {
         "*.{ts,js,vue}": [
-            "eslint --fix",
-            "prettier --write"
+            "prettier --write",
+            "eslint --fix"
         ]
     },
     "scripts": {
@@ -71,5 +71,6 @@
     },
     "resolutions": {
         "jackspeak": "2.1.1"
-    }
+    },
+    "packageManager": "pnpm@8.14.0+sha256.9cebf61abd83f68177b29484da72da9751390eaad46dfc3072d266bfbb1ba7bf"
 }

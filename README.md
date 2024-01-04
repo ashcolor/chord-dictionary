@@ -30,19 +30,19 @@
 ### インストール
 
 ```:bash
-yarn
+pnpm
 ```
 
 ### ローカルサーバの起動
 
 ```:bash
-yarn dev
+pnpm dev
 ```
 
 ### Storybook 起動
 
 ```:bash
-yarn storybook
+pnpm storybook
 ```
 
 ### Chrome 拡張機能としての動作確認
@@ -60,6 +60,15 @@ yarn storybook
 ## アップロード用の zip の作成
 
 ```:bash
-yarn build
-yarn build-zip
+pnpm build
+pnpm build-zip
 ```
+
+## タグ付け（リリース用の zip ファイルの生成）
+
+```bash
+git tag v*.*.*-test
+git push origin v*.*.*
+```
+
+[Release](https://github.com/ashcolor/chord-dictionary/releases)にファイルがアップロードされる
