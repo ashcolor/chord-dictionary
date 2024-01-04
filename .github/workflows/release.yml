@@ -15,13 +15,15 @@ jobs:
         with:
           node-version-file: ".node-version"
 
+      - uses: pnpm/action-setup@v2.2.2
+
       - name: Install dependencies
         run: |
-          yarn --frozen-lockfile
+          pnpm install --frozen-lockfile
 
       - name: Build
         run: |
-          yarn build
+          pnpm build
 
       - name: Create zip file
         run: zip -r dist.zip ./dist
