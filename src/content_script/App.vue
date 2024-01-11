@@ -87,7 +87,9 @@ const chord = computed(() => {
     )
         return {};
 
-    if (!caretRangeTextNode.value.parentNode.matches(":hover")) return {};
+    // コードwiki内でマウスを横にドラッグしてコードを切り替えると、コードが表示されない不具合があったためコメントアウト
+    // 前バージョンでは不具合は発生していなかった
+    // if (!caretRangeTextNode.value.parentNode.matches(":hover")) return {};
 
     ChordNote.parseContent.transposeOn = settings.isTranspose;
     ChordNote.parseContent.intervalNote = ChordNote.Note(settings.key, settings.offset);
