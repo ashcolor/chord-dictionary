@@ -8,12 +8,6 @@
         "url": "git@github.com:ashcolor/chord-dictionary.git"
     },
     "private": true,
-    "lint-staged": {
-        "*.{ts,js,vue}": [
-            "prettier --write",
-            "eslint --fix"
-        ]
-    },
     "scripts": {
         "dev": "vite",
         "build": "vite build",
@@ -23,9 +17,7 @@
         "format": "prettier --write ./src/**/*.{ts,js,vue}",
         "format:check": "prettier --check ./src/**/*.{ts,js,vue}",
         "lint": "eslint --max-warnings=0 --ext .ts,.js,.vue .",
-        "lint:fix": "eslint --ext .ts,.js,.vue . --fix",
-        "prepare": "husky install",
-        "lint-staged": "lint-staged"
+        "lint:fix": "eslint --ext .ts,.js,.vue . --fix"
     },
     "dependencies": {
         "@iconify/vue": "^4.1.1",
@@ -57,8 +49,6 @@
         "eslint-config-prettier": "^9.0.0",
         "eslint-plugin-tailwindcss": "^3.13.0",
         "eslint-plugin-vue": "^9.17.0",
-        "husky": "^8.0.0",
-        "lint-staged": "^15.2.0",
         "postcss": "^8.4.31",
         "prettier": "^3.1.1",
         "react": "^18.2.0",
