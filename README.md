@@ -67,7 +67,7 @@ pnpm build-zip
 ## タグ付け（リリース用の zip ファイルの生成）
 
 ```bash
-git tag v*.*.*-test
+git tag v*.*.*
 git push origin v*.*.*
 ```
 
