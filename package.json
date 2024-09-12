@@ -25,8 +25,7 @@
         "tone": "^13.8.25",
         "vexflow": "^4.2.3",
         "vue": "^3.5.4",
-        "vue-i18n": "^9.5.0",
-        "vuetify": "^3.3.20"
+        "vue-i18n": "^9.5.0"
     },
     "devDependencies": {
         "@crxjs/vite-plugin": "2.0.0-beta.23",

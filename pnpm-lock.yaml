@@ -26,9 +26,6 @@ dependencies:
   vue-i18n:
     specifier: ^9.5.0
     version: 9.8.0(vue@3.5.4)
-  vuetify:
-    specifier: ^3.3.20
-    version: 3.4.9(typescript@4.9.5)(vue-i18n@9.8.0)(vue@3.5.4)
 
 devDependencies:
   '@crxjs/vite-plugin':
@@ -8937,30 +8934,6 @@ packages:
       '@vue/server-renderer': 3.5.4(vue@3.5.4)
       '@vue/shared': 3.5.4
       typescript: 4.9.5
-
-  /vuetify@3.4.9(typescript@4.9.5)(vue-i18n@9.8.0)(vue@3.5.4):
-    resolution: {integrity: sha512-pgBPdbgrHHHZWRybWevzRFezMax6CP2MccTivjOZSOF0XsnzoNOJGGpkTgIfBrk4UCp9jKx6JOJIztGtx/IcSw==}
-    engines: {node: ^12.20 || >=14.13}
-    peerDependencies:
-      typescript: '>=4.7'
-      vite-plugin-vuetify: '>=1.0.0-alpha.12'
-      vue: ^3.3.0
-      vue-i18n: ^9.0.0
-      webpack-plugin-vuetify: '>=2.0.0-alpha.11'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      vite-plugin-vuetify:
-        optional: true
-      vue-i18n:
-        optional: true
-      webpack-plugin-vuetify:
-        optional: true
-    dependencies:
-      typescript: 4.9.5
-      vue: 3.5.4(typescript@4.9.5)
-      vue-i18n: 9.8.0(vue@3.5.4)
-    dev: false
 
   /walker@1.0.8:
     resolution: {integrity: sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==}
