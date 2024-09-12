@@ -18,7 +18,8 @@
 - [VueUse](https://vueuse.org/)
 - [Vue i18n](https://vue-i18n.intlify.dev/)
 - [pinia](https://pinia.vuejs.org/introduction.html)
-- [Vuetify](https://vuetifyjs.com/)
+- [tailwindcss](https://tailwindcss.com/)
+- [daisyUI](https://daisyui.com/)
 - [Storybook](https://storybook.js.org/)
 
 #### 音楽系ライブラリ
