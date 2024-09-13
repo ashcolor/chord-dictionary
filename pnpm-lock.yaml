@@ -12,10 +12,10 @@ dependencies:
     specifier: ^4.1.1
     version: 4.1.1(vue@3.5.4)
   pinia:
-    specifier: ^2.1.6
+    specifier: ^2.1.7
     version: 2.1.7(typescript@5.6.2)(vue@3.5.4)
   tone:
-    specifier: ^13.8.25
+    specifier: ^13.8.34
     version: 13.8.34
   vexflow:
     specifier: ^4.2.3
@@ -32,7 +32,7 @@ devDependencies:
     specifier: 2.0.0-beta.23
     version: 2.0.0-beta.23
   '@intlify/unplugin-vue-i18n':
-    specifier: ^1.4.0
+    specifier: ^1.6.0
     version: 1.6.0(vue-i18n@10.0.1)
   '@storybook/addon-controls':
     specifier: ^8.3.0
@@ -50,43 +50,43 @@ devDependencies:
     specifier: ^0.5.10
     version: 0.5.10(tailwindcss@3.4.0)
   '@typescript-eslint/eslint-plugin':
-    specifier: ^6.7.4
+    specifier: ^6.17.0
     version: 6.17.0(@typescript-eslint/parser@6.17.0)(eslint@8.56.0)(typescript@5.6.2)
   '@typescript-eslint/parser':
-    specifier: ^6.7.4
+    specifier: ^6.17.0
     version: 6.17.0(eslint@8.56.0)(typescript@5.6.2)
   '@vitejs/plugin-vue':
-    specifier: ^4.4.0
+    specifier: ^4.6.2
     version: 4.6.2(vite@5.4.4)(vue@3.5.4)
   '@vue/eslint-config-typescript':
     specifier: ^12.0.0
     version: 12.0.0(eslint-plugin-vue@9.19.2)(eslint@8.56.0)(typescript@5.6.2)
   '@vueuse/core':
-    specifier: ^10.5.0
+    specifier: ^10.7.1
     version: 10.7.1(vue@3.5.4)
   autoprefixer:
     specifier: ^10.4.16
     version: 10.4.16(postcss@8.4.32)
   chrome-types:
-    specifier: ^0.1.231
+    specifier: ^0.1.246
     version: 0.1.246
   daisyui:
-    specifier: ^4.4.4
+    specifier: ^4.5.0
     version: 4.5.0(postcss@8.4.32)
   eslint:
-    specifier: ^8.50.0
+    specifier: ^8.56.0
     version: 8.56.0
   eslint-config-prettier:
-    specifier: ^9.0.0
+    specifier: ^9.1.0
     version: 9.1.0(eslint@8.56.0)
   eslint-plugin-tailwindcss:
-    specifier: ^3.13.0
+    specifier: ^3.13.1
     version: 3.13.1(tailwindcss@3.4.0)
   eslint-plugin-vue:
-    specifier: ^9.17.0
+    specifier: ^9.19.2
     version: 9.19.2(eslint@8.56.0)
   postcss:
-    specifier: ^8.4.31
+    specifier: ^8.4.32
     version: 8.4.32
   prettier:
     specifier: ^3.1.1
@@ -95,7 +95,7 @@ devDependencies:
     specifier: ^8.3.0
     version: 8.3.0
   tailwindcss:
-    specifier: ^3.3.3
+    specifier: ^3.4.0
     version: 3.4.0
   typescript:
     specifier: ^5.6.2
@@ -104,7 +104,7 @@ devDependencies:
     specifier: ^5.4.4
     version: 5.4.4
   vue-tsc:
-    specifier: ^2.0.29
+    specifier: ^2.1.6
     version: 2.1.6(typescript@5.6.2)
 
 packages:
@@ -1628,7 +1628,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.22.2
-      caniuse-lite: 1.0.30001574
+      caniuse-lite: 1.0.30001660
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -1710,7 +1710,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001574
+      caniuse-lite: 1.0.30001660
       electron-to-chromium: 1.4.620
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.22.2)
@@ -1750,8 +1750,8 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /caniuse-lite@1.0.30001574:
-    resolution: {integrity: sha512-BtYEK4r/iHt/txm81KBudCUcTy7t+s9emrIaHqjYurQ10x71zJ5VQ9x1dYPcz/b+pKSp4y/v1xSI67A+LzpNyg==}
+  /caniuse-lite@1.0.30001660:
+    resolution: {integrity: sha512-GacvNTTuATm26qC74pt+ad1fW15mlQ/zuTzzY1ZoIzECTP8HURDfF43kNxPgf7H1jmelCBQTTbBNxdSXOA7Bqg==}
     dev: true
 
   /chalk@4.1.2:
