@@ -1,7 +1,6 @@
 {
     "name": "chord-dictionary",
     "version": "2.0.0",
-    "type": "module",
     "description": "chord-dictionary",
     "author": "ashcolor",
     "repository": {
