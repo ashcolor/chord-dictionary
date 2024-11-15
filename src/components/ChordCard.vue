@@ -37,7 +37,9 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <div class="daisy-join daisy-join-vertical border border-solid border-slate-200 shadow-xl">
+    <div
+        class="daisy-join daisy-join-vertical border border-solid border-slate-200 bg-white text-black shadow-xl"
+    >
         <div class="daisy-join-item flex flex-col gap-2 bg-slate-100 px-4 py-2">
             <div
                 class="text-xl font-bold"
@@ -52,7 +54,7 @@ const props = withDefaults(defineProps<Props>(), {
         <!-- eslint-disable tailwindcss/no-custom-classname -->
         <div
             :class="{ 'chord-dictionary-color-name': settings.isColorNoteName }"
-            class="daisy-card daisy-join-item w-fit bg-base-100 p-4"
+            class="daisy-card daisy-join-item w-fit p-4"
         >
             <div v-html="props.chordOriginalElement && props.chordOriginalElement.innerHTML"></div>
             <ChordScore :chord-name="chordName" :chord-original="chordOriginal"></ChordScore>
