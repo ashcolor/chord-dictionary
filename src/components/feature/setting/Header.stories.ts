@@ -3,17 +3,10 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 
 type Story = StoryObj<typeof ChordSettingHeader>;
 
-const meta: Meta<typeof ChordSettingHeader> = {
+const meta = {
     title: "Setting/ChordSettingHeader",
     component: ChordSettingHeader,
-    render: (args) => ({
-        components: { ChordSettingHeader },
-        setup() {
-            return { args };
-        },
-        template: "<ChordSettingHeader v-bind='args' />",
-    }),
-};
+} satisfies Meta<typeof ChordSettingHeader>;
 
 export default meta;
 

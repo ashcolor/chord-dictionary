@@ -1,6 +1,6 @@
 import { createI18n } from "vue-i18n";
 import { I18N_CONFIG } from "../src/config/i18n";
-import { setup } from "@storybook/vue3";
+import { setup, Preview } from "@storybook/vue3";
 import { createPinia } from "pinia";
 import "../src/popup/tailwind.css";
 
@@ -24,3 +24,16 @@ setup((app) => {
         app.use(pinia);
     }
 });
+
+const preview: Preview = {
+    parameters: {
+        controls: {
+            matchers: {
+                color: /(background|color)$/i,
+                date: /Date$/i,
+            },
+        },
+    },
+};
+
+export default preview;

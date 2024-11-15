@@ -3,7 +3,6 @@
 コードの構成音をその場で確認できる Chrome 拡張機能
 
 アイコンをクリックして起動、ページ上に表示されているコードにカーソルを合わせるとコードの構成音を表示します。
-
 また、クリックやキー操作でコードを再生して音を確認することができます。
 
 ## ダウンロード
@@ -14,18 +13,19 @@
 
 ### 使用ライブラリ
 
--   [Vite](https://ja.vitejs.dev/)
--   [Vue 3](https://ja.vuejs.org/)
--   [VueUse](https://vueuse.org/)
--   [Vue i18n](https://vue-i18n.intlify.dev/)
--   [pinia](https://pinia.vuejs.org/introduction.html)
--   [Vuetify](https://vuetifyjs.com/)
--   [Storybook](https://storybook.js.org/)
+- [Vite](https://ja.vitejs.dev/)
+- [Vue 3](https://ja.vuejs.org/)
+- [VueUse](https://vueuse.org/)
+- [Vue i18n](https://vue-i18n.intlify.dev/)
+- [pinia](https://pinia.vuejs.org/introduction.html)
+- [tailwindcss](https://tailwindcss.com/)
+- [daisyUI](https://daisyui.com/)
+- [Storybook](https://storybook.js.org/)
 
 #### 音楽系ライブラリ
 
--   [Vex Flow](https://github.com/vexflow/vexflow)
--   [Tone.js](https://tonejs.github.io/)
+- [Vex Flow](https://github.com/vexflow/vexflow)
+- [Tone.js](https://tonejs.github.io/)
 
 ### インストール
 
@@ -65,6 +65,9 @@ pnpm build-zip
 ```
 
 ## タグ付け（リリース用の zip ファイルの生成）
+
+> [!NOTE]
+> 先に`manifest.json`と`package.json`に記載されているバージョンを変更する
 
 ```bash
 git tag v*.*.*

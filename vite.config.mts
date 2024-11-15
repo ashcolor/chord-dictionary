@@ -5,16 +5,5 @@ import manifest from "./manifest.json" assert { type: "json" };
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 
 export default defineConfig({
-    plugins: [
-        vue({
-            script: {
-                defineModel: true,
-            },
-        }),
-        // @https://tomikyblog.com/vue-i18n-csp-header-unsafe_eval/
-        VueI18nPlugin({
-            jitCompilation: true,
-        }),
-        crx({ manifest }),
-    ],
+    plugins: [vue({}), VueI18nPlugin({}), crx({ manifest })],
 });

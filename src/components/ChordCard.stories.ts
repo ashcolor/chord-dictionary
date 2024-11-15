@@ -1,27 +1,20 @@
-import ChordCard from "./ChordCard.vue";
 import type { Meta, StoryObj } from "@storybook/vue3";
+import ChordCard from "./ChordCard.vue";
 import ChordNote from "../../assets/ChordNote.js";
 import { KEYS } from "../../src/config/const.ts";
 
-type Story = StoryObj<typeof ChordCard>;
-
-const meta: Meta<typeof ChordCard> = {
+const meta = {
     title: "Card/ChordCard",
     component: ChordCard,
-    render: (args) => ({
-        components: { ChordCard },
-        setup() {
-            return { args };
-        },
-        template: "<ChordCard v-bind='args'/>",
-    }),
     args: {},
-};
+} satisfies Meta<typeof ChordCard>;
 
 export default meta;
+type Story = StoryObj<typeof ChordCard>;
 
 const chordName = "C";
 const chord = ChordNote.parseContent(chordName, 0);
+
 export const Default: Story = {
     args: {
         chordIsInterval: true,
