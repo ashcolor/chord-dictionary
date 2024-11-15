@@ -28,7 +28,7 @@
         "vue-i18n": "^10.0.1"
     },
     "devDependencies": {
-        "@crxjs/vite-plugin": "2.0.0-beta.23",
+        "@crxjs/vite-plugin": "2.0.0-beta.26",
         "@intlify/unplugin-vue-i18n": "^1.6.0",
         "@storybook/addon-controls": "^8.3.0",
         "@storybook/addon-docs": "^8.3.0",
